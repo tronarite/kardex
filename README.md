@@ -2,6 +2,10 @@
 
 > Modern, minimalist, and technical personal link hub and portfolio with automatic adaptive Light/Dark mode, typewriter boot sequence, and Docker support.
 
+<p align="center">
+  <img src="preview.jpg" alt="AdvancedLinkPortfolio Preview" width="100%">
+</p>
+
 ---
 
 ## ✨ Features
