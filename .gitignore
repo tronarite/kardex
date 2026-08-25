@@ -1,0 +1,6 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Plan drafts
+plan-hub-enlaces*.md

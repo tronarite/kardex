@@ -1,0 +1,7 @@
+services:
+  hub:
+    build: .
+    container_name: linkhub-nerv
+    restart: unless-stopped
+    ports:
+      - "8090:80"
