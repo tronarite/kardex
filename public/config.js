@@ -115,6 +115,7 @@ const UNITS = [
   {
     // EJEMPLO — edítalo con tu servicio real o bórralo si no lo necesitas.
     name: "DESARROLLO WEB A MEDIDA",
+    order: 1,
     url: "https://ejemplo.com/servicios",
     description: "Webs y aplicaciones a medida, de idea a producción.",
     type: "servicios",
@@ -122,24 +123,28 @@ const UNITS = [
   },
   {
     name: "FONNAROA NETWORK",
+    order: 2,
     url: "https://fonnaroa.net",
     description: "Servidores y experiencias de Minecraft. Desde 2023",
     type: "standby",
   },
   {
     name: "PORTFOLIO FOTOGRÁFICO",
+    order: 3,
     url: "https://gallery.tronarite.net",
     description: "Galería fotográfica y archivos visuales personales.",
     type: "online",
   },
   {
     name: "GITHUB",
+    order: 4,
     url: "https://github.com/tronarite",
     description: "Código, herramientas y proyectos open source.",
     type: "source",
   },
   {
     name: "LAST.FM",
+    order: 5,
     url: "https://www.last.fm/user/Tronarite",
     description: "Mi perfil musical",
     type: "media",
