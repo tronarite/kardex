@@ -100,6 +100,13 @@ const createUnitRow = (unit, index) => {
   head.appendChild(name);
   head.appendChild(createFlagElement(status.type, status.label));
 
+  if (unit.priceRange) {
+    const price = document.createElement("span");
+    price.className = "row-price";
+    price.textContent = unit.priceRange;
+    head.appendChild(price);
+  }
+
   const desc = document.createElement("span");
   desc.className = "row-desc";
   desc.textContent = unit.description;

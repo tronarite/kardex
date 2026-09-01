@@ -494,6 +494,13 @@ body {
   text-transform: uppercase;
 }
 
+.row-price {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
 .row-desc {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 0.87rem;

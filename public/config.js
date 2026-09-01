@@ -51,19 +51,26 @@ const SITE_CONFIG = {
                                   se usa el texto por defecto de ese "type".
      displayUrl    Opcional      Texto del enlace a mostrar. Si lo omites,
                                   se genera solo a partir de "url".
+     priceRange    Opcional      Texto libre junto al indicador, ej. "20€ –
+                                  50€" o "Desde 30€". Pensado sobre todo
+                                  para type: "servicios", pero funciona en
+                                  cualquier proyecto. Si lo omites, no se
+                                  muestra nada.
 
    El número de orden (01, 02, 03...) NO se escribe a mano: se calcula solo
    según la posición en esta lista. Puedes reordenar, borrar o añadir
    proyectos sin tener que renumerar nada.
 
    TYPE disponibles y su color — su etiqueta por defecto entre paréntesis:
-     "online"   verde    ("ONLINE")
-     "dev"      azul     ("EN DESARROLLO")
-     "standby"  ámbar    ("EN PAUSA")
-     "source"   violeta  ("REPOSITORIO")
-     "media"    rosa     ("MÚSICA")
-     "servicios" verde azulado ("SERVICIOS")
-     "offline"  gris     ("INACTIVO")
+     "online"    verde         ("ONLINE")
+     "dev"       azul          ("EN DESARROLLO")
+     "standby"   ámbar         ("EN PAUSA")
+     "source"    violeta       ("REPOSITORIO")
+     "media"     rosa          ("MÚSICA")
+     "servicios" verde azulado ("SERVICIOS") — para un bien o servicio que
+                                ofreces, con enlace a otra web donde se
+                                explica (ver ejemplo con priceRange abajo)
+     "offline"   gris          ("INACTIVO")
 
    PARA AÑADIR UN PROYECTO NUEVO:
    copia este bloque completo (con su coma final) y pégalo donde quieras
@@ -74,6 +81,17 @@ const SITE_CONFIG = {
        url: "https://ejemplo.com",
        description: "Una frase corta que lo describe.",
        type: "online",
+     },
+
+   PARA AÑADIR UN SERVICIO/PRODUCTO QUE OFRECES (con enlace a otra web y
+   rango de precios):
+
+     {
+       name: "NOMBRE DEL SERVICIO",
+       url: "https://otra-web-donde-se-explica.com",
+       description: "En qué consiste, en una frase.",
+       type: "servicios",
+       priceRange: "Desde 30€",
      },
 
    ============================================================================ */

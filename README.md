@@ -82,6 +82,19 @@ Fíjate en lo que **no** hay que escribir: no hace falta numerar los proyectos (
 
 Si escribes tu propio `label`, sustituye al texto por defecto de la tabla, pero solo `type` determina el color.
 
+### Ofrecer un bien o servicio (con enlace externo y precio)
+Usa `type: "servicios"` para un proyecto que en realidad es algo que ofreces (no un enlace a tu propio trabajo), con `url` apuntando a otra web donde se explica en detalle. El campo opcional `priceRange` añade un precio o rango de precios junto al indicador:
+
+```javascript
+{
+  name: "DESARROLLO WEB A MEDIDA",
+  url: "https://otra-web-donde-se-explica.com",
+  description: "En qué consiste, en una frase.",
+  type: "servicios",
+  priceRange: "Desde 300€"   // opcional; funciona en cualquier type, no solo "servicios"
+}
+```
+
 ### Color de acento
 `accent` en `config.js` controla el color de acento del sitio (los "//", los enlaces al pasar el ratón, la barra que resalta cada fila). Opcional — por defecto es `"terracota"`.
 
