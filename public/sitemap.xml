@@ -2,7 +2,7 @@
 <!-- Sustituye el dominio de ejemplo por el tuyo antes de publicar -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://tronarite.github.io/kardex/</loc>
+    <loc>https://tu-dominio.example/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

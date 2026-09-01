@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://tronarite.github.io/kardex/sitemap.xml
+Sitemap: https://tu-dominio.example/sitemap.xml
