@@ -756,6 +756,66 @@ body {
 }
 
 /* --------------------------------------------------------------------------
+   Página 404
+   -------------------------------------------------------------------------- */
+.error-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.4rem;
+  padding: 2rem 1.5rem;
+}
+
+.error-code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+}
+
+.error-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0.25rem 0 0.5rem;
+}
+
+.error-desc {
+  font-size: 0.92rem;
+  color: var(--text-body);
+  max-width: 26rem;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+.error-link {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.15rem;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.error-link:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.error-link:focus-visible {
+  outline: 2px solid var(--line-strong);
+  outline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
    Print
    -------------------------------------------------------------------------- */
 @media print {

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>404 — Página no encontrada</title>
+  <meta name="robots" content="noindex">
+
+  <meta name="theme-color" content="#F5F3EC" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#131110" media="(prefers-color-scheme: dark)">
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=3">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Evita el parpadeo de tema al recargar cuando hay una preferencia manual guardada -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme-preference");
+        if (saved === "dark" || saved === "light") {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <main class="error-shell">
+    <span class="error-code">404</span>
+    <h1 class="error-title">Página no encontrada</h1>
+    <p class="error-desc">El enlace al que has llegado no existe o se ha movido.</p>
+    <a href="/" class="error-link">← Volver al índice</a>
+  </main>
+
+  <!-- Solo para aplicar el mismo tema de color elegido en config.js -->
+  <script src="config.js"></script>
+  <script>
+    if (typeof SITE_CONFIG !== "undefined" && SITE_CONFIG.theme) {
+      document.documentElement.dataset.themePack = SITE_CONFIG.theme;
+    }
+  </script>
+</body>
+</html>
