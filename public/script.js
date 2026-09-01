@@ -24,7 +24,7 @@ const DEFAULT_STATUS_LABELS = {
 
 const VALID_STATUS_TYPES = new Set(Object.keys(DEFAULT_STATUS_LABELS));
 
-const VALID_THEME_PACKS = new Set(["terracota", "vino", "mostaza", "monocromo"]);
+const VALID_THEME_PACKS = new Set(["terracota", "vino", "mostaza", "azul", "petroleo", "monocromo"]);
 
 /**
  * Aplica el pack de tema elegido en config.js (SITE_CONFIG.theme). Cada pack

@@ -110,14 +110,18 @@ Usa `type: "servicios"` para un proyecto que en realidad es algo que ofreces (no
 ```
 
 ### Tema de color
-`theme` en `config.js` controla la paleta del sitio. Cada opción trae ya coordinadas su versión clara y su versión oscura — cuál de las dos ves depende de tu sistema o del botón de tema (arriba a la derecha), no de esto. Opcional — por defecto es `"vino"`.
+`theme` en `config.js` controla la paleta del sitio. Cada opción trae ya coordinadas su versión clara y su versión oscura — cuál de las dos ves depende de tu sistema o del botón de tema (arriba a la derecha), no de esto. Opcional — por defecto es `"azul"`.
 
 | `theme` | Claro | Oscuro |
 |---------|-------|--------|
 | `terracota` | Papel crema + acento terracota | Tinta cálida casi negra + terracota claro |
-| `vino` (por defecto) | Blanco con tinte vino + acento vino | Negro con tinte vino + vino claro |
+| `vino` | Blanco con tinte vino + acento vino | Negro con tinte vino + vino claro |
 | `mostaza` | Blanco con tinte dorado + acento mostaza | Negro con tinte dorado + mostaza claro |
+| `azul` (por defecto) | Blanco azulado + acento azul marino profundo | Negro azulado + azul claro |
+| `petroleo` | Blanco verde-azulado + acento petróleo | Negro verde-azulado + petróleo claro |
 | `monocromo` | Blanco puro, sin color de acento | Negro puro `#000000` (ideal para OLED), sin color de acento |
+
+`azul` usa un azul marino/índigo profundo, no un azul claro o frío — pensado para que no resulte gélido junto a la tipografía serif del resto del sitio.
 
 ### Título de la pestaña
 `pageTitle` en `config.js` controla el título de la pestaña del navegador. Es opcional: si lo quitas, se genera solo como `"{operatorName} — Índice"`.

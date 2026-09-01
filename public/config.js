@@ -28,10 +28,12 @@ const SITE_CONFIG = {
   // "terracota" por defecto.
   // Opciones (cada una con su propio fondo claro/oscuro, no solo el acento):
   //   "terracota"  papel crema / tinta cálida, acento rojo-naranja
-  //   "vino"       (por defecto) blanco/negro con tinte vino, acento vino
+  //   "vino"       blanco/negro con tinte vino, acento vino
   //   "mostaza"    blanco/negro con tinte cálido dorado, acento mostaza
+  //   "azul"       (por defecto) azul marino profundo, no un azul frío/claro
+  //   "petroleo"   azul verdoso profundo, entre azul y verde
   //   "monocromo"  blanco puro / negro puro, sin color de acento
-  theme: "vino",
+  theme: "azul",
 
   // Tu disponibilidad, arriba a la izquierda de la página.
   availability: {
