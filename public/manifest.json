@@ -1,9 +1,9 @@
 {
-  "name": "Índice — Hub personal de proyectos",
-  "short_name": "Índice",
+  "name": "Kardex — Hub personal de proyectos",
+  "short_name": "Kardex",
   "description": "Índice personal de proyectos y enlaces, con estética editorial minimalista.",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "background_color": "#F5F3EC",
   "theme_color": "#F5F3EC",
