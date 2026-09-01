@@ -1,12 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <!-- Tarjeta de índice: fondo papel + marco tinta -->
-  <rect width="64" height="64" fill="#17140F"/>
-  <rect x="6" y="6" width="52" height="52" fill="#F5F3EC"/>
+  <!-- Marca de Kardex: tarjeta de índice, en monocromo puro para que
+       encaje con cualquiera de los temas de color del sitio. -->
+  <rect width="64" height="64" fill="#111111"/>
+  <rect x="6" y="6" width="52" height="52" fill="#FFFFFF"/>
   <!-- Esquina doblada -->
-  <path d="M42 6 L58 6 L58 22 Z" fill="#17140F"/>
-  <path d="M42 6 L58 22 L42 22 Z" fill="#EFEADB"/>
+  <path d="M42 6 L58 6 L58 22 Z" fill="#111111"/>
+  <path d="M42 6 L58 22 L42 22 Z" fill="#DADADA"/>
   <!-- Líneas de índice -->
-  <line x1="16" y1="28" x2="40" y2="28" stroke="#17140F" stroke-width="3" stroke-linecap="square"/>
-  <line x1="16" y1="37" x2="48" y2="37" stroke="#17140F" stroke-width="3" stroke-linecap="square"/>
-  <line x1="16" y1="46" x2="32" y2="46" stroke="#A6321C" stroke-width="3" stroke-linecap="square"/>
+  <line x1="16" y1="28" x2="40" y2="28" stroke="#111111" stroke-width="3" stroke-linecap="square"/>
+  <line x1="16" y1="37" x2="48" y2="37" stroke="#111111" stroke-width="3" stroke-linecap="square"/>
+  <line x1="16" y1="46" x2="32" y2="46" stroke="#111111" stroke-width="3" stroke-linecap="square"/>
 </svg>

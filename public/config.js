@@ -136,7 +136,7 @@ const UNITS = [
     url: "tronarite.net/servicios",
     description: "Diferentes opciones de asesoría y mejora de tus equipos informativos.",
     type: "proximamente",
-    label: "SERVICIO",
+    label: "PROXIMAMENTE",
     // priceRange: "Desde 300€",
   },
   {
