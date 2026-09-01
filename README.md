@@ -107,6 +107,15 @@ Usa `type: "servicios"` para un proyecto que en realidad es algo que ofreces (no
 | `rosa` |
 | `ambar` |
 
+### Variante de modo oscuro
+`darkTheme` en `config.js` controla qué fondo usa el modo oscuro (no afecta al modo claro). Opcional — por defecto es `"oscuro"`.
+
+| `darkTheme` | Descripción |
+|--------------|-------------|
+| `oscuro` (por defecto) | Gris cálido casi negro |
+| `gris` | Gris neutro |
+| `negro` | Negro puro `#000000`, ideal para pantallas OLED |
+
 ### Título de la pestaña
 `pageTitle` en `config.js` controla el título de la pestaña del navegador. Es opcional: si lo quitas, se genera solo como `"{operatorName} — Índice"`.
 

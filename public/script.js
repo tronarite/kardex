@@ -37,6 +37,19 @@ const applyAccent = (accent) => {
   }
 };
 
+const VALID_DARK_THEMES = new Set(["oscuro", "gris", "negro"]);
+
+/**
+ * Aplica la variante de modo oscuro elegida en config.js (SITE_CONFIG.darkTheme).
+ * Si no se indica, o no es una opción válida, se queda con "oscuro" (el
+ * valor por defecto ya definido en :root en style.css). No afecta al modo claro.
+ */
+const applyDarkTheme = (darkTheme) => {
+  if (darkTheme && VALID_DARK_THEMES.has(darkTheme)) {
+    document.documentElement.dataset.darkTheme = darkTheme;
+  }
+};
+
 /**
  * Resuelve { type, label } finales a partir de lo que haya en config.js.
  * - Si no se indica "type", se asume "online" (caso más común al añadir un enlace).
@@ -296,6 +309,7 @@ const initContactManager = (config) => {
 document.addEventListener("DOMContentLoaded", () => {
   initThemeManager();
   applyAccent(SITE_CONFIG.accent);
+  applyDarkTheme(SITE_CONFIG.darkTheme);
   renderIdentity(SITE_CONFIG);
   initContactManager(SITE_CONFIG);
   renderUnits(UNITS);

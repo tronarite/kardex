@@ -8,7 +8,7 @@
 
 const SITE_CONFIG = {
   // Tu nombre, alias o marca personal.
-  operatorName: "tronarite / Marcelo Añanga",
+  operatorName: "tronarite // Marcelo Añanga",
 
   // Una línea corta que te describe. Si escribes "//" en medio, se separa
   // visualmente en dos partes (puedes quitar el "//" si prefieres una frase).
@@ -27,6 +27,12 @@ const SITE_CONFIG = {
   // quitas, se usa "terracota" por defecto.
   // Opciones: "terracota" | "azul" | "verde" | "violeta" | "rosa" | "ambar"
   accent: "terracota",
+
+  // Qué variante de modo oscuro usar (no afecta al modo claro). Opcional —
+  // si lo quitas, se usa "oscuro" por defecto.
+  // Opciones: "oscuro" (gris cálido, el actual) | "gris" (gris neutro) |
+  //           "negro" (negro puro, ideal para pantallas OLED)
+  darkTheme: "oscuro",
 
   // Tu disponibilidad, arriba a la izquierda de la página.
   availability: {
@@ -96,6 +102,14 @@ const SITE_CONFIG = {
 
    ============================================================================ */
 const UNITS = [
+  {
+    // EJEMPLO — edítalo con tu servicio real o bórralo si no lo necesitas.
+    name: "DESARROLLO WEB A MEDIDA",
+    url: "https://ejemplo.com/servicios",
+    description: "Webs y aplicaciones a medida, de idea a producción.",
+    type: "servicios",
+    priceRange: "Desde 300€",
+  },
   {
     name: "FONNAROA NETWORK",
     url: "https://fonnaroa.net",
