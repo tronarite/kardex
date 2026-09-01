@@ -69,6 +69,20 @@ const UNITS = [
 
 Fíjate en lo que **no** hay que escribir: no hace falta numerar los proyectos (`01`, `02`...) — el índice se calcula solo según el orden de la lista, así que reordenar, borrar o insertar un proyecto en medio nunca rompe la numeración. Tampoco hace falta `displayUrl` (se genera solo desde `url`) ni `label` (cada `type` ya tiene un texto por defecto).
 
+### Cambiar el orden sin mover bloques
+Si solo quieres que un proyecto aparezca más arriba, no hace falta cortar y pegar su bloque dentro de la lista: añádele `order` con el número de posición que quieres (1 = primero).
+
+```javascript
+{
+  name: "GITHUB",
+  order: 1,   // pasa a ser el primero, sin tocar el resto de la lista
+  url: "https://github.com/tuusuario",
+  ...
+}
+```
+
+Los proyectos sin `order` rellenan los huecos restantes en su orden habitual. Si dos proyectos piden la misma posición, gana el que esté antes en la lista.
+
 ### Tipos de estado (`type`) disponibles:
 | `type`      | Color del indicador | Etiqueta por defecto |
 |-------------|----------------------|-----------------------|
@@ -96,13 +110,13 @@ Usa `type: "servicios"` para un proyecto que en realidad es algo que ofreces (no
 ```
 
 ### Tema de color
-`theme` en `config.js` controla la paleta del sitio. Cada opción trae ya coordinadas su versión clara y su versión oscura — cuál de las dos ves depende de tu sistema o del botón de tema (arriba a la derecha), no de esto. Opcional — por defecto es `"terracota"`.
+`theme` en `config.js` controla la paleta del sitio. Cada opción trae ya coordinadas su versión clara y su versión oscura — cuál de las dos ves depende de tu sistema o del botón de tema (arriba a la derecha), no de esto. Opcional — por defecto es `"vino"`.
 
 | `theme` | Claro | Oscuro |
 |---------|-------|--------|
-| `terracota` (por defecto) | Papel crema + acento terracota | Tinta cálida casi negra + terracota claro |
-| `azul` | Blanco con tinte azulado + acento azul | Negro con tinte azulado + azul claro |
-| `verde` | Blanco con tinte verdoso + acento verde | Negro con tinte verdoso + verde claro |
+| `terracota` | Papel crema + acento terracota | Tinta cálida casi negra + terracota claro |
+| `vino` (por defecto) | Blanco con tinte vino + acento vino | Negro con tinte vino + vino claro |
+| `mostaza` | Blanco con tinte dorado + acento mostaza | Negro con tinte dorado + mostaza claro |
 | `monocromo` | Blanco puro, sin color de acento | Negro puro `#000000` (ideal para OLED), sin color de acento |
 
 ### Título de la pestaña

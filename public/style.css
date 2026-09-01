@@ -76,52 +76,52 @@
    sistema o del botón de tema, exactamente igual que con "terracota".
    "terracota" es el valor por defecto ya definido arriba en :root.
    -------------------------------------------------------------------------- */
-:root[data-theme-pack="azul"] {
-  --light-bg: #EFF3F8;
+:root[data-theme-pack="vino"] {
+  --light-bg: #F7F0F1;
   --light-surface: #FFFFFF;
-  --light-surface-hover: #E7EDF3;
-  --light-line: #D7E0E9;
-  --light-line-strong: #10151C;
-  --light-text: #10151C;
-  --light-text-body: #3E4756;
-  --light-text-dim: #7C8695;
-  --light-text-muted: #A7B0BC;
+  --light-surface-hover: #F0E6E8;
+  --light-line: #E6D5D9;
+  --light-line-strong: #1C1013;
+  --light-text: #1C1013;
+  --light-text-body: #4A3339;
+  --light-text-dim: #8A7178;
+  --light-text-muted: #B9A5AA;
 
-  --dark-bg: #0B0F14;
-  --dark-surface: #121821;
-  --dark-surface-hover: #171E28;
-  --dark-line: #232C38;
-  --dark-line-strong: #ECF1F6;
-  --dark-text: #ECF1F6;
-  --dark-text-body: #A7B2C0;
-  --dark-text-dim: #737F8F;
-  --dark-text-muted: #495363;
+  --dark-bg: #150C0E;
+  --dark-surface: #1E1215;
+  --dark-surface-hover: #24161A;
+  --dark-line: #332025;
+  --dark-line-strong: #F3E9EB;
+  --dark-text: #F3E9EB;
+  --dark-text-body: #BFA3A9;
+  --dark-text-dim: #8C7176;
+  --dark-text-muted: #5C474B;
 
-  --accent: light-dark(#1D4E89, #6FA8D9);
+  --accent: light-dark(#7A2436, #D97B94);
 }
 
-:root[data-theme-pack="verde"] {
-  --light-bg: #EFF3EC;
+:root[data-theme-pack="mostaza"] {
+  --light-bg: #F7F3E9;
   --light-surface: #FFFFFF;
-  --light-surface-hover: #E8EEE3;
-  --light-line: #D9E2D1;
-  --light-line-strong: #121B0F;
-  --light-text: #121B0F;
-  --light-text-body: #3D4838;
-  --light-text-dim: #7B8672;
-  --light-text-muted: #A7B09E;
+  --light-surface-hover: #F0EADA;
+  --light-line: #E6DCC2;
+  --light-line-strong: #1C1810;
+  --light-text: #1C1810;
+  --light-text-body: #4A4130;
+  --light-text-dim: #8A7F63;
+  --light-text-muted: #B9AD8C;
 
-  --dark-bg: #0C110A;
-  --dark-surface: #131A10;
-  --dark-surface-hover: #182014;
-  --dark-line: #242F1C;
-  --dark-line-strong: #EDF2E9;
-  --dark-text: #EDF2E9;
-  --dark-text-body: #ACB6A2;
-  --dark-text-dim: #78836D;
-  --dark-text-muted: #4C5644;
+  --dark-bg: #15120A;
+  --dark-surface: #1E1911;
+  --dark-surface-hover: #241E14;
+  --dark-line: #332B1C;
+  --dark-line-strong: #F3EEE0;
+  --dark-text: #F3EEE0;
+  --dark-text-body: #BFB397;
+  --dark-text-dim: #8C816A;
+  --dark-text-muted: #5C5340;
 
-  --accent: light-dark(#2F6B3A, #6FBE84);
+  --accent: light-dark(#8A6A16, #D9A94D);
 }
 
 :root[data-theme-pack="monocromo"] {

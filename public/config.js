@@ -27,11 +27,11 @@ const SITE_CONFIG = {
   // o del botón de tema, no de esto. Opcional — si lo quitas, se usa
   // "terracota" por defecto.
   // Opciones (cada una con su propio fondo claro/oscuro, no solo el acento):
-  //   "terracota"  (por defecto) papel crema / tinta cálida, acento terracota
-  //   "azul"       blanco y negro con tinte azulado, acento azul
-  //   "verde"      blanco y negro con tinte verdoso, acento verde
+  //   "terracota"  papel crema / tinta cálida, acento rojo-naranja
+  //   "vino"       (por defecto) blanco/negro con tinte vino, acento vino
+  //   "mostaza"    blanco/negro con tinte cálido dorado, acento mostaza
   //   "monocromo"  blanco puro / negro puro, sin color de acento
-  theme: "terracota",
+  theme: "vino",
 
   // Tu disponibilidad, arriba a la izquierda de la página.
   availability: {
@@ -61,6 +61,13 @@ const SITE_CONFIG = {
                                   para type: "servicios", pero funciona en
                                   cualquier proyecto. Si lo omites, no se
                                   muestra nada.
+     order         Opcional      Un número (1, 2, 3...) para fijar en qué
+                                  posición del índice aparece, sin tener
+                                  que mover el bloque dentro de la lista.
+                                  Si dos proyectos repiten el mismo número,
+                                  gana el que esté antes en la lista. Los
+                                  que no tienen "order" se quedan en su
+                                  sitio de siempre.
 
    El número de orden (01, 02, 03...) NO se escribe a mano: se calcula solo
    según la posición en esta lista. Puedes reordenar, borrar o añadir

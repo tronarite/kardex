@@ -24,7 +24,7 @@ const DEFAULT_STATUS_LABELS = {
 
 const VALID_STATUS_TYPES = new Set(Object.keys(DEFAULT_STATUS_LABELS));
 
-const VALID_THEME_PACKS = new Set(["terracota", "azul", "verde", "monocromo"]);
+const VALID_THEME_PACKS = new Set(["terracota", "vino", "mostaza", "monocromo"]);
 
 /**
  * Aplica el pack de tema elegido en config.js (SITE_CONFIG.theme). Cada pack
@@ -129,12 +129,52 @@ const createUnitRow = (unit, index) => {
   return row;
 };
 
+/**
+ * Ordena las unidades colocando las que tienen "order" exactamente en esa
+ * posición (1 = primera), y rellenando el resto de huecos con las que no
+ * indican "order", en su orden relativo original. Si dos unidades piden
+ * la misma posición, gana la que esté antes en la lista.
+ */
+const sortUnitsByOrder = (units) => {
+  const withIndex = units.map((unit, index) => ({ unit, index }));
+
+  const ordered = withIndex
+    .filter(({ unit }) => unit.order !== undefined && unit.order !== null)
+    .sort((a, b) => a.unit.order - b.unit.order || a.index - b.index);
+
+  const unordered = withIndex.filter(
+    ({ unit }) => unit.order === undefined || unit.order === null
+  );
+
+  const result = [];
+  let orderedPtr = 0;
+  let unorderedPtr = 0;
+
+  for (let position = 1; position <= units.length; position++) {
+    const nextOrdered = ordered[orderedPtr];
+    if (nextOrdered && nextOrdered.unit.order <= position) {
+      result.push(nextOrdered.unit);
+      orderedPtr++;
+    } else if (unorderedPtr < unordered.length) {
+      result.push(unordered[unorderedPtr].unit);
+      unorderedPtr++;
+    } else if (nextOrdered) {
+      result.push(nextOrdered.unit);
+      orderedPtr++;
+    }
+  }
+
+  return result;
+};
+
 const renderUnits = (units) => {
   const container = document.getElementById("units-list");
   if (!container) return;
 
+  const sortedUnits = sortUnitsByOrder(units);
+
   container.innerHTML = "";
-  const rows = units.map((unit, index) => {
+  const rows = sortedUnits.map((unit, index) => {
     const row = createUnitRow(unit, index);
     container.appendChild(row);
     return row;
