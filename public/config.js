@@ -22,17 +22,16 @@ const SITE_CONFIG = {
   // vacío, se usa automáticamente "{operatorName} — Índice".
   pageTitle: "tronarite - Índice personal",
 
-  // Color de acento del sitio (los "//", los enlaces al pasar el ratón, la
-  // barra que aparece al lado de cada proyecto...). Opcional — si lo
-  // quitas, se usa "terracota" por defecto.
-  // Opciones: "terracota" | "azul" | "verde" | "violeta" | "rosa" | "ambar"
-  accent: "terracota",
-
-  // Qué variante de modo oscuro usar (no afecta al modo claro). Opcional —
-  // si lo quitas, se usa "oscuro" por defecto.
-  // Opciones: "oscuro" (gris cálido, el actual) | "gris" (gris neutro) |
-  //           "negro" (negro puro, ideal para pantallas OLED)
-  darkTheme: "oscuro",
+  // Tema de color del sitio. Cada opción trae ya coordinadas su versión
+  // clara y su versión oscura — cuál de las dos ves depende de tu sistema
+  // o del botón de tema, no de esto. Opcional — si lo quitas, se usa
+  // "terracota" por defecto.
+  // Opciones:
+  //   "terracota"  (por defecto) papel/tinta cálidos + acento terracota
+  //   "azul"       igual que terracota, con acento azul
+  //   "verde"      igual que terracota, con acento verde
+  //   "monocromo"  blanco puro / negro puro, sin color de acento
+  theme: "terracota",
 
   // Tu disponibilidad, arriba a la izquierda de la página.
   availability: {

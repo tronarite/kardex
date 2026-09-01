@@ -24,29 +24,18 @@ const DEFAULT_STATUS_LABELS = {
 
 const VALID_STATUS_TYPES = new Set(Object.keys(DEFAULT_STATUS_LABELS));
 
-const VALID_ACCENTS = new Set(["terracota", "azul", "verde", "violeta", "rosa", "ambar"]);
+const VALID_THEME_PACKS = new Set(["terracota", "azul", "verde", "monocromo"]);
 
 /**
- * Aplica el color de acento elegido en config.js (SITE_CONFIG.accent).
- * Si no se indica, o no es una de las opciones válidas, se queda con el
- * valor por defecto ("terracota") ya definido en :root en style.css.
+ * Aplica el pack de tema elegido en config.js (SITE_CONFIG.theme). Cada pack
+ * trae ya coordinadas su versión clara y su versión oscura — cuál de las
+ * dos se ve depende del sistema o del botón de tema, no de esto. Si no se
+ * indica, o no es una opción válida, se queda con "terracota" (el valor
+ * por defecto ya definido en :root en style.css).
  */
-const applyAccent = (accent) => {
-  if (accent && VALID_ACCENTS.has(accent)) {
-    document.documentElement.dataset.accent = accent;
-  }
-};
-
-const VALID_DARK_THEMES = new Set(["oscuro", "gris", "negro"]);
-
-/**
- * Aplica la variante de modo oscuro elegida en config.js (SITE_CONFIG.darkTheme).
- * Si no se indica, o no es una opción válida, se queda con "oscuro" (el
- * valor por defecto ya definido en :root en style.css). No afecta al modo claro.
- */
-const applyDarkTheme = (darkTheme) => {
-  if (darkTheme && VALID_DARK_THEMES.has(darkTheme)) {
-    document.documentElement.dataset.darkTheme = darkTheme;
+const applyThemePack = (theme) => {
+  if (theme && VALID_THEME_PACKS.has(theme)) {
+    document.documentElement.dataset.themePack = theme;
   }
 };
 
@@ -308,8 +297,7 @@ const initContactManager = (config) => {
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", () => {
   initThemeManager();
-  applyAccent(SITE_CONFIG.accent);
-  applyDarkTheme(SITE_CONFIG.darkTheme);
+  applyThemePack(SITE_CONFIG.theme);
   renderIdentity(SITE_CONFIG);
   initContactManager(SITE_CONFIG);
   renderUnits(UNITS);

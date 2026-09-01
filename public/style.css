@@ -8,10 +8,20 @@
 :root {
   color-scheme: light dark;
 
-  /* Tokens del modo oscuro "oscuro" (por defecto). Cambian por completo
-     según SITE_CONFIG.darkTheme (ver bloques [data-dark-theme] más abajo);
-     el modo claro no se toca, solo se sustituye el lado oscuro de cada
-     light-dark() con estas variables intermedias. */
+  /* Tokens del pack "terracota" (por defecto). Cada pack alternativo (ver
+     bloques [data-theme-pack] más abajo) redefine estas variables
+     --light-* / --dark-* / --accent juntas; el resto de la hoja de estilos
+     solo usa light-dark() sobre ellas, así que nunca hay que tocar nada más. */
+  --light-bg: #F5F3EC;
+  --light-surface: #FFFFFF;
+  --light-surface-hover: #FBF9F2;
+  --light-line: #E4DFD1;
+  --light-line-strong: #17140F;
+  --light-text: #17140F;
+  --light-text-body: #4B463C;
+  --light-text-dim: #8A8374;
+  --light-text-muted: #B3AC9C;
+
   --dark-bg: #131110;
   --dark-surface: #1B1815;
   --dark-surface-hover: #201C18;
@@ -21,22 +31,21 @@
   --dark-text-body: #B8B0A2;
   --dark-text-dim: #857D6E;
   --dark-text-muted: #5C5548;
-  --dark-shadow-elevated: 0 4px 30px rgba(0, 0, 0, 0.5);
 
   /* Superficies */
-  --bg: light-dark(#F5F3EC, var(--dark-bg));
-  --surface: light-dark(#FFFFFF, var(--dark-surface));
-  --surface-hover: light-dark(#FBF9F2, var(--dark-surface-hover));
+  --bg: light-dark(var(--light-bg), var(--dark-bg));
+  --surface: light-dark(var(--light-surface), var(--dark-surface));
+  --surface-hover: light-dark(var(--light-surface-hover), var(--dark-surface-hover));
 
   /* Líneas */
-  --line: light-dark(#E4DFD1, var(--dark-line));
-  --line-strong: light-dark(#17140F, var(--dark-line-strong));
+  --line: light-dark(var(--light-line), var(--dark-line));
+  --line-strong: light-dark(var(--light-line-strong), var(--dark-line-strong));
 
   /* Tipografía */
-  --text: light-dark(#17140F, var(--dark-text));
-  --text-body: light-dark(#4B463C, var(--dark-text-body));
-  --text-dim: light-dark(#8A8374, var(--dark-text-dim));
-  --text-muted: light-dark(#B3AC9C, var(--dark-text-muted));
+  --text: light-dark(var(--light-text), var(--dark-text));
+  --text-body: light-dark(var(--light-text-body), var(--dark-text-body));
+  --text-dim: light-dark(var(--light-text-dim), var(--dark-text-dim));
+  --text-muted: light-dark(var(--light-text-muted), var(--dark-text-muted));
 
   /* Acento (sello / tinta roja, no el naranja genérico de IA) */
   --accent: light-dark(#A6321C, #E2724A);
@@ -61,36 +70,31 @@
 }
 
 /* --------------------------------------------------------------------------
-   Acentos alternativos — elegidos desde config.js (SITE_CONFIG.accent),
-   aplicados vía [data-accent] en <html>. "terracota" es el valor por
-   defecto ya definido arriba en :root, así que no necesita su propio bloque.
+   Packs de tema alternativos — elegidos desde config.js (SITE_CONFIG.theme),
+   aplicados vía [data-theme-pack] en <html>. Cada uno trae ya coordinadas
+   su versión clara y su versión oscura; cuál de las dos se ve depende del
+   sistema o del botón de tema, exactamente igual que con "terracota".
+   "terracota" es el valor por defecto ya definido arriba en :root.
    -------------------------------------------------------------------------- */
-:root[data-accent="azul"] { --accent: light-dark(#1D4E89, #6FA8D9); }
-:root[data-accent="verde"] { --accent: light-dark(#2F6B3A, #6FBE84); }
-:root[data-accent="violeta"] { --accent: light-dark(#5B3A8A, #A98FE0); }
-:root[data-accent="rosa"] { --accent: light-dark(#96355A, #E58AA6); }
-:root[data-accent="ambar"] { --accent: light-dark(#8A6A16, #D9A94D); }
-
-/* --------------------------------------------------------------------------
-   Temas oscuros alternativos — elegidos desde config.js
-   (SITE_CONFIG.darkTheme), aplicados vía [data-dark-theme] en <html>.
-   "oscuro" es el valor por defecto ya definido arriba en :root.
-   Solo afectan al modo oscuro; el modo claro es siempre el mismo.
-   -------------------------------------------------------------------------- */
-:root[data-dark-theme="gris"] {
-  --dark-bg: #17181A;
-  --dark-surface: #1F2023;
-  --dark-surface-hover: #26282B;
-  --dark-line: #303236;
-  --dark-line-strong: #EDEDEE;
-  --dark-text: #EDEDEE;
-  --dark-text-body: #AFB2B8;
-  --dark-text-dim: #82858C;
-  --dark-text-muted: #55585E;
-  --dark-shadow-elevated: 0 4px 30px rgba(0, 0, 0, 0.55);
+:root[data-theme-pack="azul"] {
+  --accent: light-dark(#1D4E89, #6FA8D9);
 }
 
-:root[data-dark-theme="negro"] {
+:root[data-theme-pack="verde"] {
+  --accent: light-dark(#2F6B3A, #6FBE84);
+}
+
+:root[data-theme-pack="monocromo"] {
+  --light-bg: #FFFFFF;
+  --light-surface: #FFFFFF;
+  --light-surface-hover: #F5F5F5;
+  --light-line: #E5E5E5;
+  --light-line-strong: #111111;
+  --light-text: #111111;
+  --light-text-body: #3D3D3D;
+  --light-text-dim: #6B6B6B;
+  --light-text-muted: #9E9E9E;
+
   --dark-bg: #000000;
   --dark-surface: #0A0A0A;
   --dark-surface-hover: #141414;
@@ -100,7 +104,8 @@
   --dark-text-body: #A8A8A8;
   --dark-text-dim: #7A7A7A;
   --dark-text-muted: #4A4A4A;
-  --dark-shadow-elevated: 0 4px 30px rgba(0, 0, 0, 0.7);
+
+  --accent: light-dark(#3A3A3A, #D9D9D9);
 }
 
 [data-theme="light"] { color-scheme: light; }

@@ -95,26 +95,15 @@ Usa `type: "servicios"` para un proyecto que en realidad es algo que ofreces (no
 }
 ```
 
-### Color de acento
-`accent` en `config.js` controla el color de acento del sitio (los "//", los enlaces al pasar el ratón, la barra que resalta cada fila). Opcional — por defecto es `"terracota"`.
+### Tema de color
+`theme` en `config.js` controla la paleta del sitio. Cada opción trae ya coordinadas su versión clara y su versión oscura — cuál de las dos ves depende de tu sistema o del botón de tema (arriba a la derecha), no de esto. Opcional — por defecto es `"terracota"`.
 
-| `accent` |
-|----------|
-| `terracota` (por defecto) |
-| `azul` |
-| `verde` |
-| `violeta` |
-| `rosa` |
-| `ambar` |
-
-### Variante de modo oscuro
-`darkTheme` en `config.js` controla qué fondo usa el modo oscuro (no afecta al modo claro). Opcional — por defecto es `"oscuro"`.
-
-| `darkTheme` | Descripción |
-|--------------|-------------|
-| `oscuro` (por defecto) | Gris cálido casi negro |
-| `gris` | Gris neutro |
-| `negro` | Negro puro `#000000`, ideal para pantallas OLED |
+| `theme` | Claro | Oscuro |
+|---------|-------|--------|
+| `terracota` (por defecto) | Papel crema + acento terracota | Gris cálido casi negro + terracota claro |
+| `azul` | Papel crema + acento azul | Gris cálido casi negro + azul claro |
+| `verde` | Papel crema + acento verde | Gris cálido casi negro + verde claro |
+| `monocromo` | Blanco puro, sin color de acento | Negro puro `#000000` (ideal para OLED), sin color de acento |
 
 ### Título de la pestaña
 `pageTitle` en `config.js` controla el título de la pestaña del navegador. Es opcional: si lo quitas, se genera solo como `"{operatorName} — Índice"`.
