@@ -172,7 +172,21 @@ const renderUnits = (units) => {
   const container = document.getElementById("units-list");
   if (!container) return;
 
-  const sortedUnits = sortUnitsByOrder(units);
+  // Si a un proyecto le falta "name" o "url" (obligatorios), se salta ese
+  // proyecto en vez de romper el índice entero — y avisa por consola para
+  // que sea fácil detectar cuál es el que falta completar.
+  const validUnits = units.filter((unit) => {
+    const isValid = Boolean(unit.name) && Boolean(unit.url);
+    if (!isValid) {
+      console.warn(
+        `Kardex: se ha omitido un proyecto de config.js por faltarle "name" o "url":`,
+        unit
+      );
+    }
+    return isValid;
+  });
+
+  const sortedUnits = sortUnitsByOrder(validUnits);
 
   container.innerHTML = "";
   const rows = sortedUnits.map((unit, index) => {
