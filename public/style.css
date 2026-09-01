@@ -77,10 +77,50 @@
    "terracota" es el valor por defecto ya definido arriba en :root.
    -------------------------------------------------------------------------- */
 :root[data-theme-pack="azul"] {
+  --light-bg: #EFF3F8;
+  --light-surface: #FFFFFF;
+  --light-surface-hover: #E7EDF3;
+  --light-line: #D7E0E9;
+  --light-line-strong: #10151C;
+  --light-text: #10151C;
+  --light-text-body: #3E4756;
+  --light-text-dim: #7C8695;
+  --light-text-muted: #A7B0BC;
+
+  --dark-bg: #0B0F14;
+  --dark-surface: #121821;
+  --dark-surface-hover: #171E28;
+  --dark-line: #232C38;
+  --dark-line-strong: #ECF1F6;
+  --dark-text: #ECF1F6;
+  --dark-text-body: #A7B2C0;
+  --dark-text-dim: #737F8F;
+  --dark-text-muted: #495363;
+
   --accent: light-dark(#1D4E89, #6FA8D9);
 }
 
 :root[data-theme-pack="verde"] {
+  --light-bg: #EFF3EC;
+  --light-surface: #FFFFFF;
+  --light-surface-hover: #E8EEE3;
+  --light-line: #D9E2D1;
+  --light-line-strong: #121B0F;
+  --light-text: #121B0F;
+  --light-text-body: #3D4838;
+  --light-text-dim: #7B8672;
+  --light-text-muted: #A7B09E;
+
+  --dark-bg: #0C110A;
+  --dark-surface: #131A10;
+  --dark-surface-hover: #182014;
+  --dark-line: #242F1C;
+  --dark-line-strong: #EDF2E9;
+  --dark-text: #EDF2E9;
+  --dark-text-body: #ACB6A2;
+  --dark-text-dim: #78836D;
+  --dark-text-muted: #4C5644;
+
   --accent: light-dark(#2F6B3A, #6FBE84);
 }
 

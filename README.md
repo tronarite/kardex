@@ -100,9 +100,9 @@ Usa `type: "servicios"` para un proyecto que en realidad es algo que ofreces (no
 
 | `theme` | Claro | Oscuro |
 |---------|-------|--------|
-| `terracota` (por defecto) | Papel crema + acento terracota | Gris cálido casi negro + terracota claro |
-| `azul` | Papel crema + acento azul | Gris cálido casi negro + azul claro |
-| `verde` | Papel crema + acento verde | Gris cálido casi negro + verde claro |
+| `terracota` (por defecto) | Papel crema + acento terracota | Tinta cálida casi negra + terracota claro |
+| `azul` | Blanco con tinte azulado + acento azul | Negro con tinte azulado + azul claro |
+| `verde` | Blanco con tinte verdoso + acento verde | Negro con tinte verdoso + verde claro |
 | `monocromo` | Blanco puro, sin color de acento | Negro puro `#000000` (ideal para OLED), sin color de acento |
 
 ### Título de la pestaña

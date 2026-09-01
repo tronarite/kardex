@@ -26,10 +26,10 @@ const SITE_CONFIG = {
   // clara y su versión oscura — cuál de las dos ves depende de tu sistema
   // o del botón de tema, no de esto. Opcional — si lo quitas, se usa
   // "terracota" por defecto.
-  // Opciones:
-  //   "terracota"  (por defecto) papel/tinta cálidos + acento terracota
-  //   "azul"       igual que terracota, con acento azul
-  //   "verde"      igual que terracota, con acento verde
+  // Opciones (cada una con su propio fondo claro/oscuro, no solo el acento):
+  //   "terracota"  (por defecto) papel crema / tinta cálida, acento terracota
+  //   "azul"       blanco y negro con tinte azulado, acento azul
+  //   "verde"      blanco y negro con tinte verdoso, acento verde
   //   "monocromo"  blanco puro / negro puro, sin color de acento
   theme: "terracota",
 
