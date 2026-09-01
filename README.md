@@ -92,6 +92,7 @@ Los proyectos sin `order` rellenan los huecos restantes en su orden habitual. Si
 | `source`    | Violeta | REPOSITORIO |
 | `media`     | Rosa/carmesí | MÚSICA |
 | `servicios` | Verde azulado | SERVICIOS |
+| `proximamente` | Naranja | PRÓXIMAMENTE |
 | `offline`   | Gris neutro  | INACTIVO |
 
 Si escribes tu propio `label`, sustituye al texto por defecto de la tabla, pero solo `type` determina el color.

@@ -19,6 +19,7 @@ const DEFAULT_STATUS_LABELS = {
   source: "REPOSITORIO",
   media: "MÚSICA",
   servicios: "SERVICIOS",
+  proximamente: "PRÓXIMAMENTE",
   offline: "INACTIVO"
 };
 

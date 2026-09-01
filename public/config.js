@@ -84,6 +84,8 @@ const SITE_CONFIG = {
      "servicios" verde azulado ("SERVICIOS") — para un bien o servicio que
                                 ofreces, con enlace a otra web donde se
                                 explica (ver ejemplo con priceRange abajo)
+     "proximamente" naranja    ("PRÓXIMAMENTE") — para algo que aún no
+                                está listo pero quieres anunciar ya
      "offline"   gris          ("INACTIVO")
 
    PARA AÑADIR UN PROYECTO NUEVO:

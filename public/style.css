@@ -57,6 +57,7 @@
   --c-source: light-dark(#5B4A8A, #A292D9);
   --c-media: light-dark(#9C3B57, #E58AA6);
   --c-servicios: light-dark(#1F6E6B, #5FC4BE);
+  --c-proximamente: light-dark(#B8541E, #F0935E);
   --c-offline: light-dark(#8A8374, #5C5548);
 
   --shadow-elevated: light-dark(0 1px 2px rgba(23, 20, 15, 0.04), 0 10px 30px rgba(0, 0, 0, 0.45));
@@ -328,6 +329,7 @@ body {
 .flag-dot--source { background-color: var(--c-source); }
 .flag-dot--media { background-color: var(--c-media); }
 .flag-dot--servicios { background-color: var(--c-servicios); }
+.flag-dot--proximamente { background-color: var(--c-proximamente); }
 .flag-dot--offline { background-color: var(--c-offline); }
 
 /* Theme toggle: un pequeño "dial" en vez de emoji inconsistentes entre plataformas */
