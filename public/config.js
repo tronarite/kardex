@@ -55,16 +55,18 @@ const SITE_CONFIG = {
      name          Obligatorio   Título del proyecto o enlace.
      url           Obligatorio   A dónde lleva (incluye "https://").
      description   Opcional      Frase corta debajo del título.
-     type          Opcional      Color del indicador (ver tabla). Si lo
-                                  omites, se asume "online".
-     label         Opcional      Texto junto al indicador. Si lo omites,
-                                  se usa el texto por defecto de ese "type".
+     type          Opcional      Fase del proyecto (ver tabla) — controla
+                                  SOLO el color del punto. Si lo omites,
+                                  se asume "activo".
+     label         Opcional      El texto que se ve junto al punto. Aquí
+                                  es donde pones la categoría si quieres
+                                  una — "REPOSITORIO", "MÚSICA", "SERVICIO",
+                                  lo que sea. Si lo omites, se usa el texto
+                                  por defecto de ese "type" (ver tabla).
      displayUrl    Opcional      Texto del enlace a mostrar. Si lo omites,
                                   se genera solo a partir de "url".
      priceRange    Opcional      Texto libre junto al indicador, ej. "20€ –
-                                  50€" o "Desde 30€". Pensado sobre todo
-                                  para type: "servicios", pero funciona en
-                                  cualquier proyecto. Si lo omites, no se
+                                  50€" o "Desde 30€". Si lo omites, no se
                                   muestra nada.
      order         Opcional      Un número (1, 2, 3...) para fijar en qué
                                   posición del índice aparece, sin tener
@@ -78,20 +80,22 @@ const SITE_CONFIG = {
    según la posición en esta lista. Puedes reordenar, borrar o añadir
    proyectos sin tener que renumerar nada.
 
-   TYPE disponibles para PROYECTOS y su color — etiqueta por defecto entre
-   paréntesis (esto NO es lo mismo que SITE_CONFIG.availability de arriba,
-   que es tu disponibilidad personal, con su propio catálogo):
-     "online"    verde         ("ACTIVO")
-     "dev"       azul          ("EN DESARROLLO")
-     "standby"   ámbar         ("EN PAUSA")
-     "source"    violeta       ("REPOSITORIO")
-     "media"     rosa          ("MÚSICA")
-     "servicios" verde azulado ("SERVICIOS") — para un bien o servicio que
-                                ofreces, con enlace a otra web donde se
-                                explica (ver ejemplo con priceRange abajo)
-     "proximamente" naranja    ("PRÓXIMAMENTE") — para algo que aún no
-                                está listo pero quieres anunciar ya
-     "offline"   gris          ("INACTIVO")
+   TYPE disponibles para PROYECTOS — describen SOLO la fase/ciclo de vida,
+   nunca la categoría (para eso usa "label", ver arriba). Etiqueta por
+   defecto entre paréntesis. Esto NO es lo mismo que SITE_CONFIG.availability
+   de arriba, que es tu disponibilidad personal, con su propio catálogo:
+     "activo"       verde  ("ACTIVO")        — funcionando con normalidad
+     "desarrollo"   azul   ("EN DESARROLLO") — en construcción
+     "pausa"        ámbar  ("EN PAUSA")      — detenido de momento
+     "proximamente" naranja ("PRÓXIMAMENTE") — anunciado pero aún no listo
+     "inactivo"     gris   ("INACTIVO")      — dado de baja / archivado
+
+   Como "type" y "label" son independientes, puedes combinar cualquier
+   categoría con cualquier fase en la misma insignia:
+
+     { type: "activo",       label: "REPOSITORIO" }  -> punto verde, texto "REPOSITORIO"
+     { type: "proximamente", label: "SERVICIO" }      -> punto naranja, texto "SERVICIO"
+     { type: "activo",       label: "MÚSICA" }         -> punto verde, texto "MÚSICA"
 
    PARA AÑADIR UN PROYECTO NUEVO:
    copia este bloque completo (con su coma final) y pégalo donde quieras
@@ -101,7 +105,7 @@ const SITE_CONFIG = {
        name: "NOMBRE DEL PROYECTO",
        url: "https://ejemplo.com",
        description: "Una frase corta que lo describe.",
-       type: "online",
+       type: "activo",
      },
 
    PARA AÑADIR UN SERVICIO/PRODUCTO QUE OFRECES (con enlace a otra web y
@@ -111,7 +115,8 @@ const SITE_CONFIG = {
        name: "NOMBRE DEL SERVICIO",
        url: "https://otra-web-donde-se-explica.com",
        description: "En qué consiste, en una frase.",
-       type: "servicios",
+       type: "activo",
+       label: "SERVICIO",
        priceRange: "Desde 30€",
      },
 
@@ -124,6 +129,7 @@ const UNITS = [
     url: "tronarite.net/servicios",
     description: "Diferentes opciones de asesoría y mejora de tus equipos informativos.",
     type: "proximamente",
+    label: "SERVICIO",
     // priceRange: "Desde 300€",
   },
   {
@@ -131,27 +137,29 @@ const UNITS = [
     order: 3,
     url: "https://fonnaroa.net",
     description: "Servidores y experiencias de Minecraft. Desde 2023.",
-    type: "standby",
+    type: "pausa",
   },
   {
     name: "PORTFOLIO FOTOGRÁFICO",
     order: 2,
     url: "https://gallery.tronarite.net",
     description: "Galería fotográfica y archivos visuales personales.",
-    type: "online",
+    type: "activo",
   },
   {
     name: "GITHUB",
     order: 1,
     url: "https://github.com/tronarite",
     description: "Código, herramientas y proyectos open source.",
-    type: "source",
+    type: "activo",
+    label: "REPOSITORIO",
   },
   {
     name: "LAST.FM",
     order: 4,
     url: "https://www.last.fm/user/Tronarite",
     description: "Mi perfil musical",
-    type: "media",
+    type: "activo",
+    label: "MÚSICA",
   },
 ];

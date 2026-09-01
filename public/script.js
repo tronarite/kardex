@@ -11,16 +11,16 @@
 const prefersReducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// Etiqueta por defecto para cada "type" cuando config.js no especifica "label".
+// "type" describe SOLO la fase del proyecto (color del punto). Para la
+// categoría (REPOSITORIO, MÚSICA, SERVICIO...) usa "label", que es texto
+// libre y no toca el color — así una entrada puede combinar cualquier
+// categoría con cualquier estado (ver ejemplos en config.js).
 const DEFAULT_STATUS_LABELS = {
-  online: "ACTIVO",
-  dev: "EN DESARROLLO",
-  standby: "EN PAUSA",
-  source: "REPOSITORIO",
-  media: "MÚSICA",
-  servicios: "SERVICIOS",
+  activo: "ACTIVO",
+  desarrollo: "EN DESARROLLO",
+  pausa: "EN PAUSA",
   proximamente: "PRÓXIMAMENTE",
-  offline: "INACTIVO"
+  inactivo: "INACTIVO"
 };
 
 const VALID_STATUS_TYPES = new Set(Object.keys(DEFAULT_STATUS_LABELS));
@@ -42,13 +42,13 @@ const applyThemePack = (theme) => {
 
 /**
  * Resuelve { type, label } finales a partir de lo que haya en config.js.
- * - Si no se indica "type", se asume "online" (caso más común al añadir un enlace).
+ * - Si no se indica "type", se asume "activo" (caso más común al añadir un enlace).
  * - Si se indica un "type" que no existe (típicamente un error tipográfico),
- *   se muestra en gris "offline" para que el error salte a la vista.
+ *   se muestra en gris "inactivo" para que el error salte a la vista.
  * - Si no se indica "label", se usa el texto por defecto de ese "type".
  */
 const resolveStatus = (type, label) => {
-  const resolvedType = type === undefined ? "online" : (VALID_STATUS_TYPES.has(type) ? type : "offline");
+  const resolvedType = type === undefined ? "activo" : (VALID_STATUS_TYPES.has(type) ? type : "inactivo");
   const resolvedLabel = label || DEFAULT_STATUS_LABELS[resolvedType];
   return { type: resolvedType, label: resolvedLabel };
 };

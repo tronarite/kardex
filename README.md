@@ -61,13 +61,23 @@ const UNITS = [
     name: "PROYECTO EJEMPLO",              // obligatorio
     url: "https://ejemplo.com",            // obligatorio
     description: "Plataforma en producción.", // opcional
-    type: "online"                          // opcional (por defecto "online")
+    type: "activo"                          // opcional (por defecto "activo")
   }
   // añade tantos bloques como quieras, separados por comas
 ];
 ```
 
 Fíjate en lo que **no** hay que escribir: no hace falta numerar los proyectos (`01`, `02`...) — el índice se calcula solo según el orden de la lista, así que reordenar, borrar o insertar un proyecto en medio nunca rompe la numeración. Tampoco hace falta `displayUrl` (se genera solo desde `url`) ni `label` (cada `type` ya tiene un texto por defecto).
+
+### `type` es la fase, `label` es la categoría — son independientes
+`type` controla **solo** el color del punto y describe el ciclo de vida del proyecto (activo, en desarrollo, en pausa...). Para mostrar de qué trata el enlace (un repositorio, tu música, un servicio...), usa `label` — es texto libre y no cambia el color. Puedes combinar cualquier `label` con cualquier `type`:
+
+```javascript
+{ type: "activo",       label: "REPOSITORIO" }  // punto verde, texto "REPOSITORIO"
+{ type: "proximamente", label: "SERVICIO" }      // punto naranja, texto "SERVICIO"
+```
+
+Esto es lo que hace posible anunciar, por ejemplo, un servicio que aún no está listo (`type: "proximamente"`) sin perder el texto que dice que es un servicio (`label: "SERVICIO"`) — antes tenías que elegir uno u otro.
 
 ### Cambiar el orden sin mover bloques
 Si solo quieres que un proyecto aparezca más arriba, no hace falta cortar y pegar su bloque dentro de la lista: añádele `order` con el número de posición que quieres (1 = primero).
@@ -83,17 +93,14 @@ Si solo quieres que un proyecto aparezca más arriba, no hace falta cortar y peg
 
 Los proyectos sin `order` rellenan los huecos restantes en su orden habitual. Si dos proyectos piden la misma posición, gana el que esté antes en la lista.
 
-### Tipos de estado de PROYECTO (`type` dentro de `UNITS`):
-| `type`      | Color del indicador | Etiqueta por defecto |
-|-------------|----------------------|-----------------------|
-| `online`    | Verde   | ACTIVO |
-| `dev`       | Azul    | EN DESARROLLO |
-| `standby`   | Ámbar   | EN PAUSA |
-| `source`    | Violeta | REPOSITORIO |
-| `media`     | Rosa/carmesí | MÚSICA |
-| `servicios` | Verde azulado | SERVICIOS |
+### Fases de PROYECTO (`type` dentro de `UNITS`):
+| `type` | Color del indicador | Etiqueta por defecto |
+|--------|----------------------|-----------------------|
+| `activo` | Verde | ACTIVO |
+| `desarrollo` | Azul | EN DESARROLLO |
+| `pausa` | Ámbar | EN PAUSA |
 | `proximamente` | Naranja | PRÓXIMAMENTE |
-| `offline`   | Gris neutro  | INACTIVO |
+| `inactivo` | Gris neutro | INACTIVO |
 
 Si escribes tu propio `label`, sustituye al texto por defecto de la tabla, pero solo `type` determina el color.
 
@@ -110,15 +117,16 @@ Este es un catálogo **distinto** al de arriba: no describe el estado de un proy
 Nota: `online`/"ACTIVO" indica que el **proyecto** está activo, no que la web en sí esté disponible. Por ejemplo, una web puede seguir respondiendo (online técnicamente) mientras el proyecto detrás está en pausa — en ese caso usa `type: "standby"`, no `"online"`.
 
 ### Ofrecer un bien o servicio (con enlace externo y precio)
-Usa `type: "servicios"` para un proyecto que en realidad es algo que ofreces (no un enlace a tu propio trabajo), con `url` apuntando a otra web donde se explica en detalle. El campo opcional `priceRange` añade un precio o rango de precios junto al indicador:
+Para un proyecto que en realidad es algo que ofreces (no un enlace a tu propio trabajo), pon `label: "SERVICIO"` (o el texto que prefieras) con `url` apuntando a otra web donde se explica en detalle, y elige el `type` según si ya está disponible o no. El campo opcional `priceRange` añade un precio o rango de precios junto al indicador:
 
 ```javascript
 {
   name: "DESARROLLO WEB A MEDIDA",
   url: "https://otra-web-donde-se-explica.com",
   description: "En qué consiste, en una frase.",
-  type: "servicios",
-  priceRange: "Desde 300€"   // opcional; funciona en cualquier type, no solo "servicios"
+  type: "activo",        // o "proximamente" si aún no está listo
+  label: "SERVICIO",
+  priceRange: "Desde 300€"   // opcional; funciona con cualquier type
 }
 ```
 

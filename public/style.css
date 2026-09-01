@@ -50,16 +50,14 @@
   /* Acento (sello / tinta roja, no el naranja genérico de IA) */
   --accent: light-dark(#A6321C, #E2724A);
 
-  /* Indicadores de estado de PROYECTOS — un único punto de color, sin
-     fondo relleno */
-  --c-online: light-dark(#3F7A54, #5FBE84);
-  --c-dev: light-dark(#2E5C8A, #6FA8D9);
-  --c-standby: light-dark(#966A1F, #D9A94D);
-  --c-source: light-dark(#5B4A8A, #A292D9);
-  --c-media: light-dark(#9C3B57, #E58AA6);
-  --c-servicios: light-dark(#1F6E6B, #5FC4BE);
+  /* Indicadores de FASE DE PROYECTO — un único punto de color, sin fondo
+     relleno. Solo describen el ciclo de vida; la categoría (repositorio,
+     música, servicio...) va en "label" como texto libre, sin color propio. */
+  --c-activo: light-dark(#3F7A54, #5FBE84);
+  --c-desarrollo: light-dark(#2E5C8A, #6FA8D9);
+  --c-pausa: light-dark(#966A1F, #D9A94D);
   --c-proximamente: light-dark(#B8541E, #F0935E);
-  --c-offline: light-dark(#8A8374, #5C5548);
+  --c-inactivo: light-dark(#8A8374, #5C5548);
 
   /* Indicadores de DISPONIBILIDAD PERSONAL — catálogo separado del de
      proyectos, porque "en pausa" para un proyecto no es lo mismo que
@@ -340,14 +338,11 @@ body {
   background-color: var(--text-muted);
 }
 
-.status-online .flag-dot { background-color: var(--c-online); }
-.status-dev .flag-dot { background-color: var(--c-dev); }
-.status-standby .flag-dot { background-color: var(--c-standby); }
-.status-source .flag-dot { background-color: var(--c-source); }
-.status-media .flag-dot { background-color: var(--c-media); }
-.status-servicios .flag-dot { background-color: var(--c-servicios); }
+.status-activo .flag-dot { background-color: var(--c-activo); }
+.status-desarrollo .flag-dot { background-color: var(--c-desarrollo); }
+.status-pausa .flag-dot { background-color: var(--c-pausa); }
 .status-proximamente .flag-dot { background-color: var(--c-proximamente); }
-.status-offline .flag-dot { background-color: var(--c-offline); }
+.status-inactivo .flag-dot { background-color: var(--c-inactivo); }
 
 /* Disponibilidad personal (catálogo separado, ver arriba) */
 .status-disponible .flag-dot { background-color: var(--p-disponible); }
@@ -495,8 +490,8 @@ body {
 }
 
 .copy-btn.copied {
-  border-color: var(--c-online);
-  color: var(--c-online);
+  border-color: var(--c-activo);
+  color: var(--c-activo);
 }
 
 .masthead-footer {
