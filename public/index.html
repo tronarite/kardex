@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>tronarite — Índice</title>
+  <meta name="description" content="Índice personal de proyectos y enlaces, con estética editorial minimalista y modo claro/oscuro adaptativo.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#F5F3EC" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#131110" media="(prefers-color-scheme: dark)">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:title" content="tronarite — Índice">
+  <meta property="og:description" content="Índice personal de proyectos y enlaces, con estética editorial minimalista.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="preview.jpg">
+  <!-- Sustituye por el dominio real donde publiques el sitio -->
+  <meta property="og:url" content="https://tu-dominio.example/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="tronarite — Índice">
+  <meta name="twitter:description" content="Índice personal de proyectos y enlaces, con estética editorial minimalista.">
+  <meta name="twitter:image" content="preview.jpg">
+  <link rel="canonical" href="https://tu-dominio.example/">
+
+  <!-- Icons & PWA -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Sin fuentes externas: usa la pila tipográfica nativa del sistema (ver style.css) -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Evita el parpadeo de tema al recargar cuando hay una preferencia manual guardada -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme-preference");
+        if (saved === "dark" || saved === "light") {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "ÍNDICE // DEV_HUB",
+    "description": "Índice personal de proyectos y enlaces, con estética editorial minimalista."
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#index">Saltar al índice de proyectos</a>
+
+  <div class="page">
+
+    <!-- Masthead: identidad, tema y contacto -->
+    <aside class="masthead">
+      <div class="masthead-top">
+        <span class="flag" id="status-flag">
+          <span class="flag-dot flag-dot--online" aria-hidden="true"></span>
+          <span class="flag-text">DISPONIBLE</span>
+        </span>
+
+        <button id="theme-toggle" class="theme-toggle" data-state="auto" aria-label="Cambiar modo claro / oscuro" title="Cambiar tema">
+          <span class="theme-dial" aria-hidden="true"></span>
+          <span id="theme-label">AUTO</span>
+        </button>
+      </div>
+
+      <div class="identity">
+        <p class="identity-kicker">ÍNDICE PERSONAL</p>
+        <h1 class="identity-name" id="operator-name">Tu Nombre / Alias</h1>
+        <p class="identity-role" id="operator-subtitle">DESARROLLO SOFTWARE // INGENIERÍA &amp; SISTEMAS</p>
+      </div>
+
+      <div class="contact-block">
+        <span class="contact-kicker">CONTACTO</span>
+        <a href="mailto:contacto@ejemplo.com" class="contact-email" id="contact-email-link">
+          <span id="contact-email-text">contacto@ejemplo.com</span>
+        </a>
+        <button id="copy-email-btn" class="copy-btn" aria-label="Copiar correo al portapapeles">
+          <span id="copy-btn-text">Copiar dirección</span>
+        </button>
+        <span class="visually-hidden" id="copy-status" role="status" aria-live="polite"></span>
+      </div>
+
+      <p class="masthead-footer">
+        <span aria-hidden="true">·</span> Actualizado <span id="sync-timestamp">—</span>
+      </p>
+    </aside>
+
+    <!-- Índice de proyectos y enlaces -->
+    <main class="index" id="index" aria-label="Proyectos y enlaces">
+      <div class="index-head">
+        <span class="index-head-number" aria-hidden="true">N.º</span>
+        <span class="index-head-title">PROYECTOS Y ENLACES</span>
+      </div>
+
+      <ol class="index-list" id="units-list">
+        <!-- Se inserta dinámicamente desde config.js / script.js -->
+      </ol>
+
+      <!-- Alternativa accesible para navegadores/crawlers sin JavaScript -->
+      <noscript>
+        <ol class="index-list">
+          <li class="index-row">
+            <a class="index-link" href="https://ejemplo.com" target="_blank" rel="noopener noreferrer">
+              <span class="row-number">01</span>
+              <span class="row-body">
+                <span class="row-head">
+                  <span class="row-name">PROYECTO EJEMPLO</span>
+                  <span class="row-flag"><span class="flag-dot flag-dot--online"></span>ONLINE</span>
+                </span>
+                <span class="row-desc">Descripción del proyecto o plataforma en producción.</span>
+              </span>
+              <span class="row-url">ejemplo.com →</span>
+            </a>
+          </li>
+          <li class="index-row">
+            <a class="index-link" href="https://github.com/tuusuario" target="_blank" rel="noopener noreferrer">
+              <span class="row-number">02</span>
+              <span class="row-body">
+                <span class="row-head">
+                  <span class="row-name">GITHUB</span>
+                  <span class="row-flag"><span class="flag-dot flag-dot--source"></span>REPOSITORIO</span>
+                </span>
+                <span class="row-desc">Código, herramientas y proyectos open source.</span>
+              </span>
+              <span class="row-url">github.com/tuusuario →</span>
+            </a>
+          </li>
+        </ol>
+      </noscript>
+    </main>
+
+  </div>
+
+  <footer class="credit">
+    <a href="https://github.com/tronarite/kardex" target="_blank" rel="noopener noreferrer">Powered by Kardex</a>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

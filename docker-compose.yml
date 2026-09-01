@@ -5,3 +5,12 @@ services:
     restart: unless-stopped
     ports:
       - "8090:80"
+    # Monta la carpeta completa en modo lectura: edita cualquier archivo
+    # dentro de public/ (sobre todo config.js) y guarda — el cambio se ve
+    # al recargar la pestaña del navegador, sin reconstruir la imagen.
+    # (Importante: se monta la CARPETA, no archivos sueltos — montar
+    # archivos individuales es frágil en Docker Desktop para Mac/Windows,
+    # porque al guardar tu editor puede recrear el archivo con un inodo
+    # nuevo y el punto de montaje se queda apuntando a un archivo borrado.)
+    volumes:
+      - ./public:/usr/share/nginx/html:ro
