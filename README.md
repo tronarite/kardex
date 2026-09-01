@@ -70,16 +70,29 @@ const UNITS = [
 Fíjate en lo que **no** hay que escribir: no hace falta numerar los proyectos (`01`, `02`...) — el índice se calcula solo según el orden de la lista, así que reordenar, borrar o insertar un proyecto en medio nunca rompe la numeración. Tampoco hace falta `displayUrl` (se genera solo desde `url`) ni `label` (cada `type` ya tiene un texto por defecto).
 
 ### Tipos de estado (`type`) disponibles:
-| `type`     | Color del indicador | Etiqueta por defecto |
-|------------|----------------------|-----------------------|
-| `online`   | Verde   | ONLINE |
-| `dev`      | Azul    | EN DESARROLLO |
-| `standby`  | Ámbar   | EN PAUSA |
-| `source`   | Violeta | REPOSITORIO |
-| `media`    | Rosa/carmesí | MÚSICA |
-| `offline`  | Gris neutro  | INACTIVO |
+| `type`      | Color del indicador | Etiqueta por defecto |
+|-------------|----------------------|-----------------------|
+| `online`    | Verde   | ONLINE |
+| `dev`       | Azul    | EN DESARROLLO |
+| `standby`   | Ámbar   | EN PAUSA |
+| `source`    | Violeta | REPOSITORIO |
+| `media`     | Rosa/carmesí | MÚSICA |
+| `servicios` | Verde azulado | SERVICIOS |
+| `offline`   | Gris neutro  | INACTIVO |
 
 Si escribes tu propio `label`, sustituye al texto por defecto de la tabla, pero solo `type` determina el color.
+
+### Color de acento
+`accent` en `config.js` controla el color de acento del sitio (los "//", los enlaces al pasar el ratón, la barra que resalta cada fila). Opcional — por defecto es `"terracota"`.
+
+| `accent` |
+|----------|
+| `terracota` (por defecto) |
+| `azul` |
+| `verde` |
+| `violeta` |
+| `rosa` |
+| `ambar` |
 
 ### Título de la pestaña
 `pageTitle` en `config.js` controla el título de la pestaña del navegador. Es opcional: si lo quitas, se genera solo como `"{operatorName} — Índice"`.

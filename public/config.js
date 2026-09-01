@@ -12,7 +12,7 @@ const SITE_CONFIG = {
 
   // Una línea corta que te describe. Si escribes "//" en medio, se separa
   // visualmente en dos partes (puedes quitar el "//" si prefieres una frase).
-  operatorRole: "ING. INFORMÁTICA // DEV. // FOTÓGRAFO AMATEUR",
+  operatorRole: "ING. INFORMÁTICA // DEVELOPER AMATEUR // FOTÓGRAFO AMATEUR",
 
   // Tu correo de contacto. Se usa para el enlace "mailto:" y para el botón
   // de copiar al portapapeles.
@@ -21,6 +21,12 @@ const SITE_CONFIG = {
   // Título de la pestaña del navegador. Opcional: si lo quitas o lo dejas
   // vacío, se usa automáticamente "{operatorName} — Índice".
   pageTitle: "tronarite - Índice personal",
+
+  // Color de acento del sitio (los "//", los enlaces al pasar el ratón, la
+  // barra que aparece al lado de cada proyecto...). Opcional — si lo
+  // quitas, se usa "terracota" por defecto.
+  // Opciones: "terracota" | "azul" | "verde" | "violeta" | "rosa" | "ambar"
+  accent: "terracota",
 
   // Tu disponibilidad, arriba a la izquierda de la página.
   availability: {
@@ -56,6 +62,7 @@ const SITE_CONFIG = {
      "standby"  ámbar    ("EN PAUSA")
      "source"   violeta  ("REPOSITORIO")
      "media"    rosa     ("MÚSICA")
+     "servicios" verde azulado ("SERVICIOS")
      "offline"  gris     ("INACTIVO")
 
    PARA AÑADIR UN PROYECTO NUEVO:

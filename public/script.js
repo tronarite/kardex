@@ -18,10 +18,24 @@ const DEFAULT_STATUS_LABELS = {
   standby: "EN PAUSA",
   source: "REPOSITORIO",
   media: "MÚSICA",
+  servicios: "SERVICIOS",
   offline: "INACTIVO"
 };
 
 const VALID_STATUS_TYPES = new Set(Object.keys(DEFAULT_STATUS_LABELS));
+
+const VALID_ACCENTS = new Set(["terracota", "azul", "verde", "violeta", "rosa", "ambar"]);
+
+/**
+ * Aplica el color de acento elegido en config.js (SITE_CONFIG.accent).
+ * Si no se indica, o no es una de las opciones válidas, se queda con el
+ * valor por defecto ("terracota") ya definido en :root en style.css.
+ */
+const applyAccent = (accent) => {
+  if (accent && VALID_ACCENTS.has(accent)) {
+    document.documentElement.dataset.accent = accent;
+  }
+};
 
 /**
  * Resuelve { type, label } finales a partir de lo que haya en config.js.
@@ -274,6 +288,7 @@ const initContactManager = (config) => {
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", () => {
   initThemeManager();
+  applyAccent(SITE_CONFIG.accent);
   renderIdentity(SITE_CONFIG);
   initContactManager(SITE_CONFIG);
   renderUnits(UNITS);
