@@ -58,11 +58,18 @@ const SITE_CONFIG = {
      type          Opcional      Fase del proyecto (ver tabla) — controla
                                   SOLO el color del punto. Si lo omites,
                                   se asume "activo".
-     label         Opcional      El texto que se ve junto al punto. Aquí
-                                  es donde pones la categoría si quieres
-                                  una — "REPOSITORIO", "MÚSICA", "SERVICIO",
-                                  lo que sea. Si lo omites, se usa el texto
-                                  por defecto de ese "type" (ver tabla).
+     label         Opcional      El texto que se ve junto al punto. NO
+                                  hace falta usar los textos por defecto
+                                  ("ACTIVO", "EN PAUSA"...) — escribe lo
+                                  que de verdad describe ese enlace, en tus
+                                  palabras. Suele funcionar mejor si dice
+                                  QUÉ TIPO DE COSA es (ej. "GALERÍA",
+                                  "RRSS", "REPOSITORIO", "COMUNIDAD") en
+                                  vez de repetir un estado que no puedes
+                                  prometer ("ACTIVO" no garantiza que subas
+                                  contenido a menudo) o que ya cuenta la
+                                  "description". Si lo omites del todo, se
+                                  usa el texto por defecto de ese "type".
      displayUrl    Opcional      Texto del enlace a mostrar. Si lo omites,
                                   se genera solo a partir de "url".
      priceRange    Opcional      Texto libre junto al indicador, ej. "20€ –
@@ -145,6 +152,7 @@ const UNITS = [
     url: "https://gallery.tronarite.net",
     description: "Galería fotográfica y archivos visuales personales.",
     type: "activo",
+    label: "GALERÍA",
   },
   {
     name: "GITHUB",
@@ -160,6 +168,6 @@ const UNITS = [
     url: "https://www.last.fm/user/Tronarite",
     description: "Mi perfil musical",
     type: "activo",
-    label: "MÚSICA",
+    label: "RRSS",
   },
 ];
