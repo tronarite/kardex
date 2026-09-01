@@ -13,7 +13,7 @@ const prefersReducedMotion = () =>
 
 // Etiqueta por defecto para cada "type" cuando config.js no especifica "label".
 const DEFAULT_STATUS_LABELS = {
-  online: "ONLINE",
+  online: "ACTIVO",
   dev: "EN DESARROLLO",
   standby: "EN PAUSA",
   source: "REPOSITORIO",
@@ -64,10 +64,10 @@ const getSystemTimestamp = () => {
 // ==========================================================================
 const createFlagElement = (type, label) => {
   const flag = document.createElement("span");
-  flag.className = "row-flag";
+  flag.className = `row-flag status-${type}`;
 
   const dot = document.createElement("span");
-  dot.className = `flag-dot flag-dot--${type}`;
+  dot.className = "flag-dot";
   dot.setAttribute("aria-hidden", "true");
 
   flag.appendChild(dot);
@@ -241,9 +241,8 @@ const renderIdentity = (config) => {
   const flagEl = document.getElementById("status-flag");
   if (flagEl && config.availability) {
     const status = resolveStatus(config.availability.type, config.availability.label);
-    const dot = flagEl.querySelector(".flag-dot");
     const text = flagEl.querySelector(".flag-text");
-    if (dot) dot.className = `flag-dot flag-dot--${status.type}`;
+    flagEl.className = `flag status-${status.type}`;
     if (text) text.textContent = status.label;
   }
 

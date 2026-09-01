@@ -86,7 +86,7 @@ Los proyectos sin `order` rellenan los huecos restantes en su orden habitual. Si
 ### Tipos de estado (`type`) disponibles:
 | `type`      | Color del indicador | Etiqueta por defecto |
 |-------------|----------------------|-----------------------|
-| `online`    | Verde   | ONLINE |
+| `online`    | Verde   | ACTIVO |
 | `dev`       | Azul    | EN DESARROLLO |
 | `standby`   | Ámbar   | EN PAUSA |
 | `source`    | Violeta | REPOSITORIO |
@@ -96,6 +96,8 @@ Los proyectos sin `order` rellenan los huecos restantes en su orden habitual. Si
 | `offline`   | Gris neutro  | INACTIVO |
 
 Si escribes tu propio `label`, sustituye al texto por defecto de la tabla, pero solo `type` determina el color.
+
+Nota: `online`/"ACTIVO" indica que el **proyecto** está activo, no que la web en sí esté disponible. Por ejemplo, una web puede seguir respondiendo (online técnicamente) mientras el proyecto detrás está en pausa — en ese caso usa `type: "standby"`, no `"online"`.
 
 ### Ofrecer un bien o servicio (con enlace externo y precio)
 Usa `type: "servicios"` para un proyecto que en realidad es algo que ofreces (no un enlace a tu propio trabajo), con `url` apuntando a otra web donde se explica en detalle. El campo opcional `priceRange` añade un precio o rango de precios junto al indicador:

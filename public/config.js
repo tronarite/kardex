@@ -8,7 +8,7 @@
 
 const SITE_CONFIG = {
   // Tu nombre, alias o marca personal.
-  operatorName: "tronarite // Marcelo Añanga",
+  operatorName: "tronarite / Marcelo Añanga",
 
   // Una línea corta que te describe. Si escribes "//" en medio, se separa
   // visualmente en dos partes (puedes quitar el "//" si prefieres una frase).
@@ -116,9 +116,9 @@ const UNITS = [
     // EJEMPLO — edítalo con tu servicio real o bórralo si no lo necesitas.
     name: "SERVICIOS",
     order: 5,
-    // url: "",
+    url: "tronarite.net/servicios",
     description: "Diferentes opciones de asesoría y mejora de tus equipos informativos.",
-    type: "servicios",
+    type: "proximamente",
     // priceRange: "Desde 300€",
   },
   {

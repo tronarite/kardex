@@ -304,16 +304,24 @@ body {
   gap: 0.75rem;
 }
 
-.flag {
+/* Indicador de estado — mismo estilo de texto para todos los estados en
+   todo el sitio (masthead y filas del índice); lo único que cambia entre
+   uno y otro es el color del punto, vía la clase .status-* en el mismo
+   elemento (solo afecta a .flag-dot dentro, no al texto). */
+.flag,
+.row-flag {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--text-dim);
 }
+
+.flag { font-size: 0.7rem; }
+.row-flag { font-size: 0.66rem; }
 
 .flag-dot {
   width: 6px;
@@ -323,14 +331,14 @@ body {
   background-color: var(--text-muted);
 }
 
-.flag-dot--online { background-color: var(--c-online); box-shadow: 0 0 0 3px light-dark(rgba(63,122,84,0.15), rgba(95,190,132,0.18)); }
-.flag-dot--dev { background-color: var(--c-dev); }
-.flag-dot--standby { background-color: var(--c-standby); }
-.flag-dot--source { background-color: var(--c-source); }
-.flag-dot--media { background-color: var(--c-media); }
-.flag-dot--servicios { background-color: var(--c-servicios); }
-.flag-dot--proximamente { background-color: var(--c-proximamente); }
-.flag-dot--offline { background-color: var(--c-offline); }
+.status-online .flag-dot { background-color: var(--c-online); }
+.status-dev .flag-dot { background-color: var(--c-dev); }
+.status-standby .flag-dot { background-color: var(--c-standby); }
+.status-source .flag-dot { background-color: var(--c-source); }
+.status-media .flag-dot { background-color: var(--c-media); }
+.status-servicios .flag-dot { background-color: var(--c-servicios); }
+.status-proximamente .flag-dot { background-color: var(--c-proximamente); }
+.status-offline .flag-dot { background-color: var(--c-offline); }
 
 /* Theme toggle: un pequeño "dial" en vez de emoji inconsistentes entre plataformas */
 .theme-toggle {
@@ -626,17 +634,6 @@ body {
   letter-spacing: -0.005em;
 }
 
-.row-flag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: var(--text-dim);
-  text-transform: uppercase;
-}
 
 .row-price {
   font-family: var(--font-mono);
