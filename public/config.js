@@ -35,9 +35,12 @@ const SITE_CONFIG = {
   //   "monocromo"  blanco puro / negro puro, sin color de acento
   theme: "azul",
 
-  // Tu disponibilidad, arriba a la izquierda de la página.
+  // Tu disponibilidad personal, arriba a la izquierda de la página.
+  // OJO: este "type" es un catálogo distinto al de los proyectos de abajo
+  // — aquí se trata de si TÚ estás disponible, no de si un proyecto lo está.
+  // Opciones: "disponible" | "ocupado" | "vacaciones" | "no-disponible"
   availability: {
-    type: "standby",        // ver tabla de TYPES más abajo
+    type: "vacaciones",
     label: "DE VACACIONES",   // texto libre, opcional (si lo quitas, usa uno por defecto)
   },
 };
@@ -75,8 +78,10 @@ const SITE_CONFIG = {
    según la posición en esta lista. Puedes reordenar, borrar o añadir
    proyectos sin tener que renumerar nada.
 
-   TYPE disponibles y su color — su etiqueta por defecto entre paréntesis:
-     "online"    verde         ("ONLINE")
+   TYPE disponibles para PROYECTOS y su color — etiqueta por defecto entre
+   paréntesis (esto NO es lo mismo que SITE_CONFIG.availability de arriba,
+   que es tu disponibilidad personal, con su propio catálogo):
+     "online"    verde         ("ACTIVO")
      "dev"       azul          ("EN DESARROLLO")
      "standby"   ámbar         ("EN PAUSA")
      "source"    violeta       ("REPOSITORIO")

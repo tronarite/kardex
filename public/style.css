@@ -50,7 +50,8 @@
   /* Acento (sello / tinta roja, no el naranja genérico de IA) */
   --accent: light-dark(#A6321C, #E2724A);
 
-  /* Indicadores de estado — un único punto de color, sin fondo relleno */
+  /* Indicadores de estado de PROYECTOS — un único punto de color, sin
+     fondo relleno */
   --c-online: light-dark(#3F7A54, #5FBE84);
   --c-dev: light-dark(#2E5C8A, #6FA8D9);
   --c-standby: light-dark(#966A1F, #D9A94D);
@@ -59,6 +60,14 @@
   --c-servicios: light-dark(#1F6E6B, #5FC4BE);
   --c-proximamente: light-dark(#B8541E, #F0935E);
   --c-offline: light-dark(#8A8374, #5C5548);
+
+  /* Indicadores de DISPONIBILIDAD PERSONAL — catálogo separado del de
+     proyectos, porque "en pausa" para un proyecto no es lo mismo que
+     "estoy de vacaciones" para una persona. */
+  --p-disponible: light-dark(#3F7A54, #5FBE84);
+  --p-ocupado: light-dark(#966A1F, #D9A94D);
+  --p-vacaciones: light-dark(#5B4A8A, #A292D9);
+  --p-no-disponible: light-dark(#8A8374, #5C5548);
 
   --shadow-elevated: light-dark(0 1px 2px rgba(23, 20, 15, 0.04), 0 10px 30px rgba(0, 0, 0, 0.45));
 
@@ -339,6 +348,12 @@ body {
 .status-servicios .flag-dot { background-color: var(--c-servicios); }
 .status-proximamente .flag-dot { background-color: var(--c-proximamente); }
 .status-offline .flag-dot { background-color: var(--c-offline); }
+
+/* Disponibilidad personal (catálogo separado, ver arriba) */
+.status-disponible .flag-dot { background-color: var(--p-disponible); }
+.status-ocupado .flag-dot { background-color: var(--p-ocupado); }
+.status-vacaciones .flag-dot { background-color: var(--p-vacaciones); }
+.status-no-disponible .flag-dot { background-color: var(--p-no-disponible); }
 
 /* Theme toggle: un pequeño "dial" en vez de emoji inconsistentes entre plataformas */
 .theme-toggle {

@@ -53,6 +53,25 @@ const resolveStatus = (type, label) => {
   return { type: resolvedType, label: resolvedLabel };
 };
 
+// Catálogo de DISPONIBILIDAD PERSONAL (SITE_CONFIG.availability), separado
+// del catálogo de proyectos: "en pausa" para un proyecto no es lo mismo
+// que "estoy de vacaciones" para una persona.
+const DEFAULT_AVAILABILITY_LABELS = {
+  disponible: "DISPONIBLE",
+  ocupado: "OCUPADO",
+  vacaciones: "DE VACACIONES",
+  "no-disponible": "NO DISPONIBLE"
+};
+
+const VALID_AVAILABILITY_TYPES = new Set(Object.keys(DEFAULT_AVAILABILITY_LABELS));
+
+const resolveAvailability = (type, label) => {
+  const resolvedType =
+    type === undefined ? "disponible" : (VALID_AVAILABILITY_TYPES.has(type) ? type : "no-disponible");
+  const resolvedLabel = label || DEFAULT_AVAILABILITY_LABELS[resolvedType];
+  return { type: resolvedType, label: resolvedLabel };
+};
+
 const getSystemTimestamp = () => {
   const now = new Date();
   const pad = (n) => String(n).padStart(2, "0");
@@ -240,7 +259,7 @@ const renderIdentity = (config) => {
 
   const flagEl = document.getElementById("status-flag");
   if (flagEl && config.availability) {
-    const status = resolveStatus(config.availability.type, config.availability.label);
+    const status = resolveAvailability(config.availability.type, config.availability.label);
     const text = flagEl.querySelector(".flag-text");
     flagEl.className = `flag status-${status.type}`;
     if (text) text.textContent = status.label;

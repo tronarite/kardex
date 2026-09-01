@@ -51,7 +51,7 @@ const SITE_CONFIG = {
   operatorRole: "DESARROLLO SOFTWARE // INGENIERÍA & SISTEMAS",
   contactEmail: "contacto@ejemplo.com",
   availability: {
-    type: "online",      // opcional, ver tabla de types abajo
+    type: "disponible",  // opcional, ver tabla "Disponibilidad personal" abajo
     label: "DISPONIBLE"  // opcional, texto libre
   }
 };
@@ -83,7 +83,7 @@ Si solo quieres que un proyecto aparezca más arriba, no hace falta cortar y peg
 
 Los proyectos sin `order` rellenan los huecos restantes en su orden habitual. Si dos proyectos piden la misma posición, gana el que esté antes en la lista.
 
-### Tipos de estado (`type`) disponibles:
+### Tipos de estado de PROYECTO (`type` dentro de `UNITS`):
 | `type`      | Color del indicador | Etiqueta por defecto |
 |-------------|----------------------|-----------------------|
 | `online`    | Verde   | ACTIVO |
@@ -96,6 +96,16 @@ Los proyectos sin `order` rellenan los huecos restantes en su orden habitual. Si
 | `offline`   | Gris neutro  | INACTIVO |
 
 Si escribes tu propio `label`, sustituye al texto por defecto de la tabla, pero solo `type` determina el color.
+
+### Disponibilidad personal (`type` dentro de `availability`)
+Este es un catálogo **distinto** al de arriba: no describe el estado de un proyecto, sino si tú estás disponible ahora mismo. Como con los proyectos, `label` es libre y sustituye al texto por defecto — escribe lo que quieras, `type` solo decide el color.
+
+| `type` | Color del indicador | Etiqueta por defecto |
+|--------|----------------------|-----------------------|
+| `disponible` | Verde | DISPONIBLE |
+| `ocupado` | Ámbar | OCUPADO |
+| `vacaciones` | Violeta | DE VACACIONES |
+| `no-disponible` | Gris neutro | NO DISPONIBLE |
 
 Nota: `online`/"ACTIVO" indica que el **proyecto** está activo, no que la web en sí esté disponible. Por ejemplo, una web puede seguir respondiendo (online técnicamente) mientras el proyecto detrás está en pausa — en ese caso usa `type: "standby"`, no `"online"`.
 
