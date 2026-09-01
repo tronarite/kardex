@@ -169,7 +169,7 @@
   --dark-text-dim: #768394;
   --dark-text-muted: #4A5566;
 
-  --accent: light-dark(#1B3B66, #89ABDD);
+  --accent: light-dark(#1746B0, #5B9BF2);
 }
 
 :root[data-theme-pack="petroleo"] {
