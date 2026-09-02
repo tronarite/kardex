@@ -1,26 +1,33 @@
 /* ============================================================================
-   CONFIGURACIÓN DEL SITIO — edita SOLO este archivo.
-   No hace falta tocar script.js ni style.css para personalizar tu índice.
+   CONFIGURACIÓN DEL SITIO — plantilla de ejemplo.
 
-   Para aplicar un cambio: guarda este archivo y recarga la pestaña del
-   navegador (Cmd+R). Nada más — no hace falta reconstruir Docker.
+   Este archivo SÍ se sube al repositorio (es la plantilla genérica).
+   Para usarlo: copia este archivo como "config.js" en esta misma carpeta
+   y edita "config.js" con tus datos reales. "config.js" está en
+   .gitignore a propósito — así tus datos personales (nombre, correo,
+   enlaces...) nunca se suben al repositorio.
+
+     cp public/config.example.js public/config.js
+
+   Para aplicar un cambio en tu config.js: guarda el archivo y recarga la
+   pestaña del navegador (Cmd+R). Nada más — no hace falta reconstruir Docker.
    ============================================================================ */
 
 const SITE_CONFIG = {
   // Tu nombre, alias o marca personal.
-  operatorName: "tronarite / Marcelo Añanga",
+  operatorName: "Tu Nombre / Alias",
 
   // Una línea corta que te describe. Si escribes "//" en medio, se separa
   // visualmente en dos partes (puedes quitar el "//" si prefieres una frase).
-  operatorRole: "ING. INFORMÁTICA // DEVELOPER AMATEUR // FOTÓGRAFO AMATEUR",
+  operatorRole: "DESARROLLO SOFTWARE // INGENIERÍA & SISTEMAS",
 
   // Tu correo de contacto. Se usa para el enlace "mailto:" y para el botón
   // de copiar al portapapeles.
-  contactEmail: "contacto@tronarite.net",
+  contactEmail: "contacto@ejemplo.com",
 
   // Título de la pestaña del navegador. Opcional: si lo quitas o lo dejas
   // vacío, se usa automáticamente "{operatorName} — Índice".
-  pageTitle: "tronarite - Índice personal",
+  pageTitle: "Tu Nombre — Índice personal",
 
   // Tema de color del sitio. Cada opción trae ya coordinadas su versión
   // clara y su versión oscura — cuál de las dos ves depende de tu sistema
@@ -30,18 +37,18 @@ const SITE_CONFIG = {
   //   "terracota"  papel crema / tinta cálida, acento rojo-naranja
   //   "vino"       blanco/negro con tinte vino, acento vino
   //   "mostaza"    blanco/negro con tinte cálido dorado, acento mostaza
-  //   "azul"       (por defecto) azul marino profundo, no un azul frío/claro
+  //   "azul"       azul marino profundo, no un azul frío/claro
   //   "petroleo"   azul verdoso profundo, entre azul y verde
   //   "monocromo"  blanco puro / negro puro, sin color de acento
-  theme: "azul",
+  theme: "terracota",
 
   // Tu disponibilidad personal, arriba a la izquierda de la página.
   // OJO: este "type" es un catálogo distinto al de los proyectos de abajo
   // — aquí se trata de si TÚ estás disponible, no de si un proyecto lo está.
   // Opciones: "disponible" | "ocupado" | "vacaciones" | "no-disponible"
   availability: {
-    type: "vacaciones",
-    label: "DE VACACIONES",   // texto libre, opcional (si lo quitas, usa uno por defecto)
+    type: "disponible",
+    label: "DISPONIBLE",   // texto libre, opcional (si lo quitas, usa uno por defecto)
   },
 };
 
@@ -130,44 +137,45 @@ const SITE_CONFIG = {
    ============================================================================ */
 const UNITS = [
   {
-    // EJEMPLO — edítalo con tu servicio real o bórralo si no lo necesitas.
-    name: "SERVICIOS",
-    order: 5,
-    url: "tronarite.net/servicios",
-    description: "Diferentes opciones de asesoría y mejora de tus equipos informativos.",
-    type: "proximamente",
-    label: "PROXIMAMENTE",
-    // priceRange: "Desde 300€",
-  },
-  {
-    name: "FONNAROA NETWORK",
-    order: 3,
-    url: "https://fonnaroa.net",
-    description: "Servidores y experiencias de Minecraft. Desde 2023.",
-    type: "pausa",
+    name: "PROYECTO EJEMPLO",
+    order: 1,
+    url: "https://ejemplo.com",
+    description: "Descripción del proyecto o plataforma en producción.",
+    type: "activo",
+    label: "REPOSITORIO",
   },
   {
     name: "PORTFOLIO FOTOGRÁFICO",
     order: 2,
-    url: "https://gallery.tronarite.net",
+    url: "https://foto.ejemplo.com",
     description: "Galería fotográfica y archivos visuales personales.",
     type: "activo",
     label: "GALERÍA",
   },
   {
-    name: "GITHUB",
-    order: 1,
-    url: "https://github.com/tronarite",
-    description: "Código, herramientas y proyectos open source.",
-    type: "activo",
-    label: "REPOSITORIO",
+    name: "PROYECTO EN PAUSA",
+    order: 3,
+    url: "https://ejemplo.com/proyecto-antiguo",
+    description: "Un proyecto que ya no actualizas con frecuencia.",
+    type: "pausa",
   },
   {
-    name: "LAST.FM",
+    name: "PERFIL MUSICAL",
     order: 4,
-    url: "https://www.last.fm/user/Tronarite",
-    description: "Mi perfil musical",
+    url: "https://www.last.fm/user/tuusuario",
+    description: "Historial musical y estadísticas en tiempo real.",
     type: "activo",
     label: "RRSS",
+  },
+  {
+    // EJEMPLO de servicio anunciado pero aún no disponible — edítalo con tu
+    // servicio real o bórralo si no lo necesitas.
+    name: "SERVICIOS",
+    order: 5,
+    url: "https://ejemplo.com/servicios",
+    description: "Diferentes opciones de asesoría y consultoría.",
+    type: "proximamente",
+    label: "SERVICIO",
+    priceRange: "Desde 30€",
   },
 ];

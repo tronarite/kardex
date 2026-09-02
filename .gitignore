@@ -4,3 +4,8 @@ Thumbs.db
 
 # Plan drafts
 plan-hub-enlaces*.md
+
+# Configuración personal — nunca se sube (contiene tu nombre, correo y
+# enlaces reales). Usa public/config.example.js como plantilla:
+#   cp public/config.example.js public/config.js
+public/config.js

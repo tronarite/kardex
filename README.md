@@ -48,6 +48,7 @@ Solo necesitas [Docker](https://www.docker.com/) con Docker Compose (viene inclu
 ```bash
 git clone https://github.com/tronarite/kardex.git
 cd kardex
+cp public/config.example.js public/config.js   # tu configuración personal (ver más abajo)
 docker compose up -d --build
 ```
 
@@ -62,7 +63,13 @@ docker compose down
 
 ## Configuración
 
-Toda tu personalización vive en [`public/config.js`](public/config.js) — no necesitas tocar `script.js` ni `style.css`. El archivo está pensado para ser lo más cómodo posible de editar a mano: cada campo tiene su explicación al lado, y solo hay que añadir/quitar/reordenar bloques dentro de `UNITS`.
+Toda tu personalización vive en `public/config.js` — no necesitas tocar `script.js` ni `style.css`. El archivo está pensado para ser lo más cómodo posible de editar a mano: cada campo tiene su explicación al lado, y solo hay que añadir/quitar/reordenar bloques dentro de `UNITS`.
+
+**`public/config.js` está en `.gitignore` a propósito** — es tu archivo personal (nombre, correo, enlaces reales) y nunca se sube al repositorio. Lo que sí se sube es [`public/config.example.js`](public/config.example.js), una plantilla genérica con datos de ejemplo. Si aún no tienes tu `config.js`, créalo copiando la plantilla:
+
+```bash
+cp public/config.example.js public/config.js
+```
 
 **Para aplicar un cambio:** con el contenedor ya levantado (`docker compose up -d`), solo tienes que:
 1. Editar `public/config.js` en tu editor de texto y guardar.
@@ -175,7 +182,12 @@ Para un proyecto que en realidad es algo que ofreces (no un enlace a tu propio t
 Ojo: esto **no** cambia la vista previa cuando compartes el enlace en redes sociales (WhatsApp, Twitter/X, etc.) — esa usa `og:title`/`twitter:title`, que están fijos en `public/index.html` porque los bots que generan esas previsualizaciones no ejecutan JavaScript. Si quieres cambiar también eso, edita esas líneas directamente en `index.html`.
 
 ### Meta tags y dominio
-Antes de publicar, actualiza el dominio de ejemplo en `public/index.html` (`og:url`, `canonical`), `public/robots.txt` y `public/sitemap.xml`.
+Antes de publicar, actualiza el dominio de ejemplo en `public/index.html` (`og:url`, `canonical`), `public/robots.txt` y `public/sitemap.xml`. Aprovecha también para poner tu nombre/rol reales en el `<title>` y en `og:title`/`og:description` de `index.html` (ver nota arriba) y para regenerar `public/og-image.jpg` con tus datos si quieres — la que trae el repo es genérica a propósito.
+
+### Cambiar el favicon
+Para el 95% de los casos, basta con sustituir `public/favicon.svg` por tu propio SVG (mismo nombre de archivo) — actualiza el icono de la pestaña del navegador al momento, sin tocar nada más.
+
+Si además quieres que tu icono se vea bien al "añadir a inicio" en móvil o al instalar como PWA, regenera también los PNG en `public/icons/` (`apple-touch-icon.png` 180×180, `icon-192.png`, `icon-512.png`) a partir de tu nuevo SVG — con cualquier conversor SVG→PNG gratuito online (por ejemplo [realfavicongenerator.net](https://realfavicongenerator.net) o [cloudconvert.com](https://cloudconvert.com)), manteniendo esos mismos nombres de archivo.
 
 ---
 
@@ -187,14 +199,16 @@ Kardex/
 │   ├── index.html            # Estructura semántica, meta tags OG/Twitter, noscript fallback
 │   ├── 404.html                # Página de error, mismo diseño y tema que el resto del sitio
 │   ├── style.css              # Design system: tokens light-dark(), layout, componentes
-│   ├── config.js              # Tu identidad, contacto y proyectos — edita solo este archivo
-│   ├── script.js               # Renderizado, gestión de tema y copiado — lógica, no toques datos aquí
-│   ├── favicon.svg              # Marca vectorial (tarjeta de índice)
-│   ├── preview.jpg               # Captura usada en el README y como og:image
-│   ├── icons/                     # apple-touch-icon.png, icon-192.png, icon-512.png
-│   ├── manifest.json               # Manifest PWA (instalable)
-│   ├── robots.txt                   # Directivas para crawlers
-│   └── sitemap.xml                   # Sitemap básico
+│   ├── config.example.js       # Plantilla genérica — SÍ se sube al repo
+│   ├── config.js                # Tu configuración real — en .gitignore, nunca se sube
+│   ├── script.js                 # Renderizado, gestión de tema y copiado — lógica, no toques datos aquí
+│   ├── favicon.svg                # Marca vectorial (tarjeta de índice)
+│   ├── preview.jpg                 # Captura de la interfaz, usada en el README
+│   ├── og-image.jpg                 # Tarjeta usada como og:image / twitter:image al compartir el enlace
+│   ├── icons/                        # apple-touch-icon.png, icon-192.png, icon-512.png
+│   ├── manifest.json                  # Manifest PWA (instalable)
+│   ├── robots.txt                      # Directivas para crawlers
+│   └── sitemap.xml                      # Sitemap básico
 ├── Dockerfile                # Imagen de producción nginx:1.27-alpine
 ├── nginx.conf                 # Gzip, cache headers y cabeceras de seguridad
 ├── docker-compose.yml           # Monta public/ dentro del contenedor (puerto 8090:80)
