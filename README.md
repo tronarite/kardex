@@ -3,26 +3,51 @@
 > Hub personal de proyectos y enlaces en formato "ficha de índice", con estética editorial (papel + tinta), modo claro/oscuro adaptativo y soporte Docker. Cero dependencias externas: sin fuentes ni scripts de terceros.
 
 <p align="center">
+  <img alt="Licencia MIT" src="https://img.shields.io/badge/licencia-MIT-111111">
+  <img alt="Sin dependencias" src="https://img.shields.io/badge/dependencias-0-111111">
+  <img alt="Docker listo" src="https://img.shields.io/badge/docker-listo-111111">
+  <img alt="Sin build step" src="https://img.shields.io/badge/build%20step-ninguno-111111">
+</p>
+
+<p align="center">
   <img src="public/preview.jpg" alt="Vista previa de Kardex" width="100%">
 </p>
 
+## Índice
+
+- [Características](#características)
+- [Requisitos](#requisitos)
+- [Inicio rápido con Docker](#inicio-rápido-con-docker)
+- [Configuración](#configuración)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Licencia](#licencia)
+
 ---
 
-## ✨ Características
+## Características
 
 - **Estética editorial propia:** tipografía serif + monoespaciada del sistema (sin Google Fonts ni CDNs externos), paleta papel/tinta con un único acento, sin los clichés de "terminal hacker" (grid de puntos, naranja neón, cursor parpadeante).
 - **Layout en índice:** masthead fijo con identidad y contacto + listado de proyectos en formato ficha/índice, en vez de la típica tarjeta única centrada tipo Linktree.
 - **Adaptativo Claro/Oscuro:** vía `prefers-color-scheme` y la función CSS `light-dark()` (un único set de tokens de color, sin duplicación), con toggle manual opcional y sin parpadeo de tema al recargar.
+- **6 temas de color** listos para elegir (`terracota`, `vino`, `mostaza`, `azul`, `petroleo`, `monocromo`), cada uno con su propio fondo claro/oscuro coordinado, no solo un acento.
 - **100% Vanilla y sin build:** HTML5, CSS3 y JavaScript vanilla. Configuración y contenido separados de la lógica en `config.js`.
 - **Accesible:** navegación por teclado, `aria-live` en el copiado de correo, skip-link, `prefers-reduced-motion`, y fallback completo sin JavaScript.
-- **SEO / PWA listo:** Open Graph, Twitter Card, `manifest.json`, `robots.txt`, `sitemap.xml` e iconos para instalar como app.
-- **Docker listo:** imagen `nginx:1.27-alpine` con Gzip, cache headers, `HEALTHCHECK` y cabeceras de seguridad.
+- **SEO / PWA listo:** Open Graph, Twitter Card, `manifest.json`, `robots.txt`, `sitemap.xml`, página 404 propia e iconos para instalar como app.
+- **Docker listo:** imagen `nginx:1.27-alpine` con Gzip, cache headers, `HEALTHCHECK` y cabeceras de seguridad; edición en caliente vía volumen montado, sin reconstruir la imagen para cambios de contenido.
 
 ---
 
-## 🚀 Inicio rápido con Docker
+## Requisitos
+
+Solo necesitas [Docker](https://www.docker.com/) con Docker Compose (viene incluido en Docker Desktop). No hace falta Node, ni ningún gestor de paquetes, ni build step de ningún tipo.
+
+---
+
+## Inicio rápido con Docker
 
 ```bash
+git clone https://github.com/tronarite/kardex.git
+cd kardex
 docker compose up -d --build
 ```
 
@@ -35,7 +60,7 @@ docker compose down
 
 ---
 
-## 🛠️ Configuración
+## Configuración
 
 Toda tu personalización vive en [`public/config.js`](public/config.js) — no necesitas tocar `script.js` ni `style.css`. El archivo está pensado para ser lo más cómodo posible de editar a mano: cada campo tiene su explicación al lado, y solo hay que añadir/quitar/reordenar bloques dentro de `UNITS`.
 
@@ -114,7 +139,7 @@ Este es un catálogo **distinto** al de arriba: no describe el estado de un proy
 | `vacaciones` | Violeta | DE VACACIONES |
 | `no-disponible` | Gris neutro | NO DISPONIBLE |
 
-Nota: `online`/"ACTIVO" indica que el **proyecto** está activo, no que la web en sí esté disponible. Por ejemplo, una web puede seguir respondiendo (online técnicamente) mientras el proyecto detrás está en pausa — en ese caso usa `type: "standby"`, no `"online"`.
+Nota: `"activo"` indica que el **proyecto** está en marcha, no que la web en sí esté disponible. Una web puede seguir respondiendo con normalidad mientras el proyecto detrás está detenido — en ese caso usa `type: "pausa"`, no `"activo"`.
 
 ### Ofrecer un bien o servicio (con enlace externo y precio)
 Para un proyecto que en realidad es algo que ofreces (no un enlace a tu propio trabajo), pon `label: "SERVICIO"` (o el texto que prefieras) con `url` apuntando a otra web donde se explica en detalle, y elige el `type` según si ya está disponible o no. El campo opcional `priceRange` añade un precio o rango de precios junto al indicador:
@@ -154,12 +179,13 @@ Antes de publicar, actualiza el dominio de ejemplo en `public/index.html` (`og:u
 
 ---
 
-## 📂 Estructura del proyecto
+## Estructura del proyecto
 
 ```
 Kardex/
 ├── public/                  # Todo lo que se sirve tal cual en el navegador
 │   ├── index.html            # Estructura semántica, meta tags OG/Twitter, noscript fallback
+│   ├── 404.html                # Página de error, mismo diseño y tema que el resto del sitio
 │   ├── style.css              # Design system: tokens light-dark(), layout, componentes
 │   ├── config.js              # Tu identidad, contacto y proyectos — edita solo este archivo
 │   ├── script.js               # Renderizado, gestión de tema y copiado — lógica, no toques datos aquí
@@ -179,6 +205,6 @@ Kardex/
 
 ---
 
-## 📄 Licencia
+## Licencia
 
 Licencia MIT. Úsalo y personalízalo libremente para tu propio hub personal.
