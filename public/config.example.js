@@ -25,6 +25,14 @@ const SITE_CONFIG = {
   // de copiar al portapapeles.
   contactEmail: "contacto@ejemplo.com",
 
+  // [BETA] Tu teléfono de contacto, solo para la página /servicios.html
+  // (función en beta, ver ese archivo). Opcional: si lo quitas, esa página
+  // simplemente no muestra el bloque de teléfono. En la página no aparece
+  // en texto plano hasta que alguien pulsa "mostrar teléfono" — un filtro
+  // básico contra bots que solo leen el HTML, no una verificación real
+  // (para eso haría falta un backend, que este sitio no tiene).
+  contactPhone: "+34 600 000 000",
+
   // Título de la pestaña del navegador. Opcional: si lo quitas o lo dejas
   // vacío, se usa automáticamente "{operatorName} — Índice".
   pageTitle: "Tu Nombre — Índice personal",
@@ -184,7 +192,9 @@ const UNITS = [
   },
   {
     // EJEMPLO de servicio anunciado pero aún no disponible — edítalo con tu
-    // servicio real o bórralo si no lo necesitas.
+    // servicio real o bórralo si no lo necesitas. Si quieres usar la página
+    // de detalle (ver SERVICES más abajo, función en BETA), cambia "url"
+    // por "servicios.html" en vez de un enlace externo.
     name: "SERVICIOS",
     order: 5,
     url: "https://ejemplo.com/servicios",
@@ -192,5 +202,41 @@ const UNITS = [
     type: "proximamente",
     label: "SERVICIO",
     priceRange: "Desde 30€",
+  },
+];
+
+
+/* ============================================================================
+   [BETA] SERVICIOS — listado detallado para la página servicios.html
+   ============================================================================
+   Función en beta: la página existe y funciona, pero el diseño y el
+   contenido de esta sección todavía pueden cambiar bastante antes de darla
+   por terminada. No sustituye a la fila "SERVICIOS" de arriba en UNITS —
+   esa sigue siendo el enlace que aparece en el índice principal; esto es
+   el contenido de la página a la que ese enlace puede apuntar.
+
+   Cada bloque es una tarjeta de servicio en la página. Solo "name" es
+   obligatorio.
+
+     name          Obligatorio   Nombre del servicio.
+     description   Opcional      En qué consiste, con el detalle que quieras
+                                  (a diferencia de la description de UNITS,
+                                  aquí no hace falta que sea una frase corta).
+     priceRange    Opcional      Texto libre, ej. "Desde 30€" o "20€ – 50€".
+     order         Opcional      Igual que en UNITS: fija la posición sin
+                                  mover el bloque.
+   ============================================================================ */
+const SERVICES = [
+  {
+    name: "NOMBRE DEL SERVICIO",
+    order: 1,
+    description: "Descripción detallada de en qué consiste este servicio, qué incluye y qué no.",
+    priceRange: "Desde 30€",
+  },
+  {
+    name: "OTRO SERVICIO",
+    order: 2,
+    description: "Otra descripción detallada, tan larga como haga falta.",
+    priceRange: "20€ – 50€",
   },
 ];

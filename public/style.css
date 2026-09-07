@@ -708,6 +708,94 @@ body {
 }
 
 /* --------------------------------------------------------------------------
+   [BETA] Página de servicios (servicios.html)
+   Reutiliza casi todo lo de arriba (.index-row, .row-*, .contact-block...);
+   esto es solo lo que no existía: la insignia BETA, el enlace de volver y
+   el "portón" del teléfono.
+   -------------------------------------------------------------------------- */
+.beta-badge {
+  display: inline-block;
+  padding: 0.05rem 0.35rem;
+  margin-left: 0.4rem;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  vertical-align: middle;
+}
+
+.masthead-back {
+  margin-top: -0.75rem;
+}
+
+.back-link {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.1rem;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.back-link:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.back-link:focus-visible {
+  outline: 2px solid var(--line-strong);
+  outline-offset: 2px;
+}
+
+.phone-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+/* display:flex de arriba gana por especificidad al [hidden] del user-agent
+   stylesheet (que solo pone display:none) — sin esto, ocultar el portón
+   tras revelar el teléfono no hacía nada visualmente. */
+.phone-gate[hidden] {
+  display: none;
+}
+
+.phone-gate-note {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--text-muted);
+  max-width: 20rem;
+  line-height: 1.4;
+}
+
+.contact-phone {
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.1rem;
+  margin-top: 0.4rem;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.contact-phone:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.contact-phone:focus-visible {
+  outline: 2px solid var(--line-strong);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
    Accessibility & Reduced Motion
    -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
