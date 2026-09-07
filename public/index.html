@@ -12,8 +12,12 @@
   <title>Tu Nombre — Índice personal</title>
   <meta name="description" content="Índice personal de proyectos y enlaces, con estética editorial minimalista y modo claro/oscuro adaptativo.">
   <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#F5F3EC" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#131110" media="(prefers-color-scheme: dark)">
+  <!-- Debe coincidir con --light-bg / --dark-bg del theme-pack activo en
+       style.css (SITE_CONFIG.theme en config.js) — no se puede calcular en
+       CSS, así que si cambias de tema actualiza esto a mano. Valores
+       actuales: "azul". -->
+  <meta name="theme-color" content="#E6EBF7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0D131C" media="(prefers-color-scheme: dark)">
 
   <!-- Open Graph / Twitter -->
   <meta property="og:title" content="Tu Nombre — Índice personal">
@@ -29,32 +33,22 @@
 
   <!-- Icons & PWA -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg?v=3">
+  <!-- Fallback clásico: navegadores/crawlers viejos piden /favicon.ico por
+       defecto aunque haya un <link rel="icon"> más moderno; sin este archivo
+       esa petición cae en 404. -->
+  <link rel="alternate icon" type="image/x-icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="manifest" href="manifest.json">
 
   <!-- Sin fuentes externas: usa la pila tipográfica nativa del sistema (ver style.css) -->
   <link rel="stylesheet" href="style.css">
 
-  <!-- Evita el parpadeo de tema al recargar cuando hay una preferencia manual guardada -->
-  <script>
-    (function () {
-      try {
-        var saved = localStorage.getItem("theme-preference");
-        if (saved === "dark" || saved === "light") {
-          document.documentElement.setAttribute("data-theme", saved);
-        }
-      } catch (e) {}
-    })();
-  </script>
+  <!-- Evita el parpadeo de tema al recargar cuando hay una preferencia manual
+       guardada. Externo (no inline) para que la CSP de nginx.conf pueda ser
+       estricta (script-src 'self', sin "unsafe-inline"). -->
+  <script src="theme-init.js"></script>
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Kardex",
-    "description": "Índice personal de proyectos y enlaces, con estética editorial minimalista."
-  }
-  </script>
+  <script type="application/ld+json" src="ld.json"></script>
 </head>
 <body>
   <a class="skip-link" href="#index">Saltar al índice de proyectos</a>
@@ -100,7 +94,7 @@
     <!-- Índice de proyectos y enlaces -->
     <main class="index" id="index" aria-label="Proyectos y enlaces">
       <div class="index-head">
-        <span class="index-head-number" aria-hidden="true">N.º</span>
+        <span class="index-head-number" aria-hidden="true">N°</span>
         <span class="index-head-title">PROYECTOS Y ENLACES</span>
       </div>
 
