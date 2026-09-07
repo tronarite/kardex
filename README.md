@@ -33,13 +33,14 @@
 - **100% Vanilla y sin build:** HTML5, CSS3 y JavaScript vanilla. Configuración y contenido separados de la lógica en `config.js`.
 - **Accesible:** navegación por teclado, `aria-live` en el copiado de correo, skip-link, `prefers-reduced-motion`, y fallback completo sin JavaScript.
 - **SEO / PWA listo:** Open Graph, Twitter Card, `manifest.json`, `robots.txt`, `sitemap.xml`, página 404 propia e iconos para instalar como app.
-- **Docker listo:** imagen `nginx:1.27-alpine` con Gzip, cache headers, `HEALTHCHECK` y cabeceras de seguridad; edición en caliente vía volumen montado, sin reconstruir la imagen para cambios de contenido.
+- **Docker listo:** imagen `nginx:1.27-alpine` con Gzip, cache headers, `HEALTHCHECK`, cabeceras de seguridad y CSP estricta; edición en caliente vía volumen montado, sin reconstruir la imagen para cambios de contenido.
+- **SEO y previsualizaciones al compartir, sin tocarlas a mano:** el contenedor sincroniza `<title>`, `og:title`/`og:description`, `canonical` y el Sitemap directamente desde tu `config.js` — edita tu nombre o dominio una vez y se propaga solo (ver [Meta tags y dominio](#meta-tags-y-dominio)).
 
 ---
 
 ## Requisitos
 
-Solo necesitas [Docker](https://www.docker.com/) con Docker Compose (viene incluido en Docker Desktop). No hace falta Node, ni ningún gestor de paquetes, ni build step de ningún tipo.
+Solo necesitas [Docker](https://www.docker.com/) con Docker Compose (viene incluido en Docker Desktop) — no hace falta instalar Node ni ningún gestor de paquetes en tu máquina, ni build step de ningún tipo; el propio contenedor trae Node solo para sincronizar las etiquetas de SEO (ver [Meta tags y dominio](#meta-tags-y-dominio)). Node en tu máquina solo hace falta si quieres servir el sitio *sin* Docker.
 
 ---
 
@@ -182,7 +183,21 @@ Para un proyecto que en realidad es algo que ofreces (no un enlace a tu propio t
 Ojo: esto **no** cambia la vista previa cuando compartes el enlace en redes sociales (WhatsApp, Twitter/X, etc.) — esa usa `og:title`/`twitter:title`, que están fijos en `public/index.html` porque los bots que generan esas previsualizaciones no ejecutan JavaScript. Si quieres cambiar también eso, edita esas líneas directamente en `index.html`.
 
 ### Meta tags y dominio
-Antes de publicar, actualiza el dominio de ejemplo en `public/index.html` (`og:url`, `canonical`), `public/robots.txt` y `public/sitemap.xml`. Aprovecha también para poner tu nombre/rol reales en el `<title>` y en `og:title`/`og:description` de `index.html` (ver nota arriba) y para regenerar `public/og-image.jpg` con tus datos si quieres — la que trae el repo es genérica a propósito.
+`<title>`, la meta description, `og:title`/`og:description`/`og:url`, `twitter:title`/`twitter:description`, `canonical`, `public/ld.json` y el Sitemap de `public/robots.txt`/`public/sitemap.xml` **se rellenan solos** a partir de `operatorName`, `operatorRole`, `pageTitle` y el nuevo campo `siteUrl` de tu `config.js` — no los edites a mano, se sobrescriben. El contenedor Docker lo sincroniza al arrancar y también en caliente: si editas `config.js` mientras el contenedor sigue arriba, se vuelve a aplicar solo, sin reiniciar nada (`scripts/docker-entrypoint-meta.sh` vigila el archivo con `inotifywait`).
+
+¿Por qué esto no se resuelve solo con JavaScript en el navegador, como el resto de `config.js`? Porque bots como el de Discord, Twitter/X o WhatsApp leen esas etiquetas directamente del HTML servido, sin ejecutar JavaScript — si solo se rellenaran en el navegador, la previsualización al compartir el enlace saldría en blanco o genérica. `scripts/sync-meta.js` (Node) las deja ya escritas en los archivos antes de que nginx los sirva.
+
+Si sirves el sitio sin Docker, ejecuta `node scripts/sync-meta.js` a mano cada vez que cambies esos campos.
+
+`public/index.html`, `public/ld.json`, `public/robots.txt` y `public/sitemap.xml` sí están en git (a diferencia de `config.js`) — al publicar con tus datos reales, tu copia local queda "sucia" frente a la plantilla genérica del repo. Trátalos igual que `config.js`:
+
+```bash
+git update-index --skip-worktree public/index.html public/ld.json public/robots.txt public/sitemap.xml
+```
+
+(revierte con `--no-skip-worktree` sobre el archivo si alguna vez necesitas tocar de verdad la plantilla, no solo tus datos).
+
+Aparte de esto, sigue pendiente regenerar `public/og-image.jpg` con tus datos si quieres — la que trae el repo es genérica a propósito y no se genera sola.
 
 ### Cambiar el favicon
 Para el 95% de los casos, basta con sustituir `public/favicon.svg` por tu propio SVG (mismo nombre de archivo) — actualiza el icono de la pestaña del navegador al momento, sin tocar nada más.
@@ -196,26 +211,33 @@ Si además quieres que tu icono se vea bien al "añadir a inicio" en móvil o al
 ```
 Kardex/
 ├── public/                  # Todo lo que se sirve tal cual en el navegador
-│   ├── index.html            # Estructura semántica, meta tags OG/Twitter, noscript fallback
+│   ├── index.html            # Estructura semántica; sus meta tags OG/Twitter se sincronizan solas (ver Meta tags y dominio)
 │   ├── 404.html                # Página de error, mismo diseño y tema que el resto del sitio
 │   ├── style.css              # Design system: tokens light-dark(), layout, componentes
 │   ├── config.example.js       # Plantilla genérica — SÍ se sube al repo
 │   ├── config.js                # Tu configuración real — en .gitignore, nunca se sube
 │   ├── script.js                 # Renderizado, gestión de tema y copiado — lógica, no toques datos aquí
-│   ├── favicon.svg                # Marca vectorial (tarjeta de índice)
-│   ├── preview.jpg                 # Captura de la interfaz, usada en el README
-│   ├── og-image.jpg                 # Tarjeta usada como og:image / twitter:image al compartir el enlace
-│   ├── icons/                        # apple-touch-icon.png, icon-192.png, icon-512.png
-│   ├── manifest.json                  # Manifest PWA (instalable)
-│   ├── robots.txt                      # Directivas para crawlers
-│   └── sitemap.xml                      # Sitemap básico
-├── Dockerfile                # Imagen de producción nginx:1.27-alpine
-├── nginx.conf                 # Gzip, cache headers y cabeceras de seguridad
+│   ├── theme-init.js              # Evita el parpadeo de tema al recargar (externo por la CSP)
+│   ├── 404-theme.js                # Aplica el theme-pack en la página 404
+│   ├── ld.json                      # JSON-LD (schema.org), se sincroniza solo desde config.js
+│   ├── favicon.svg                   # Marca vectorial (tarjeta de índice)
+│   ├── favicon.ico                    # Fallback clásico del favicon
+│   ├── preview.jpg                     # Captura de la interfaz, usada en el README
+│   ├── og-image.jpg                     # Tarjeta usada como og:image / twitter:image al compartir el enlace
+│   ├── icons/                             # apple-touch-icon.png, icon-192.png, icon-512.png
+│   ├── manifest.json                       # Manifest PWA (instalable)
+│   ├── robots.txt                           # Directivas para crawlers, se sincroniza solo
+│   └── sitemap.xml                           # Sitemap básico, se sincroniza solo
+├── scripts/
+│   ├── sync-meta.js         # Lee config.js y rellena las etiquetas de SEO/redes (ver Meta tags y dominio)
+│   └── docker-entrypoint-meta.sh  # Lo ejecuta el contenedor solo, al arrancar y en caliente
+├── Dockerfile                # Imagen de producción nginx:1.27-alpine + Node (para sync-meta.js)
+├── nginx.conf                 # Gzip, cache headers, cabeceras de seguridad y CSP
 ├── docker-compose.yml           # Monta public/ dentro del contenedor (puerto 8090:80)
 └── .dockerignore
 ```
 
-`public/` es la única carpeta que necesitas tocar para personalizar el contenido; todo lo que está fuera es infraestructura (Docker/nginx) que casi nunca hace falta modificar.
+`public/` es la única carpeta que necesitas tocar para personalizar el contenido; todo lo que está fuera es infraestructura (Docker/nginx/el script de sincronización) que casi nunca hace falta modificar.
 
 ---
 
