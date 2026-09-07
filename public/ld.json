@@ -1,6 +1,7 @@
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "Kardex",
-  "description": "Índice personal de proyectos y enlaces, con estética editorial minimalista."
+  "name": "Tu Nombre / Alias",
+  "description": "DESARROLLO SOFTWARE · INGENIERÍA & SISTEMAS",
+  "url": "https://tu-dominio.example/"
 }

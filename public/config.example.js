@@ -29,6 +29,21 @@ const SITE_CONFIG = {
   // vacío, se usa automáticamente "{operatorName} — Índice".
   pageTitle: "Tu Nombre — Índice personal",
 
+  // URL pública donde vas a publicar el sitio (con barra final). Con
+  // Docker, en cuanto guardes esto (o operatorName/operatorRole/
+  // pageTitle) se aplica solo a og:url/canonical (index.html), el
+  // Sitemap de robots.txt y el <loc> de sitemap.xml — no hace falta
+  // editar esos archivos a mano ni reiniciar nada (ver
+  // scripts/docker-entrypoint-meta.sh).
+  //
+  // ¿Por qué no basta con JavaScript en el navegador, como con el resto
+  // de config.js? Porque bots como el de Discord, Twitter o WhatsApp leen
+  // estas etiquetas directamente del HTML sin ejecutar JavaScript — si
+  // solo se rellenaran en el navegador, la previsualización al compartir
+  // el enlace saldría en blanco. Por eso el contenedor las deja ya
+  // escritas en los archivos en vez de esperar a que las pinte el navegador.
+  siteUrl: "https://tu-dominio.example/",
+
   // Tema de color del sitio. Cada opción trae ya coordinadas su versión
   // clara y su versión oscura — cuál de las dos ves depende de tu sistema
   // o del botón de tema, no de esto. Opcional — si lo quitas, se usa
