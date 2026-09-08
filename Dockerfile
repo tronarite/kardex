@@ -1,9 +1,14 @@
 FROM nginx:1.27-alpine
 
-# nodejs: ejecuta scripts/sync-meta.js (lee config.js y rellena solo las
-# etiquetas de SEO/redes). inotify-tools: vigila config.js para volver a
-# sincronizar automáticamente cuando lo edites, sin reiniciar el contenedor.
-RUN apk add --no-cache nodejs inotify-tools
+# nodejs: ejecuta scripts/sync-meta.js (lee config.js y rellena las
+# etiquetas de SEO/redes + genera og-image.png). inotify-tools: vigila
+# config.js para volver a sincronizar solo, sin reiniciar el contenedor.
+# librsvg (rsvg-convert): rasteriza el SVG de og-image a PNG. ttf-dejavu +
+# fontconfig: sin fuentes instaladas, rsvg-convert no tiene con qué
+# dibujar el texto (Alpine no trae ninguna por defecto) — DejaVu cubre
+# bien acentos/ñ y tiene variante serif + monoespaciada.
+RUN apk add --no-cache nodejs inotify-tools librsvg ttf-dejavu fontconfig && \
+    fc-cache -f
 
 # Set non-root permissions & copy custom Nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf

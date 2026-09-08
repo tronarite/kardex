@@ -3,7 +3,9 @@
  * Sincroniza las etiquetas "estáticas" de SEO/redes con los datos de
  * config.js: <title>, meta description, og:title/og:description/og:url,
  * twitter:title/twitter:description, <link rel="canonical"> en
- * index.html, más robots.txt, sitemap.xml y ld.json.
+ * index.html, más robots.txt, sitemap.xml, ld.json y — generada de
+ * cero, no solo texto — og-image.png, la imagen que se ve al compartir
+ * el enlace (Discord, WhatsApp, Twitter/X...).
  *
  * Por qué existe: bots como los de Discord, Twitter/X, WhatsApp o
  * Slack — y en parte también Google — leen estas etiquetas directamente
@@ -23,12 +25,13 @@
  *
  *   node scripts/sync-meta.js
  *
- * Nota: index.html, robots.txt, sitemap.xml y ld.json SÍ están en git (a
- * diferencia de config.js). Publicar con tus datos reales los deja
- * "sucios" en tu copia local — trátalos igual que config.js:
+ * Nota: index.html, robots.txt, sitemap.xml, ld.json y og-image.png SÍ
+ * están en git (a diferencia de config.js). Publicar con tus datos
+ * reales los deja "sucios" en tu copia local — trátalos igual que
+ * config.js:
  *
  *   git update-index --skip-worktree public/index.html public/ld.json \
- *     public/robots.txt public/sitemap.xml
+ *     public/robots.txt public/sitemap.xml public/og-image.png
  *
  * (revierte con --no-skip-worktree si alguna vez necesitas tocar de
  * verdad la plantilla, no solo tus datos).
@@ -36,6 +39,8 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const os = require("os");
+const { execFileSync } = require("child_process");
 
 // KARDEX_PUBLIC_DIR lo fija el contenedor Docker (sirve desde
 // /usr/share/nginx/html, no desde public/ del repo) — en local, sin la
@@ -113,6 +118,122 @@ const writeFileAtomic = (targetPath, content, attempts = 5) => {
   }
 };
 
+// ---- og-image.png: paleta por tema (mismo criterio que style.css) ----
+// Solo los tonos "claros" de cada theme-pack — og-image se ve siempre
+// sobre fondo claro en la previsualización de cualquier app, no cambia
+// con el modo oscuro del visitante.
+const THEME_PALETTES = {
+  terracota: { bg: "#F5F3EC", text: "#17140F", accent: "#A6321C" },
+  vino: { bg: "#F7F0F1", text: "#1C1013", accent: "#7A2436" },
+  mostaza: { bg: "#F7F3E9", text: "#1C1810", accent: "#8A6A16" },
+  azul: { bg: "#E6EBF7", text: "#0E1729", accent: "#1668E6" },
+  petroleo: { bg: "#EEF3F1", text: "#0F211D", accent: "#0F5C56" },
+  monocromo: { bg: "#FFFFFF", text: "#111111", accent: "#3A3A3A" },
+};
+
+const hexToRgb = (hex) => {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
+const rgbToHex = (rgb) => `#${rgb.map((v) => Math.round(v).toString(16).padStart(2, "0")).join("")}`;
+// Mismo criterio que --text-dim/--text-muted en style.css
+// (color-mix(text, bg)), reimplementado a mano: este script no tiene
+// motor CSS a mano para usar color-mix() de verdad.
+const mixHex = (hexA, hexB, pctA) => {
+  const a = hexToRgb(hexA);
+  const b = hexToRgb(hexB);
+  return rgbToHex(a.map((v, i) => v * pctA + b[i] * (1 - pctA)));
+};
+
+const escapeXml = (value) =>
+  String(value).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" }[c]));
+
+// Reduce el tamaño de letra si el texto es tan largo que se saldría del
+// lienzo (1200×630) — nombres/roles cortos como los de la plantilla se
+// quedan en el tamaño grande de siempre; uno mucho más largo se ajusta
+// solo en vez de desbordar.
+const fitFontSize = (text, maxWidth, startSize, minSize, avgCharWidthEm) => {
+  let size = startSize;
+  while (size > minSize && text.length * size * avgCharWidthEm > maxWidth) {
+    size -= 2;
+  }
+  return size;
+};
+
+const buildOgImageSvg = (cfg, palette) => {
+  const name = cfg.operatorName || "Kardex";
+  const roleParts = (cfg.operatorRole || "").split("//").map((s) => s.trim()).filter(Boolean);
+  const textDim = mixHex(palette.text, palette.bg, 0.6);
+  const textMuted = mixHex(palette.text, palette.bg, 0.38);
+  const fold = mixHex(palette.text, palette.bg, 0.25);
+
+  const maxTextWidth = 1200 - 118 * 2;
+  const nameSize = fitFontSize(name, maxTextWidth, 64, 34, 0.52);
+  const roleSize = fitFontSize(roleParts.join(" // "), maxTextWidth, 26, 16, 0.6);
+
+  const roleSpans = roleParts
+    .map((part, i) => {
+      const sep = i < roleParts.length - 1 ? `<tspan fill="${palette.accent}" font-weight="700"> // </tspan>` : "";
+      return `<tspan>${escapeXml(part)}</tspan>${sep}`;
+    })
+    .join("");
+
+  const monoStack = "Menlo, 'DejaVu Sans Mono', Consolas, monospace";
+  const serifStack = "Georgia, 'DejaVu Serif', 'Times New Roman', serif";
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="${palette.bg}"/>
+  <g transform="translate(118,204) scale(2.1875)">
+    <rect width="64" height="64" fill="${palette.text}"/>
+    <rect x="6" y="6" width="52" height="52" fill="#FFFFFF"/>
+    <path d="M42 6 L58 6 L58 22 Z" fill="${palette.text}"/>
+    <path d="M42 6 L58 22 L42 22 Z" fill="${fold}"/>
+    <line x1="16" y1="28" x2="40" y2="28" stroke="${palette.text}" stroke-width="3" stroke-linecap="square"/>
+    <line x1="16" y1="37" x2="48" y2="37" stroke="${palette.text}" stroke-width="3" stroke-linecap="square"/>
+    <line x1="16" y1="46" x2="32" y2="46" stroke="${palette.text}" stroke-width="3" stroke-linecap="square"/>
+  </g>
+  <text x="118" y="415" font-family="${monoStack}" font-size="24" font-weight="700" letter-spacing="4" fill="${textMuted}">ÍNDICE PERSONAL</text>
+  <text x="118" y="500" font-family="${serifStack}" font-size="${nameSize}" fill="${palette.text}">${escapeXml(name)}</text>
+  <text x="118" y="600" font-family="${monoStack}" font-size="${roleSize}" fill="${textDim}">${roleSpans}</text>
+</svg>`;
+};
+
+/**
+ * Rasteriza el SVG a PNG probando, en orden, las herramientas que puede
+ * haber disponibles: rsvg-convert (Linux/Docker, instalado vía apk en el
+ * Dockerfile) y sips (macOS, para poder probar el script en local sin
+ * instalar nada nuevo). Si no encuentra ninguna, no revienta el resto de
+ * la sincronización — solo avisa y deja el og-image.png que ya hubiera.
+ */
+const rasterizeSvg = (svgContent, outPath) => {
+  const tmpSvg = path.join(os.tmpdir(), `kardex-og-${process.pid}.svg`);
+  const tmpOut = path.join(os.tmpdir(), `kardex-og-${process.pid}.png`);
+  fs.writeFileSync(tmpSvg, svgContent);
+
+  const attempts = [
+    () => execFileSync("rsvg-convert", ["-w", "1200", "-h", "630", "-o", tmpOut, tmpSvg], { stdio: "ignore" }),
+    () => execFileSync("sips", ["-s", "format", "png", tmpSvg, "--out", tmpOut], { stdio: "ignore" }),
+  ];
+
+  let ok = false;
+  for (const attempt of attempts) {
+    try {
+      attempt();
+      ok = fs.existsSync(tmpOut);
+      if (ok) break;
+    } catch (_) {
+      /* prueba la siguiente herramienta */
+    }
+  }
+
+  try { fs.unlinkSync(tmpSvg); } catch (_) { /* da igual */ }
+  if (!ok) return false;
+
+  writeFileAtomic(outPath, fs.readFileSync(tmpOut));
+  try { fs.unlinkSync(tmpOut); } catch (_) { /* da igual */ }
+  return true;
+};
+
 // ---- index.html ----
 const indexPath = path.join(PUBLIC_DIR, "index.html");
 let html = fs.readFileSync(indexPath, "utf8");
@@ -151,6 +272,16 @@ let sitemap = fs.readFileSync(sitemapPath, "utf8");
 sitemap = replaceOne(sitemap, /<loc>[^<]*<\/loc>/, `<loc>${siteUrl}</loc>`, "loc", "sitemap.xml");
 writeFileAtomic(sitemapPath, sitemap);
 console.log("✓ sitemap.xml");
+
+// ---- og-image.png ----
+const ogImagePath = path.join(PUBLIC_DIR, "og-image.png");
+const palette = THEME_PALETTES[config.theme] || THEME_PALETTES.terracota;
+if (rasterizeSvg(buildOgImageSvg(config, palette), ogImagePath)) {
+  console.log("✓ og-image.png");
+} else {
+  console.warn("  ! og-image.png: no se encontró rsvg-convert ni sips — no se ha regenerado, se sigue sirviendo la que ya había");
+  warnings++;
+}
 
 console.log(`\nListo — dominio usado: ${siteUrl}`);
 if (warnings > 0) {

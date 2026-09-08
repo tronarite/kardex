@@ -34,7 +34,7 @@
 - **Accesible:** navegación por teclado, `aria-live` en el copiado de correo, skip-link, `prefers-reduced-motion`, y fallback completo sin JavaScript.
 - **SEO / PWA listo:** Open Graph, Twitter Card, `manifest.json`, `robots.txt`, `sitemap.xml`, página 404 propia e iconos para instalar como app.
 - **Docker listo:** imagen `nginx:1.27-alpine` con Gzip, cache headers, `HEALTHCHECK`, cabeceras de seguridad y CSP estricta; edición en caliente vía volumen montado, sin reconstruir la imagen para cambios de contenido.
-- **SEO y previsualizaciones al compartir, sin tocarlas a mano:** el contenedor sincroniza `<title>`, `og:title`/`og:description`, `canonical` y el Sitemap directamente desde tu `config.js` — edita tu nombre o dominio una vez y se propaga solo (ver [Meta tags y dominio](#meta-tags-y-dominio)).
+- **SEO y previsualizaciones al compartir, sin tocarlas a mano:** el contenedor sincroniza `<title>`, `og:title`/`og:description`, `canonical`, el Sitemap **y la propia imagen de la tarjeta** directamente desde tu `config.js` — edita tu nombre, tema o dominio una vez y se propaga solo (ver [Meta tags y dominio](#meta-tags-y-dominio)).
 
 ---
 
@@ -180,24 +180,24 @@ Para un proyecto que en realidad es algo que ofreces (no un enlace a tu propio t
 ### Título de la pestaña
 `pageTitle` en `config.js` controla el título de la pestaña del navegador. Es opcional: si lo quitas, se genera solo como `"{operatorName} — Índice"`.
 
-Ojo: esto **no** cambia la vista previa cuando compartes el enlace en redes sociales (WhatsApp, Twitter/X, etc.) — esa usa `og:title`/`twitter:title`, que están fijos en `public/index.html` porque los bots que generan esas previsualizaciones no ejecutan JavaScript. Si quieres cambiar también eso, edita esas líneas directamente en `index.html`.
+Esto también cambia la vista previa al compartir el enlace (WhatsApp, Twitter/X, Discord...) — ver [Meta tags y dominio](#meta-tags-y-dominio), que incluye `og:title`/`twitter:title` y la propia imagen de la tarjeta.
 
 ### Meta tags y dominio
-`<title>`, la meta description, `og:title`/`og:description`/`og:url`, `twitter:title`/`twitter:description`, `canonical`, `public/ld.json` y el Sitemap de `public/robots.txt`/`public/sitemap.xml` **se rellenan solos** a partir de `operatorName`, `operatorRole`, `pageTitle` y el nuevo campo `siteUrl` de tu `config.js` — no los edites a mano, se sobrescriben. El contenedor Docker lo sincroniza al arrancar y también en caliente: si editas `config.js` mientras el contenedor sigue arriba, se vuelve a aplicar solo, sin reiniciar nada (`scripts/docker-entrypoint-meta.sh` vigila el archivo con `inotifywait`).
+`<title>`, la meta description, `og:title`/`og:description`/`og:url`, `twitter:title`/`twitter:description`, `canonical`, `public/ld.json`, el Sitemap de `public/robots.txt`/`public/sitemap.xml` **y la propia imagen de la tarjeta** (`public/og-image.png`) **se generan solos** a partir de `operatorName`, `operatorRole`, `pageTitle`, `theme` y `siteUrl` de tu `config.js` — no los edites a mano, se sobrescriben. El contenedor Docker lo sincroniza al arrancar y también en caliente: si editas `config.js` mientras el contenedor sigue arriba, se vuelve a aplicar solo, sin reiniciar nada (`scripts/docker-entrypoint-meta.sh` vigila el archivo con `inotifywait` — en Windows/Docker Desktop esa vigilancia en caliente no siempre detecta cambios hechos desde fuera del propio contenedor; si no ves el cambio, `docker compose restart` lo fuerza).
 
-¿Por qué esto no se resuelve solo con JavaScript en el navegador, como el resto de `config.js`? Porque bots como el de Discord, Twitter/X o WhatsApp leen esas etiquetas directamente del HTML servido, sin ejecutar JavaScript — si solo se rellenaran en el navegador, la previsualización al compartir el enlace saldría en blanco o genérica. `scripts/sync-meta.js` (Node) las deja ya escritas en los archivos antes de que nginx los sirva.
+`og-image.png` es una tarjeta 1200×630 generada de cero (no una plantilla con el texto encima): mismo icono/kicker/nombre/rol que el sitio, con el fondo y el acento del `theme` activo. Para dibujarla hace falta rasterizar un SVG a PNG — dentro de Docker se usa `rsvg-convert` (instalado vía `apk` en el `Dockerfile`, con `ttf-dejavu` para que haya con qué dibujar el texto: Alpine no trae fuentes por defecto); en local sin Docker cae en `sips` si estás en macOS. Si no encuentra ninguna de las dos, avisa y no toca la imagen que ya hubiera — el resto de la sincronización sigue igual.
+
+¿Por qué todo esto no se resuelve solo con JavaScript en el navegador, como el resto de `config.js`? Porque bots como el de Discord, Twitter/X o WhatsApp leen estas etiquetas (e imagen) directamente del HTML servido, sin ejecutar JavaScript — si solo se rellenaran en el navegador, la previsualización al compartir el enlace saldría en blanco o genérica. `scripts/sync-meta.js` (Node) las deja ya escritas antes de que nginx los sirva.
 
 Si sirves el sitio sin Docker, ejecuta `node scripts/sync-meta.js` a mano cada vez que cambies esos campos.
 
-`public/index.html`, `public/ld.json`, `public/robots.txt` y `public/sitemap.xml` sí están en git (a diferencia de `config.js`) — al publicar con tus datos reales, tu copia local queda "sucia" frente a la plantilla genérica del repo. Trátalos igual que `config.js`:
+`public/index.html`, `public/ld.json`, `public/robots.txt`, `public/sitemap.xml` y `public/og-image.png` sí están en git (a diferencia de `config.js`) — al publicar con tus datos reales, tu copia local queda "sucia" frente a la plantilla genérica del repo. Trátalos igual que `config.js`:
 
 ```bash
-git update-index --skip-worktree public/index.html public/ld.json public/robots.txt public/sitemap.xml
+git update-index --skip-worktree public/index.html public/ld.json public/robots.txt public/sitemap.xml public/og-image.png
 ```
 
 (revierte con `--no-skip-worktree` sobre el archivo si alguna vez necesitas tocar de verdad la plantilla, no solo tus datos).
-
-Aparte de esto, sigue pendiente regenerar `public/og-image.jpg` con tus datos si quieres — la que trae el repo es genérica a propósito y no se genera sola.
 
 ### Cambiar el favicon
 Para el 95% de los casos, basta con sustituir `public/favicon.svg` por tu propio SVG (mismo nombre de archivo) — actualiza el icono de la pestaña del navegador al momento, sin tocar nada más.
@@ -223,7 +223,7 @@ Kardex/
 │   ├── favicon.svg                   # Marca vectorial (tarjeta de índice)
 │   ├── favicon.ico                    # Fallback clásico del favicon
 │   ├── preview.jpg                     # Captura de la interfaz, usada en el README
-│   ├── og-image.jpg                     # Tarjeta usada como og:image / twitter:image al compartir el enlace
+│   ├── og-image.png                     # Tarjeta og:image / twitter:image — se genera sola (ver Meta tags y dominio)
 │   ├── icons/                             # apple-touch-icon.png, icon-192.png, icon-512.png
 │   ├── manifest.json                       # Manifest PWA (instalable)
 │   ├── robots.txt                           # Directivas para crawlers, se sincroniza solo
