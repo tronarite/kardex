@@ -1,20 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <!-- Marca de Kardex: sol, en tonos cálidos. Fondo transparente. -->
-  <defs>
-    <radialGradient id="core" cx="50%" cy="45%" r="60%">
-      <stop offset="0%" stop-color="#FFE24D"/>
-      <stop offset="100%" stop-color="#FF9E1B"/>
-    </radialGradient>
-  </defs>
-  <g fill="#FFB020">
-    <polygon points="50.22,28.79 62.00,32.00 50.22,35.21"/>
-    <polygon points="47.15,42.61 53.21,53.21 42.61,47.15"/>
-    <polygon points="35.21,50.22 32.00,62.00 28.79,50.22"/>
-    <polygon points="21.39,47.15 10.79,53.21 16.85,42.61"/>
-    <polygon points="13.78,35.21 2.00,32.00 13.78,28.79"/>
-    <polygon points="16.85,21.39 10.79,10.79 21.39,16.85"/>
-    <polygon points="28.79,13.78 32.00,2.00 35.21,13.78"/>
-    <polygon points="42.61,16.85 53.21,10.79 47.15,21.39"/>
-  </g>
-  <circle cx="32" cy="32" r="13.0" fill="url(#core)"/>
+  <!-- Marca de Kardex: tarjeta de índice, en monocromo puro para que
+       encaje con cualquiera de los temas de color del sitio. -->
+  <rect width="64" height="64" fill="#111111"/>
+  <rect x="6" y="6" width="52" height="52" fill="#FFFFFF"/>
+  <!-- Esquina doblada -->
+  <path d="M42 6 L58 6 L58 22 Z" fill="#111111"/>
+  <path d="M42 6 L58 22 L42 22 Z" fill="#DADADA"/>
+  <!-- Líneas de índice -->
+  <line x1="16" y1="28" x2="40" y2="28" stroke="#111111" stroke-width="3" stroke-linecap="square"/>
+  <line x1="16" y1="37" x2="48" y2="37" stroke="#111111" stroke-width="3" stroke-linecap="square"/>
+  <line x1="16" y1="46" x2="32" y2="46" stroke="#111111" stroke-width="3" stroke-linecap="square"/>
 </svg>

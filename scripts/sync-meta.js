@@ -85,6 +85,34 @@ const replaceOne = (content, pattern, replacement, label, file) => {
   return content.replace(pattern, replacement);
 };
 
+const sleepSync = (ms) => {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+};
+
+/**
+ * Escribe vía archivo temporal + rename (en vez de sobrescribir en sitio)
+ * y reintenta unas cuantas veces con espera creciente. Visto en producción
+ * (Windows + Docker Desktop, backend WSL2): justo tras un "git pull", el
+ * antivirus o el propio git pueden tener el archivo bloqueado un instante
+ * ("EACCES: permission denied") — no es hipotético, tumbó la sincronización
+ * real de un despliegue. El rename es más resistente a ese tipo de bloqueo
+ * puntual que escribir directamente encima del archivo abierto.
+ */
+const writeFileAtomic = (targetPath, content, attempts = 5) => {
+  const tmpPath = `${targetPath}.tmp-${process.pid}`;
+  for (let i = 1; i <= attempts; i++) {
+    try {
+      fs.writeFileSync(tmpPath, content);
+      fs.renameSync(tmpPath, targetPath);
+      return;
+    } catch (err) {
+      try { fs.unlinkSync(tmpPath); } catch (_) { /* no existía, da igual */ }
+      if (i === attempts) throw err;
+      sleepSync(200 * i);
+    }
+  }
+};
+
 // ---- index.html ----
 const indexPath = path.join(PUBLIC_DIR, "index.html");
 let html = fs.readFileSync(indexPath, "utf8");
@@ -98,7 +126,7 @@ html = replaceOne(html, /<meta name="twitter:title" content="[^"]*">/, `<meta na
 html = replaceOne(html, /<meta name="twitter:description" content="[^"]*">/, `<meta name="twitter:description" content="${roleFlat || description}">`, "twitter:description", "index.html");
 html = replaceOne(html, /<link rel="canonical" href="[^"]*">/, `<link rel="canonical" href="${siteUrl}">`, "canonical", "index.html");
 
-fs.writeFileSync(indexPath, html);
+writeFileAtomic(indexPath, html);
 console.log("✓ index.html");
 
 // ---- ld.json ----
@@ -107,21 +135,21 @@ const ld = JSON.parse(fs.readFileSync(ldPath, "utf8"));
 ld.name = config.operatorName || ld.name;
 ld.description = roleFlat || ld.description;
 ld.url = siteUrl;
-fs.writeFileSync(ldPath, `${JSON.stringify(ld, null, 2)}\n`);
+writeFileAtomic(ldPath, `${JSON.stringify(ld, null, 2)}\n`);
 console.log("✓ ld.json");
 
 // ---- robots.txt ----
 const robotsPath = path.join(PUBLIC_DIR, "robots.txt");
 let robots = fs.readFileSync(robotsPath, "utf8");
 robots = replaceOne(robots, /Sitemap: .*/, `Sitemap: ${siteUrl}sitemap.xml`, "Sitemap", "robots.txt");
-fs.writeFileSync(robotsPath, robots);
+writeFileAtomic(robotsPath, robots);
 console.log("✓ robots.txt");
 
 // ---- sitemap.xml ----
 const sitemapPath = path.join(PUBLIC_DIR, "sitemap.xml");
 let sitemap = fs.readFileSync(sitemapPath, "utf8");
 sitemap = replaceOne(sitemap, /<loc>[^<]*<\/loc>/, `<loc>${siteUrl}</loc>`, "loc", "sitemap.xml");
-fs.writeFileSync(sitemapPath, sitemap);
+writeFileAtomic(sitemapPath, sitemap);
 console.log("✓ sitemap.xml");
 
 console.log(`\nListo — dominio usado: ${siteUrl}`);
