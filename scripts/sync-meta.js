@@ -194,7 +194,7 @@ const buildOgImageSvg = (cfg, palette) => {
   </g>
   <text x="118" y="415" font-family="${monoStack}" font-size="24" font-weight="700" letter-spacing="4" fill="${textMuted}">ÍNDICE PERSONAL</text>
   <text x="118" y="500" font-family="${serifStack}" font-size="${nameSize}" fill="${palette.text}">${escapeXml(name)}</text>
-  <text x="118" y="600" font-family="${monoStack}" font-size="${roleSize}" fill="${textDim}">${roleSpans}</text>
+  <text x="118" y="600" font-family="${monoStack}" font-size="${roleSize}" fill="${textDim}" xml:space="preserve">${roleSpans}</text>
 </svg>`;
 };
 
