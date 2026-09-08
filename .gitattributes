@@ -1,0 +1,23 @@
+# Fuerza saltos de línea LF en git, sin importar el sistema operativo del
+# checkout. Motivo real: en Windows (core.autocrlf=true, el valor por
+# defecto de Git para Windows) git convertía los .sh a CRLF al hacer
+# checkout — el shebang "#!/bin/sh\r" resultante no lo reconoce el
+# contenedor Linux ("not found", bucle de reinicio). Los .sh son los
+# críticos (rompen el arranque de Docker), pero se normaliza todo el
+# texto para no repetir el problema con otro archivo más adelante.
+* text=auto eol=lf
+
+*.sh text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.conf text eol=lf
+*.yml text eol=lf
+
+# Binarios: que git nunca intente tocarles los saltos de línea.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.woff2 binary

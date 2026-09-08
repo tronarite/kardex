@@ -16,7 +16,12 @@ COPY public/ /usr/share/nginx/html/
 # oficial de nginx: ejecuta todo lo de ahí antes de arrancar nginx.
 COPY scripts/sync-meta.js /app/scripts/sync-meta.js
 COPY scripts/docker-entrypoint-meta.sh /docker-entrypoint.d/40-sync-meta.sh
-RUN chmod +x /docker-entrypoint.d/40-sync-meta.sh
+# Quita cualquier \r que se haya colado (típico al clonar/editar en
+# Windows sin el .gitattributes del repo activo): un CRLF en el shebang
+# ("#!/bin/sh\r") hace que el contenedor no arranque ("not found", bucle
+# de reinicio) — visto en producción, no es hipotético.
+RUN sed -i 's/\r$//' /docker-entrypoint.d/40-sync-meta.sh && \
+    chmod +x /docker-entrypoint.d/40-sync-meta.sh
 
 EXPOSE 80
 
