@@ -25,6 +25,20 @@ const SITE_CONFIG = {
   // de copiar al portapapeles.
   contactEmail: "contacto@ejemplo.com",
 
+  // [BETA] Tu teléfono de contacto, solo para la vista de servicios
+  // (función en beta, ver SERVICES más abajo). Opcional: si lo quitas, esa
+  // vista simplemente no muestra el bloque de teléfono. No aparece en
+  // texto plano hasta que alguien pulsa "mostrar teléfono" — un filtro
+  // básico contra bots que solo leen el HTML, no una verificación real
+  // (para eso haría falta un backend, que este sitio no tiene).
+  contactPhone: "+34 600 000 000",
+
+  // [BETA] Tu ubicación, solo para la vista de servicios — pensada para
+  // dar una idea de dónde trabajas, no una dirección exacta (ej. "Madrid,
+  // España" o "Remoto (España)"). Opcional: si la quitas o la dejas
+  // vacía, esa vista simplemente no muestra el bloque de ubicación.
+  location: "Madrid, España",
+
   // Título de la pestaña del navegador. Opcional: si lo quitas o lo dejas
   // vacío, se usa automáticamente "{operatorName} — Índice".
   pageTitle: "Tu Nombre — Índice personal",
@@ -183,14 +197,56 @@ const UNITS = [
     label: "RRSS",
   },
   {
-    // EJEMPLO de servicio anunciado pero aún no disponible — edítalo con tu
-    // servicio real o bórralo si no lo necesitas.
+    // [BETA] "#servicios" es un valor especial que reconoce script.js: en
+    // vez de enlazar a otra página, abre la vista de servicios (ver
+    // SERVICES más abajo) con una transición, dentro de esta misma web.
+    // Si prefieres enlazar a una web externa en su lugar, cambia "url" por
+    // esa dirección normal (como en los demás bloques de arriba).
     name: "SERVICIOS",
     order: 5,
-    url: "https://ejemplo.com/servicios",
-    description: "Diferentes opciones de asesoría y consultoría.",
+    url: "#servicios",
+    description: "Ejemplos orientativos de en qué puedo ayudarte.",
     type: "proximamente",
     label: "SERVICIO",
-    priceRange: "Desde 30€",
+  },
+];
+
+
+/* ============================================================================
+   [BETA] SERVICIOS — listado de la vista de servicios (dentro de esta misma
+   web, no una página aparte — se abre desde la fila "SERVICIOS" de UNITS,
+   con "url: '#servicios'")
+   ============================================================================
+   Función en beta: funciona, pero el diseño y el contenido de esta sección
+   todavía pueden cambiar bastante antes de darla por terminada. No
+   sustituye a la fila "SERVICIOS" de arriba en UNITS — esa sigue siendo el
+   enlace que aparece en el índice principal; esto es lo que se ve dentro
+   de la vista de servicios que abre.
+
+   Cada bloque es una tarjeta de servicio. Solo "name" es obligatorio.
+
+     name          Obligatorio   Nombre del servicio.
+     description   Opcional      En qué consiste, con el detalle que quieras
+                                  (a diferencia de la description de UNITS,
+                                  aquí no hace falta que sea una frase corta).
+     order         Opcional      Igual que en UNITS: fija la posición sin
+                                  mover el bloque.
+
+   Deliberadamente NO hay campo de precio ni de tarifa por hora: la idea es
+   que sean ejemplos orientativos de lo que sabes hacer, no un catálogo
+   cerrado con tarifario — quien esté interesado escribe (usa el correo o
+   el teléfono del bloque de contacto, o el canal que prefieras) y ahí se
+   habla el alcance y el precio según cada caso.
+   ============================================================================ */
+const SERVICES = [
+  {
+    name: "NOMBRE DEL SERVICIO",
+    order: 1,
+    description: "Descripción de en qué consiste este servicio, qué incluye y qué no.",
+  },
+  {
+    name: "OTRO SERVICIO",
+    order: 2,
+    description: "Otra descripción, tan larga como haga falta.",
   },
 ];

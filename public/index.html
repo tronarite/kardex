@@ -69,12 +69,24 @@
       </div>
 
       <div class="identity">
-        <p class="identity-kicker">ÍNDICE PERSONAL</p>
+        <p class="identity-kicker">
+          <span id="kicker-text">ÍNDICE PERSONAL</span>
+          <span class="beta-badge" id="kicker-beta-badge" title="Función en beta: contenido y diseño todavía pueden cambiar" hidden>BETA</span>
+        </p>
         <h1 class="identity-name" id="operator-name">Tu Nombre / Alias</h1>
         <p class="identity-role" id="operator-subtitle">DESARROLLO SOFTWARE // INGENIERÍA &amp; SISTEMAS</p>
       </div>
 
-      <div class="contact-block">
+      <!-- Solo visible en la vista de servicios (ver initViewSwitcher en
+           script.js) — nunca es una página distinta, es la misma index.html
+           cambiando de contenido con una transición. -->
+      <div class="masthead-service-extra" id="masthead-service-extra" hidden>
+        <p class="masthead-back">
+          <a href="#" class="back-link" id="back-to-index-link">← Volver al índice</a>
+        </p>
+      </div>
+
+      <div class="contact-block" id="contact-block">
         <span class="contact-kicker">CONTACTO</span>
         <a href="mailto:contacto@ejemplo.com" class="contact-email" id="contact-email-link">
           <span id="contact-email-text">contacto@ejemplo.com</span>
@@ -83,6 +95,30 @@
           <span id="copy-btn-text">Copiar dirección</span>
         </button>
         <span class="visually-hidden" id="copy-status" role="status" aria-live="polite"></span>
+
+        <!-- [BETA] Solo se muestra en la vista de servicios y solo si hay
+             teléfono configurado. El número no se escribe en texto plano
+             hasta el clic — filtro básico contra bots que solo leen el
+             HTML, no una verificación real (ver initPhoneReveal). -->
+        <div class="phone-gate" id="phone-gate" hidden>
+          <button type="button" id="phone-reveal-btn" class="phone-reveal-btn">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24 11.36 11.36 0 0 0 3.57.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.57 1 1 0 0 1-.25 1.01Z"/>
+            </svg>
+            Mostrar teléfono
+          </button>
+          <p class="phone-gate-note">Un clic de por medio, para que no se lo lleve gratis cualquier bot que solo lea el HTML.</p>
+        </div>
+        <a href="#" id="phone-link" class="contact-phone" hidden></a>
+
+        <!-- [BETA] Solo se muestra en la vista de servicios y solo si hay
+             ubicación configurada (SITE_CONFIG.location). -->
+        <p class="service-location" id="service-location" hidden>
+          <svg class="location-pin" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 6.19 12.13 6.46 12.42a.75.75 0 0 0 1.08 0C12.81 21.13 19 14.25 19 9c0-3.86-3.14-7-7-7Zm0 9.75A2.75 2.75 0 1 1 12 6.25a2.75 2.75 0 0 1 0 5.5Z"/>
+          </svg>
+          <span id="location-text"></span>
+        </p>
       </div>
 
       <p class="masthead-footer">
@@ -90,18 +126,44 @@
       </p>
     </aside>
 
-    <!-- Índice de proyectos y enlaces -->
+    <!-- Índice de proyectos y enlaces — también hace de vista de servicios:
+         cambia de contenido en el sitio (sin navegar a otra página) al
+         pulsar la fila SERVICIOS o el enlace "Volver al índice" del
+         masthead (ver initViewSwitcher en script.js). -->
     <main class="index" id="index" aria-label="Proyectos y enlaces">
+      <!-- Solo se muestra en la vista de servicios, por encima del
+           encabezado "N° SERVICIOS" — a modo de titular de la sección,
+           no de aviso aparte. -->
+      <p class="services-intro" id="services-intro" hidden>
+        Son ejemplos orientativos de lo que puedo hacer, no un catálogo cerrado.
+        Cada caso es distinto, así que el alcance y el precio se hablan directamente.
+        <strong>¿Te interesa alguno?</strong> Escríbeme por email, WhatsApp o donde prefieras.
+      </p>
+
       <div class="index-head">
         <span class="index-head-number" aria-hidden="true">N°</span>
-        <span class="index-head-title">PROYECTOS Y ENLACES</span>
+        <span class="index-head-title" id="content-title" tabindex="-1">PROYECTOS Y ENLACES</span>
       </div>
 
-      <ol class="index-list" id="units-list">
-        <!-- Se inserta dinámicamente desde config.js / script.js -->
-      </ol>
+      <!-- Página estática (ver style.css, @media 860px arriba): esta es la
+           ÚNICA parte de todo el sitio que hace scroll — la entradilla y
+           el título de arriba no se mueven nunca. Las filas se desvanecen
+           (mask-image, no un bloque de color) al acercarse al borde
+           superior, y en cuanto quedan aunque sea mínimamente tapadas
+           script.js las marca no-clicables de verdad (ver
+           initListFadeGuard) — no solo visualmente ocultas. -->
+      <div class="index-scroll" id="index-scroll">
+        <ol class="index-list" id="content-list">
+          <!-- Se inserta dinámicamente desde config.js / script.js: UNITS
+               en la vista de índice, SERVICES en la de servicios. -->
+        </ol>
 
-      <!-- Alternativa accesible para navegadores/crawlers sin JavaScript -->
+        <p class="row-desc" id="services-empty" hidden>Todavía no hay servicios listados aquí.</p>
+      </div>
+
+      <!-- Alternativa accesible para navegadores/crawlers sin JavaScript
+           (la transición a la vista de servicios necesita JS; sin él se
+           queda en el índice de proyectos). -->
       <noscript>
         <ol class="index-list">
           <li class="index-row">
@@ -131,6 +193,7 @@
             </a>
           </li>
         </ol>
+        <p class="row-desc">¿Buscas los servicios? Escribe directamente a <a href="mailto:contacto@ejemplo.com">contacto@ejemplo.com</a>.</p>
       </noscript>
     </main>
 
@@ -139,6 +202,37 @@
   <footer class="credit">
     <a href="https://github.com/tronarite/kardex" target="_blank" rel="noopener noreferrer">Powered by Kardex</a>
   </footer>
+
+  <!-- [BETA] Modal de contacto: se abre al pulsar cualquier servicio (ver
+       initContactModal en script.js) — una versión más grande y centrada
+       del bloque de contacto del masthead, con sus propios controles
+       (mismo comportamiento, wireado por separado con initContactManager/
+       initPhoneReveal para no duplicar lógica). -->
+  <div class="modal-backdrop" id="contact-modal-backdrop" hidden>
+    <div class="contact-modal" id="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+      <button type="button" class="modal-close" id="contact-modal-close" aria-label="Cerrar">✕</button>
+
+      <span class="contact-kicker" id="contact-modal-title">CONTACTO</span>
+      <a href="mailto:contacto@ejemplo.com" class="contact-email contact-email--modal" id="modal-contact-email-link">
+        <span id="modal-contact-email-text">contacto@ejemplo.com</span>
+      </a>
+      <button type="button" id="modal-copy-email-btn" class="copy-btn copy-btn--modal">
+        <span id="modal-copy-btn-text">Copiar dirección</span>
+      </button>
+      <span class="visually-hidden" id="modal-copy-status" role="status" aria-live="polite"></span>
+
+      <div class="phone-gate" id="modal-phone-gate" hidden>
+        <button type="button" id="modal-phone-reveal-btn" class="phone-reveal-btn phone-reveal-btn--modal">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24 11.36 11.36 0 0 0 3.57.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.57 1 1 0 0 1-.25 1.01Z"/>
+          </svg>
+          Mostrar teléfono
+        </button>
+        <p class="phone-gate-note">Un clic de por medio, para que no se lo lleve gratis cualquier bot que solo lea el HTML.</p>
+      </div>
+      <a href="#" id="modal-phone-link" class="contact-phone contact-phone--modal" hidden></a>
+    </div>
+  </div>
 
   <script src="config.js"></script>
   <script src="script.js"></script>

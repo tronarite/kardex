@@ -19,6 +19,7 @@
 - [Requisitos](#requisitos)
 - [Inicio rápido con Docker](#inicio-rápido-con-docker)
 - [Configuración](#configuración)
+- [Vista de servicios `[BETA]`](#vista-de-servicios-beta)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Licencia](#licencia)
 
@@ -35,6 +36,7 @@
 - **SEO / PWA listo:** Open Graph, Twitter Card, `manifest.json`, `robots.txt`, `sitemap.xml`, página 404 propia e iconos para instalar como app.
 - **Docker listo:** imagen `nginx:1.27-alpine` con Gzip, cache headers, `HEALTHCHECK`, cabeceras de seguridad y CSP estricta; edición en caliente vía volumen montado, sin reconstruir la imagen para cambios de contenido.
 - **SEO y previsualizaciones al compartir, sin tocarlas a mano:** el contenedor sincroniza `<title>`, `og:title`/`og:description`, `canonical`, el Sitemap **y la propia imagen de la tarjeta** directamente desde tu `config.js` — edita tu nombre, tema o dominio una vez y se propaga solo (ver [Meta tags y dominio](#meta-tags-y-dominio)).
+- **Vista de servicios `[BETA]`:** un listado aparte de servicios que ofreces, con transición animada dentro de la misma página (no navega a otra URL) y un modal de contacto ampliado — ver [Vista de servicios](#vista-de-servicios-beta).
 
 ---
 
@@ -203,6 +205,58 @@ git update-index --skip-worktree public/index.html public/ld.json public/robots.
 Para el 95% de los casos, basta con sustituir `public/favicon.svg` por tu propio SVG (mismo nombre de archivo) — actualiza el icono de la pestaña del navegador al momento, sin tocar nada más.
 
 Si además quieres que tu icono se vea bien al "añadir a inicio" en móvil o al instalar como PWA, regenera también los PNG en `public/icons/` (`apple-touch-icon.png` 180×180, `icon-192.png`, `icon-512.png`) a partir de tu nuevo SVG — con cualquier conversor SVG→PNG gratuito online (por ejemplo [realfavicongenerator.net](https://realfavicongenerator.net) o [cloudconvert.com](https://cloudconvert.com)), manteniendo esos mismos nombres de archivo.
+
+---
+
+## Vista de servicios `[BETA]`
+
+Función en beta: funciona de punta a punta, pero el diseño y el contenido de esta sección todavía pueden cambiar. Es un listado aparte, pensado para ofertar servicios propios (no proyectos/enlaces), que vive **dentro de la misma página** — no navega a ninguna URL nueva, cambia de contenido con una transición animada (el masthead sale por un lado y entra por el otro; la lista de proyectos se disuelve y aparece la de servicios).
+
+### Activarla
+Por defecto no se muestra ningún enlace hacia ella. Para activarla, añade (o edita) un bloque en `UNITS` cuyo `url` sea exactamente `"#servicios"` — ese valor especial lo reconoce `script.js` y, en vez de abrir un enlace, dispara la transición:
+
+```javascript
+{
+  name: "SERVICIOS",
+  url: "#servicios",   // valor especial: abre la vista de servicios, no navega
+  description: "Ejemplos orientativos de en qué puedo ayudarte.",
+  type: "proximamente",
+  label: "SERVICIO",
+}
+```
+
+También se puede enlazar directamente compartiendo `tu-dominio.example/#servicios` — si alguien llega así (en vez de pulsar el enlace desde el índice), el botón para salir de la vista dice "Índice" en vez de "Volver al índice", porque de verdad no viene de ningún sitio.
+
+### Listar los servicios (`SERVICES`)
+Cada bloque de `SERVICES` en `config.js` es una tarjeta de la vista. Solo `name` es obligatorio:
+
+```javascript
+const SERVICES = [
+  {
+    name: "NOMBRE DEL SERVICIO",
+    order: 1,   // opcional, igual que en UNITS
+    description: "En qué consiste, con el detalle que quieras.",
+  },
+];
+```
+
+Deliberadamente **no hay campo de precio ni de tarifa por hora**: la idea es que sean ejemplos orientativos de lo que sabes hacer, no un catálogo cerrado con tarifario. Al pulsar cualquier tarjeta se abre un modal de contacto ampliado (el mismo correo/teléfono del masthead, en grande) — quien esté interesado escribe y ahí se habla el alcance y el precio según cada caso.
+
+### Teléfono y ubicación (opcionales, solo en esta vista)
+Dos campos opcionales de `SITE_CONFIG` que **solo se muestran en la vista de servicios**, no en el índice principal:
+
+```javascript
+const SITE_CONFIG = {
+  // ...
+  contactPhone: "+34 600 000 000",   // opcional
+  location: "Madrid, España",         // opcional
+};
+```
+
+- `contactPhone` no aparece en texto plano hasta que alguien pulsa "Mostrar teléfono" — un filtro básico contra bots que solo leen el HTML, **no una verificación real** (para eso haría falta un backend, que este sitio no tiene).
+- `location` es orientativa (ciudad/zona, o "Remoto"), no una dirección exacta.
+
+Si quitas cualquiera de los dos campos (o los dejas vacíos), esa parte simplemente no se muestra — no hace falta desactivar nada más.
 
 ---
 
