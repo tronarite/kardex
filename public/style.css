@@ -45,10 +45,12 @@
      con literales por tema) para que salgan siempre con el matiz correcto
      del tema activo Y con contraste garantizado, en vez de tener que
      ajustar 12 valores a mano (6 temas × claro/oscuro) cada vez. --text-dim
-     pasa el mínimo AA (4.5:1) para texto normal; --text-muted es más claro
-     a propósito y se reserva para elementos decorativos/aria-hidden. */
-  --text-dim: color-mix(in srgb, var(--text) 60%, var(--bg) 40%);
-  --text-muted: color-mix(in srgb, var(--text) 38%, var(--bg) 62%);
+     va por encima del mínimo AA (4.5:1) para texto normal, con margen de
+     sobra para que se lea bien también en pantallas más pequeñas o con
+     brillo bajo; --text-muted es más claro a propósito y se reserva para
+     elementos decorativos/aria-hidden. */
+  --text-dim: color-mix(in srgb, var(--text) 68%, var(--bg) 32%);
+  --text-muted: color-mix(in srgb, var(--text) 46%, var(--bg) 54%);
 
   /* Acento (sello / tinta roja, no el naranja genérico de IA) */
   --accent: light-dark(#A6321C, #E2724A);
@@ -217,6 +219,10 @@ body {
   background-color: var(--bg);
   background-image:
     radial-gradient(ellipse at top, light-dark(rgba(23,20,15,0.035), rgba(255,255,255,0.03)), transparent 60%);
+  /* La transición índice ↔ servicios saca los paneles fuera del viewport
+     (ver .panel-slide-* más abajo) — sin esto aparecería una barra de
+     scroll horizontal fantasma mientras dura la animación. */
+  overflow-x: hidden;
 }
 
 .skip-link {
@@ -262,11 +268,70 @@ body {
 }
 
 @media (min-width: 860px) {
-  .page {
-    grid-template-columns: 15.5rem 1fr;
-    gap: 4rem;
-    align-items: start;
+  /* Página estática: nada de scroll (ni de "rebote" al forzarlo) en todo
+     el sitio — lo único que se desplaza es la propia lista de enlaces/
+     servicios, dentro de su propio hueco (ver .index-list más abajo). En
+     móvil se deja el scroll normal de toda la página (una sola columna,
+     sin masthead fijo al lado con el que compaginar el desplazamiento). */
+  html, body {
+    height: 100%;
+    overflow: hidden;
   }
+
+  .page {
+    height: 100vh;
+    height: 100dvh;
+    grid-template-columns: 15.5rem 1fr;
+    grid-template-rows: minmax(0, 1fr);
+    gap: 4rem;
+    align-items: stretch;
+    /* Mucho menos hueco muerto abajo que en móvil (3.5rem): con la
+       página fija a 100dvh, ese margen le quitaba a la lista casi 1cm de
+       alto útil antes de necesitar scroll, dejando la zona de
+       desvanecido demasiado arriba, lejos del borde real del navegador. */
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  /* Vista de servicios (ver initViewSwitcher en script.js): el masthead
+     pasa a la columna derecha y la lista de contenido a la izquierda —
+     solo tiene sentido "el otro lado" cuando hay dos columnas; en una sola
+     columna (móvil) el swap queda desactivado y solo se ve la animación.
+     "order" por sí solo NO basta: solo decide qué elemento va en qué
+     columna, pero las columnas del grid mantienen su ancho (15.5rem/1fr)
+     donde estaban — sin invertir también grid-template-columns, la lista
+     de servicios quedaría apretada en la columna estrecha. */
+  .page--services {
+    grid-template-columns: 1fr 15.5rem;
+  }
+  .page--services .masthead { order: 2; }
+  .page--services .index { order: 1; }
+}
+
+/* --------------------------------------------------------------------------
+   Transición índice ↔ servicios
+   El masthead sale de pantalla por la izquierda y vuelve a entrar por la
+   derecha (colocándose al otro lado del grid); la lista de contenido hace
+   el movimiento espejo. translateX en vw (no en % del propio ancho) para
+   que "salir"/"entrar" sea siempre respecto al viewport, sin importar en
+   qué columna esté el elemento en ese momento.
+   -------------------------------------------------------------------------- */
+.masthead,
+.index {
+  transition: transform 0.42s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.3s ease;
+}
+
+.panel-slide-left {
+  transform: translateX(-120vw);
+  opacity: 0;
+}
+
+.panel-slide-right {
+  transform: translateX(120vw);
+  opacity: 0;
+}
+
+.no-transition {
+  transition: none !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -282,10 +347,12 @@ body {
 
 @media (min-width: 860px) {
   .masthead {
-    position: sticky;
-    top: 3.5rem;
+    /* La página ya no hace scroll (ver .page más arriba), así que no hace
+       falta "sticky" — el masthead simplemente se queda donde está. */
     padding-bottom: 0;
     border-bottom: none;
+    min-height: 0;
+    overflow: hidden;
   }
 }
 
@@ -479,6 +546,56 @@ body {
   color: var(--c-activo);
 }
 
+/* Distinto a propósito de .copy-btn: aunque esté justo al lado del botón
+   de copiar correo, este REVELA algo que no estaba (no copia algo que ya
+   se ve) — con el mismo borde sólido se confundía con "otro botón más"
+   de la misma familia. Borde discontinuo + icono en el color de acento
+   marcan que es una acción distinta. */
+.phone-reveal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: transparent;
+  border: 1px dashed var(--accent);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.phone-reveal-btn svg {
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.phone-reveal-btn:hover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-style: solid;
+}
+
+.phone-reveal-btn:focus-visible {
+  outline: 2px solid var(--line-strong);
+  outline-offset: 2px;
+}
+
+.phone-reveal-btn--modal {
+  font-size: 0.78rem;
+  padding: 0.55rem 0.9rem;
+}
+
+.phone-reveal-btn--modal svg {
+  width: 15px;
+  height: 15px;
+}
+
 .masthead-footer {
   font-family: var(--font-mono);
   font-size: 0.7rem;
@@ -504,6 +621,51 @@ body {
   margin-bottom: 0.25rem;
 }
 
+/* Único elemento con scroll de toda la página (ver @media 860px de .page
+   más arriba) — la entradilla y "N° ..." quedan fuera, así que nunca se
+   mueven. El desvanecido (arriba Y abajo) es un mask-image sobre el
+   propio contenido (no un fondo de color detrás del título): las filas
+   se disuelven según se acercan a cualquiera de los dos bordes en vez de
+   cortarse de golpe — como si desaparecieran fuera de la pantalla — y no
+   deja ningún "bloque" ni línea de color de por medio. */
+@media (min-width: 860px) {
+  .index {
+    min-height: 0;
+  }
+
+  .index-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 1.75rem, black calc(100% - 1.75rem), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, black 1.75rem, black calc(100% - 1.75rem), transparent 100%);
+    /* Un poco de margen extra respecto a la zona de desvanecido (ver
+       FADE_ZONE_PX en script.js): sin este hueco la primera fila arranca
+       justo pegada al borde de esa zona y queda marcada como tapada
+       (no-clicable) incluso sin haber hecho scroll todavía. */
+    padding-top: 2rem;
+    /* La franja de acento (.index-row::before) se sale de la fila hacia
+       la izquierda (bleed); sin este hueco quedaría recortada por el
+       propio scroll (overflow-y:auto obliga a recortar también en X).
+       margin-left negativo + padding-left del mismo tamaño + ancho
+       ampliado: el contenido queda exactamente donde estaba, solo se
+       reserva sitio para que la franja no se corte. */
+    margin-left: -1.5rem;
+    padding-left: 1.5rem;
+    width: calc(100% + 1.5rem);
+    /* Barra de scroll nativa: sin ella (transparente, ancho 0 en
+       Firefox) — el scroll sigue funcionando igual con rueda/gesto,
+       solo no se ve una raya blanca de por medio. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .index-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 .index-head-number {
   font-family: var(--font-mono);
   font-size: 0.7rem;
@@ -526,6 +688,14 @@ body {
 .index-row {
   border-bottom: 1px solid var(--line);
   position: relative;
+}
+
+/* Puesta por script.js (initListFadeGuard) en cuanto la fila queda aunque
+   sea mínimamente tapada por la zona de desvanecido de arriba — de
+   verdad deja de poder pulsarse (no solo queda oculta detrás de otra
+   cosa), y sale del orden de tabulación con teclado. */
+.index-row.is-obscured {
+  pointer-events: none;
 }
 
 .index-row::before {
@@ -556,15 +726,24 @@ body {
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
+/* .index-link también se usa en la vista de servicios como <button> (abre
+   el modal de contacto en vez de navegar) — estos resets no afectan a su
+   uso normal como <a>, solo hacen que un <button> se vea idéntico. */
 .index-link {
   display: grid;
   grid-template-columns: 2.25rem 1fr auto;
   align-items: baseline;
   gap: 1rem;
+  width: 100%;
   padding: 1.15rem 0.75rem 1.15rem 1.25rem;
+  background: none;
+  border: none;
+  font: inherit;
+  text-align: left;
   color: inherit;
   text-decoration: none;
   outline: none;
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -707,12 +886,92 @@ body {
   outline-offset: 2px;
 }
 
+/* Mismo planteamiento que la marca "Powered by" de otro proyecto propio
+   del autor: franja fija de ancho completo, centrada con flexbox, casi
+   invisible (30% de opacidad) hasta que se pasa el ratón.
+   Con la página fija a 100dvh (ver @media 860px de .page, arriba del
+   todo), dejarla en el flujo normal le restaba altura real a la lista;
+   así, fuera del flujo, no le quita ni un píxel. pointer-events en dos
+   pasos: el hueco vacío de alrededor no bloquea clics sobre lo que haya
+   debajo, solo el propio enlace los recibe.
+   Esta regla vive AQUÍ (junto a la base) y no en el @media de arriba a
+   propósito: con la misma especificidad, en igualdad de condiciones gana
+   la que esté más abajo en el archivo — si esta regla quedara antes que
+   la base en el código, la base la pisaría entera. */
+@media (min-width: 860px) {
+  .credit {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    pointer-events: none;
+  }
+
+  .credit a {
+    pointer-events: auto;
+    padding: 4px 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 9px;
+    letter-spacing: normal;
+    color: var(--text);
+    opacity: 0.3;
+    transition: opacity 0.15s ease;
+  }
+
+  .credit a:hover {
+    color: var(--text);
+    opacity: 0.7;
+  }
+}
+
 /* --------------------------------------------------------------------------
-   [BETA] Página de servicios (servicios.html)
-   Reutiliza casi todo lo de arriba (.index-row, .row-*, .contact-block...);
-   esto es solo lo que no existía: la insignia BETA, el enlace de volver y
-   el "portón" del teléfono.
+   [BETA] Vista de servicios
+   No es una página aparte: es index.html cambiando de contenido (ver
+   initViewSwitcher en script.js). Reutiliza casi todo lo de arriba
+   (.index-row, .row-*, .contact-block...); esto es solo lo que no existía:
+   la insignia BETA, el enlace de volver, el "portón" del teléfono y el
+   párrafo introductorio orientativo.
    -------------------------------------------------------------------------- */
+/* Entradilla editorial (como el "deck" bajo el titular de un artículo):
+   serif en cursiva, más grande que el cuerpo normal, sin caja ni borde —
+   funciona como subtítulo de la sección, por encima de "N° SERVICIOS",
+   no como un aviso aparte. */
+.services-intro {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-body);
+  line-height: 1.5;
+  max-width: 34rem;
+  margin-bottom: 2rem;
+}
+
+/* La parte que de verdad importa leer (la pregunta/CTA) resalta en el
+   color de acento del tema activo y sin cursiva, para que el ojo vaya
+   directo a lo accionable en vez de perderse en el resto de la frase. */
+.services-intro strong {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.masthead-service-extra {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* Ver el porqué de esta regla en .phone-gate[hidden] un poco más abajo:
+   mismo problema de especificidad contra el [hidden] del user-agent. */
+.masthead-service-extra[hidden] {
+  display: none;
+}
+
 .beta-badge {
   display: inline-block;
   padding: 0.05rem 0.35rem;
@@ -726,23 +985,43 @@ body {
   vertical-align: middle;
 }
 
-.masthead-back {
-  margin-top: -0.75rem;
+/* display:inline-block de arriba gana por especificidad al [hidden] del
+   user-agent stylesheet (que solo pone display:none) — mismo problema que
+   .phone-gate/.masthead-service-extra más abajo. Ahora que la insignia se
+   oculta/muestra según la vista (ver initViewSwitcher), hace falta esto. */
+.beta-badge[hidden] {
+  display: none;
 }
 
+.masthead-back {
+  margin: 0;
+}
+
+/* Antes era un enlace de texto discreto — ahora es el único camino de
+   vuelta desde la vista de servicios, así que se trata como un botón de
+   verdad: borde y relleno tenue del acento, y se invierte a "lleno" al
+   pasar el ratón/foco para que destaque claramente. */
 .back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--text-dim);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1.5px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.9rem;
   text-decoration: none;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 0.1rem;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
 .back-link:hover {
-  color: var(--accent);
-  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  transform: translateX(-2px);
 }
 
 .back-link:focus-visible {
@@ -795,6 +1074,141 @@ body {
   outline-offset: 2px;
 }
 
+/* [BETA] Ubicación — solo en la vista de servicios (ver
+   SITE_CONFIG.location y initViewSwitcher en script.js). Mismo tratamiento
+   tipográfico que .contact-phone (para que no desentone), con un pin en
+   el color de acento del tema — un icono da más peso visual a este dato
+   que otro simple renglón de texto suelto. */
+.service-location {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.service-location[hidden] {
+  display: none;
+}
+
+.location-pin {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  fill: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   [BETA] Modal de contacto
+   Se abre al pulsar cualquier servicio (ver initContactModal en script.js):
+   una versión más grande y centrada del bloque de contacto, sobre un fondo
+   oscurecido que tapa el resto de la página.
+   -------------------------------------------------------------------------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: light-dark(rgba(23, 20, 15, 0.45), rgba(0, 0, 0, 0.65));
+  animation: modal-fade-in 0.18s ease;
+}
+
+/* display:flex de arriba gana por especificidad al [hidden] del user-agent
+   stylesheet — mismo patrón que .phone-gate/.beta-badge más arriba. */
+.modal-backdrop[hidden] {
+  display: none;
+}
+
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.contact-modal {
+  position: relative;
+  width: 100%;
+  max-width: 26rem;
+  max-height: calc(100vh - 3rem);
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-elevated);
+  padding: 2.5rem 2rem 2.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  animation: modal-pop-in 0.22s cubic-bezier(0.2, 0.8, 0.3, 1.1);
+}
+
+@keyframes modal-pop-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.modal-close:hover {
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+
+.modal-close:focus-visible {
+  outline: 2px solid var(--line-strong);
+  outline-offset: 2px;
+}
+
+/* Reutiliza .contact-kicker, .contact-email, .copy-btn, .phone-gate y
+   .contact-phone tal cual (mismos componentes que el masthead) — estos
+   modificadores solo agrandan la tipografía para que se lea bien como
+   pieza central de la pantalla, no de refilón en una barra lateral. */
+.contact-email--modal {
+  font-size: 1.35rem;
+  font-weight: 700;
+  padding-bottom: 0.15rem;
+}
+
+.copy-btn--modal {
+  font-size: 0.78rem;
+  padding: 0.55rem 0.9rem;
+}
+
+/* Mismo peso visual que .contact-email--modal — antes se quedaba bastante
+   más pequeño y sin negrita, como si importara menos que el correo. */
+.contact-phone--modal {
+  font-size: 1.35rem;
+  font-weight: 700;
+  padding-bottom: 0.15rem;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
 /* --------------------------------------------------------------------------
    Accessibility & Reduced Motion
    -------------------------------------------------------------------------- */
@@ -809,6 +1223,20 @@ body {
   .index-row.animate-init {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  /* Cinturón y tirantes: script.js ya evita animar la transición de vista
+     cuando hay preferencia de movimiento reducido, esto es solo por si
+     alguna de estas clases quedara puesta. */
+  .panel-slide-left,
+  .panel-slide-right {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .modal-backdrop,
+  .contact-modal {
+    animation: none !important;
   }
 }
 
