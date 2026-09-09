@@ -427,6 +427,7 @@ const initViewSwitcher = (config) => {
   const backLink = document.getElementById("back-to-index-link");
   const contentTitle = document.getElementById("content-title");
   const servicesIntro = document.getElementById("services-intro");
+  const servicesHighlights = document.getElementById("services-highlights");
 
   if (!page || !masthead || !main || !contentTitle) return;
 
@@ -471,6 +472,7 @@ const initViewSwitcher = (config) => {
     contentTitle.textContent = isServices ? "SERVICIOS" : "PROYECTOS Y ENLACES";
     main.setAttribute("aria-label", isServices ? "Servicios" : "Proyectos y enlaces");
     if (servicesIntro) servicesIntro.hidden = !isServices;
+    if (servicesHighlights) servicesHighlights.hidden = !isServices;
 
     document.title = isServices
       ? (config.operatorName ? `Servicios — ${config.operatorName}` : "Servicios")
