@@ -823,7 +823,11 @@ body {
 
 .row-flag {
   margin-left: 0.75rem;
-  vertical-align: middle;
+  /* "middle" (el valor por defecto de vertical-align) alinea con el punto
+     medio del x-height, que queda visiblemente más bajo que el centro
+     real del título en mayúsculas — este valor lo sube para que el punto
+     de estado quede centrado con el texto del título, no colgando. */
+  vertical-align: 0.22em;
 }
 
 .row-price {
@@ -832,7 +836,7 @@ body {
   font-weight: 600;
   color: var(--accent);
   margin-left: 0.6rem;
-  vertical-align: middle;
+  vertical-align: 0.22em;
 }
 
 .row-desc {
