@@ -2,7 +2,8 @@
 /**
  * Sincroniza las etiquetas "estáticas" de SEO/redes con los datos de
  * config.js: <title>, meta description/author, og:*, twitter:*,
- * <link rel="canonical"> y el bloque <script type="application/ld+json">
+ * <link rel="canonical">, el "?v=" de cache-busting del favicon
+ * (SITE_CONFIG.faviconVersion) y el bloque <script type="application/ld+json">
  * (inline) en index.html, más robots.txt y sitemap.xml (raíz + /servicios).
  *
  * Genera además de cero (no solo texto):
@@ -95,6 +96,17 @@ const roleFlat = (config.operatorRole || "").replace(/\s*\/\/\s*/g, " · ").trim
 const description = config.operatorName
   ? `Índice personal de proyectos y enlaces de ${config.operatorName}.${roleFlat ? ` ${roleFlat}.` : ""}`
   : "Índice personal de proyectos y enlaces, con estética editorial minimalista y modo claro/oscuro adaptativo.";
+
+// Cache-busting del favicon (SITE_CONFIG.faviconVersion). Se pone/actualiza
+// "?v=N" solo en el <link ... href="favicon.svg..."> del HTML; si no hay
+// versión, se deja "favicon.svg" a secas. Vive en config.js justamente
+// para que sobreviva a "git pull" sin reeditar el HTML a mano.
+const faviconVersion = config.faviconVersion;
+const applyFaviconVersion = (content) =>
+  content.replace(
+    /href="favicon\.svg(?:\?v=[^"]*)?"/g,
+    () => (faviconVersion ? `href="favicon.svg?v=${faviconVersion}"` : `href="favicon.svg"`)
+  );
 
 let warnings = 0;
 const replaceOne = (content, pattern, replacement, label, file) => {
@@ -393,6 +405,8 @@ const applyMeta = (content, fileLabel, tags) => {
   set(/<meta name="twitter:image:alt" content="[^"]*">/, `<meta name="twitter:image:alt" content="${tags.imageAlt}">`, "twitter:image:alt");
   set(/<link rel="canonical" href="[^"]*">/, `<link rel="canonical" href="${tags.url}">`, "canonical");
 
+  content = applyFaviconVersion(content);
+
   // Datos estructurados: bloque <script type="application/ld+json"> INLINE
   // (Google ignora el atributo src en este tipo de script). Se reemplaza
   // con función para no interpretar "$..." del JSON como grupos de captura.
@@ -526,6 +540,19 @@ serviciosHtml = replaceOne(
 );
 writeFileAtomic(serviciosPath, serviciosHtml);
 console.log("✓ servicios.html");
+
+// ---- 404.html: solo la versión del favicon ----
+// (no lleva meta de SEO/redes propias; lo único que sincroniza es el
+// "?v=" del favicon, para que no se quede desfasado del resto).
+const notFoundPath = path.join(PUBLIC_DIR, "404.html");
+if (fs.existsSync(notFoundPath)) {
+  const before = fs.readFileSync(notFoundPath, "utf8");
+  const after = applyFaviconVersion(before);
+  if (after !== before) {
+    writeFileAtomic(notFoundPath, after);
+    console.log("✓ 404.html (favicon)");
+  }
+}
 
 // (El JSON-LD ya no es un archivo aparte: va inline en index.html y
 // servicios.html, ver applyMeta arriba — Google ignora el src en un

@@ -71,6 +71,15 @@ const SITE_CONFIG = {
   //   "monocromo"  blanco puro / negro puro, sin color de acento
   theme: "terracota",
 
+  // Cache-busting del favicon. Se añade como "?v=N" al enlace de
+  // favicon.svg en el HTML — súbela (5 -> 6 -> 7...) cada vez que cambies
+  // favicon.svg, para que los navegadores dejen de servir el icono viejo
+  // de su caché. Vive aquí y no en el HTML a propósito: config.js no se
+  // toca al hacer "git pull", así que el número sobrevive a cada
+  // despliegue sin tener que reeditar index.html a mano (lo aplica
+  // scripts/sync-meta.js). Opcional: si la quitas, no se añade "?v=".
+  faviconVersion: 5,
+
   // Tu disponibilidad personal, arriba a la izquierda de la página.
   // OJO: este "type" es un catálogo distinto al de los proyectos de abajo
   // — aquí se trata de si TÚ estás disponible, no de si un proyecto lo está.
