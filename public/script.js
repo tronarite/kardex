@@ -274,7 +274,7 @@ const renderUnits = (units) => {
 };
 
 // ==========================================================================
-// VISTA DE SERVICIOS [BETA]
+// VISTA DE SERVICIOS
 // No es una página distinta: es la misma index.html cambiando de contenido
 // (ver initViewSwitcher más abajo, que orquesta la transición y llama a
 // renderServices en el momento justo). Se apoya en SERVICES (config.js) y
@@ -357,7 +357,7 @@ const renderServices = (services) => {
   const validServices = (services || []).filter((service) => {
     const isValid = Boolean(service && service.name);
     if (!isValid) {
-      console.warn("Kardex [beta]: se ha omitido un servicio de config.js por faltarle \"name\":", service);
+      console.warn("Kardex: se ha omitido un servicio de config.js por faltarle \"name\":", service);
     }
     return isValid;
   });
@@ -377,7 +377,7 @@ const renderServices = (services) => {
 };
 
 /**
- * [BETA] "Verificación humana" del teléfono — nombre honesto de lo que es:
+ * "Verificación humana" del teléfono — nombre honesto de lo que es:
  * un filtro básico, NO una verificación real. El número no se escribe en
  * el HTML hasta que alguien hace clic, así que un scraper que solo lee el
  * texto visible de la página no se lo lleva gratis. Esto NO protege contra
@@ -427,7 +427,6 @@ const initViewSwitcher = (config) => {
   const masthead = document.querySelector(".masthead");
   const main = document.getElementById("index");
   const kickerText = document.getElementById("kicker-text");
-  const kickerBadge = document.getElementById("kicker-beta-badge");
   const serviceExtra = document.getElementById("masthead-service-extra");
   const phoneGate = document.getElementById("phone-gate");
   const phoneLink = document.getElementById("phone-link");
@@ -462,7 +461,6 @@ const initViewSwitcher = (config) => {
     }
 
     kickerText.textContent = isServices ? "SERVICIOS" : "ÍNDICE PERSONAL";
-    if (kickerBadge) kickerBadge.hidden = !isServices;
     if (serviceExtra) serviceExtra.hidden = !isServices;
 
     // El teléfono solo tiene sentido en la vista de servicios; si ya se
@@ -732,7 +730,7 @@ const initContactManager = (config, ids = {}) => {
 };
 
 // ==========================================================================
-// [BETA] MODAL DE CONTACTO
+// MODAL DE CONTACTO
 // Se abre al pulsar cualquier fila de la vista de servicios (ver
 // createServiceRow) — una versión más grande y centrada del bloque de
 // contacto del masthead, con sus propios elementos (wireados por separado

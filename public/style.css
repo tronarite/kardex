@@ -941,12 +941,12 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   [BETA] Vista de servicios
+   Vista de servicios
    No es una página aparte: es index.html cambiando de contenido (ver
    initViewSwitcher en script.js). Reutiliza casi todo lo de arriba
    (.index-row, .row-*, .contact-block...); esto es solo lo que no existía:
-   la insignia BETA, el enlace de volver, el "portón" del teléfono y el
-   párrafo introductorio orientativo.
+   el enlace de volver, el "portón" del teléfono y el párrafo
+   introductorio orientativo.
    -------------------------------------------------------------------------- */
 /* Entradilla editorial (como el "deck" bajo el titular de un artículo):
    serif en cursiva, más grande que el cuerpo normal, sin caja ni borde —
@@ -1040,27 +1040,6 @@ body {
   display: none;
 }
 
-.beta-badge {
-  display: inline-block;
-  padding: 0.05rem 0.35rem;
-  margin-left: 0.4rem;
-  border: 1px solid var(--accent);
-  border-radius: 999px;
-  color: var(--accent);
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  vertical-align: middle;
-}
-
-/* display:inline-block de arriba gana por especificidad al [hidden] del
-   user-agent stylesheet (que solo pone display:none) — mismo problema que
-   .phone-gate/.masthead-service-extra más abajo. Ahora que la insignia se
-   oculta/muestra según la vista (ver initViewSwitcher), hace falta esto. */
-.beta-badge[hidden] {
-  display: none;
-}
-
 .masthead-back {
   margin: 0;
 }
@@ -1142,7 +1121,7 @@ body {
   outline-offset: 2px;
 }
 
-/* [BETA] Ubicación — solo en la vista de servicios (ver
+/* Ubicación — solo en la vista de servicios (ver
    SITE_CONFIG.location y initViewSwitcher en script.js). Mismo tratamiento
    tipográfico que .contact-phone (para que no desentone), con un pin en
    el color de acento del tema — un icono da más peso visual a este dato
@@ -1170,7 +1149,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   [BETA] Modal de contacto
+   Modal de contacto
    Se abre al pulsar cualquier servicio (ver initContactModal en script.js):
    una versión más grande y centrada del bloque de contacto, sobre un fondo
    oscurecido que tapa el resto de la página.
@@ -1188,7 +1167,7 @@ body {
 }
 
 /* display:flex de arriba gana por especificidad al [hidden] del user-agent
-   stylesheet — mismo patrón que .phone-gate/.beta-badge más arriba. */
+   stylesheet — mismo patrón que .phone-gate/.masthead-service-extra más arriba. */
 .modal-backdrop[hidden] {
   display: none;
 }

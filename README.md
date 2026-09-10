@@ -19,7 +19,7 @@
 - [Requisitos](#requisitos)
 - [Inicio rápido con Docker](#inicio-rápido-con-docker)
 - [Configuración](#configuración)
-- [Vista de servicios `[BETA]`](#vista-de-servicios-beta)
+- [Vista de servicios](#vista-de-servicios)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Licencia](#licencia)
 
@@ -36,7 +36,7 @@
 - **SEO / PWA listo:** Open Graph, Twitter Card, `manifest.json`, `robots.txt`, `sitemap.xml`, página 404 propia e iconos para instalar como app.
 - **Docker listo:** imagen `nginx:1.27-alpine` con Gzip, cache headers, `HEALTHCHECK`, cabeceras de seguridad y CSP estricta; edición en caliente vía volumen montado, sin reconstruir la imagen para cambios de contenido.
 - **SEO y previsualizaciones al compartir, sin tocarlas a mano:** el contenedor sincroniza `<title>`, `og:title`/`og:description`, `canonical`, el Sitemap **y la propia imagen de la tarjeta** directamente desde tu `config.js` — edita tu nombre, tema o dominio una vez y se propaga solo (ver [Meta tags y dominio](#meta-tags-y-dominio)).
-- **Vista de servicios `[BETA]`:** un listado aparte de servicios que ofreces, con transición animada dentro de la misma página (no navega a otra URL) y un modal de contacto ampliado — ver [Vista de servicios](#vista-de-servicios-beta).
+- **Vista de servicios:** un listado aparte de servicios que ofreces, en su propia URL (`/servicios`), con transición animada dentro de la misma página y un modal de contacto ampliado — ver [Vista de servicios](#vista-de-servicios).
 
 ---
 
@@ -212,9 +212,9 @@ Si el navegador se empeña en seguir mostrando el icono viejo de su caché, sube
 
 ---
 
-## Vista de servicios `[BETA]`
+## Vista de servicios
 
-Función en beta: funciona de punta a punta, pero el diseño y el contenido de esta sección todavía pueden cambiar. Es un listado aparte, pensado para ofertar servicios propios (no proyectos/enlaces), que vive **dentro de la misma página** — para quien la visita no hay recarga, cambia de contenido con una transición animada (el masthead sale por un lado y entra por el otro; la lista de proyectos se disuelve y aparece la de servicios), aunque sí es una URL real y compartible (`/servicios`, ver más abajo).
+Un listado aparte, pensado para ofertar servicios propios (no proyectos/enlaces), que vive **dentro de la misma página** — para quien la visita no hay recarga, cambia de contenido con una transición animada (el masthead sale por un lado y entra por el otro; la lista de proyectos se disuelve y aparece la de servicios), aunque sí es una URL real y compartible (`/servicios`, ver más abajo).
 
 ### Activarla
 Por defecto no se muestra ningún enlace hacia ella. Para activarla, añade (o edita) un bloque en `UNITS` cuyo `url` sea exactamente `"/servicios"` — ese valor especial lo reconoce `script.js` y, en vez de abrir un enlace, dispara la transición (nginx.conf ya sabe servir `public/servicios.html` en esa ruta, no hace falta tocar nada del servidor):
@@ -276,7 +276,7 @@ Todo esto lo monta `scripts/sync-meta.js` en la misma sincronización que `index
 Kardex/
 ├── public/                  # Todo lo que se sirve tal cual en el navegador
 │   ├── index.html            # Estructura semántica; sus meta tags OG/Twitter se sincronizan solas (ver Meta tags y dominio)
-│   ├── servicios.html         # [BETA] Ruta /servicios — se genera sola desde index.html (ver Vista de servicios); no lo edites a mano
+│   ├── servicios.html         # Ruta /servicios — se genera sola desde index.html (ver Vista de servicios); no lo edites a mano
 │   ├── 404.html                # Página de error, mismo diseño y tema que el resto del sitio
 │   ├── style.css              # Design system: tokens light-dark(), layout, componentes
 │   ├── config.example.js       # Plantilla genérica — SÍ se sube al repo
@@ -288,7 +288,7 @@ Kardex/
 │   ├── favicon.ico                    # Fallback clásico del favicon
 │   ├── preview.jpg                     # Captura de la interfaz, usada en el README
 │   ├── og-image.png                     # Tarjeta og:image / twitter:image — se genera sola (ver Meta tags y dominio)
-│   ├── og-servicios-image.png            # [BETA] Misma idea, para /servicios — se genera sola (ver Vista de servicios)
+│   ├── og-servicios-image.png            # Misma idea, para /servicios — se genera sola (ver Vista de servicios)
 │   ├── icons/                             # apple-touch-icon.png, icon-192.png, icon-512.png
 │   ├── manifest.json                       # Manifest PWA (instalable)
 │   ├── robots.txt                           # Directivas para crawlers, se sincroniza solo

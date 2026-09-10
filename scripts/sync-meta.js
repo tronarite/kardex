@@ -10,7 +10,7 @@
  *   - og-image.png y og-servicios-image.png, las imágenes de
  *     previsualización al compartir el enlace (Discord, WhatsApp,
  *     Twitter/X...).
- *   - servicios.html [BETA]: la ruta /servicios. Se construye ENTERA a
+ *   - servicios.html: la ruta /servicios. Se construye ENTERA a
  *     partir de index.html ya sincronizado — mismo <body>, solo cambian
  *     el <head> (meta propios) y el <noscript> (lista real de servicios
  *     desde SERVICES, para que un crawler sin JS vea contenido). Así su
@@ -226,7 +226,7 @@ const buildOgImageSvg = (cfg, palette) => {
 </svg>`;
 };
 
-// ---- og-servicios-image.png [BETA]: los mismos 4 puntos a favor de la
+// ---- og-servicios-image.png: los mismos 4 puntos a favor de la
 // vista de servicios (icono + label + desc) que ya muestra index.html en
 // .services-highlights, ahora como imagen de previsualización al
 // compartir /servicios. ----
@@ -449,7 +449,7 @@ const indexHtmlSynced = applyMeta(fs.readFileSync(indexPath, "utf8"), "index.htm
 writeFileAtomic(indexPath, indexHtmlSynced);
 console.log("✓ index.html");
 
-// ---- servicios.html [BETA] ----
+// ---- servicios.html ----
 // Se genera ENTERA a partir de index.html (ya sincronizado): mismo
 // <body>, solo cambian el <head> (meta propios) y el <noscript> (lista
 // real de servicios en vez de la de proyectos, para que un crawler que
@@ -585,7 +585,7 @@ if (rasterizeSvg(buildOgImageSvg(config, palette), ogImagePath)) {
   warnings++;
 }
 
-// ---- og-servicios-image.png [BETA] ----
+// ---- og-servicios-image.png ----
 // Los 4 puntos a favor se leen del markup ya sincronizado de index.html
 // (fuente de verdad única — ver parseServiceHighlights).
 const highlights = parseServiceHighlights(indexHtmlSynced);

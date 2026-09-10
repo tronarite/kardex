@@ -25,15 +25,15 @@ const SITE_CONFIG = {
   // de copiar al portapapeles.
   contactEmail: "contacto@ejemplo.com",
 
-  // [BETA] Tu teléfono de contacto, solo para la vista de servicios
-  // (función en beta, ver SERVICES más abajo). Opcional: si lo quitas, esa
-  // vista simplemente no muestra el bloque de teléfono. No aparece en
-  // texto plano hasta que alguien pulsa "mostrar teléfono" — un filtro
-  // básico contra bots que solo leen el HTML, no una verificación real
-  // (para eso haría falta un backend, que este sitio no tiene).
+  // Tu teléfono de contacto, solo para la vista de servicios (ver
+  // SERVICES más abajo). Opcional: si lo quitas, esa vista simplemente no
+  // muestra el bloque de teléfono. No aparece en texto plano hasta que
+  // alguien pulsa "mostrar teléfono" — un filtro básico contra bots que
+  // solo leen el HTML, no una verificación real (para eso haría falta un
+  // backend, que este sitio no tiene).
   contactPhone: "+34 600 000 000",
 
-  // [BETA] Tu ubicación, solo para la vista de servicios — pensada para
+  // Tu ubicación, solo para la vista de servicios — pensada para
   // dar una idea de dónde trabajas, no una dirección exacta (ej. "Madrid,
   // España" o "Remoto (España)"). Opcional: si la quitas o la dejas
   // vacía, esa vista simplemente no muestra el bloque de ubicación.
@@ -215,7 +215,7 @@ const UNITS = [
     label: "RRSS",
   },
   {
-    // [BETA] "/servicios" es un valor especial que reconoce script.js: en
+    // "/servicios" es un valor especial que reconoce script.js: en
     // vez de enlazar a otra página, abre la vista de servicios (ver
     // SERVICES más abajo) con una transición, dentro de esta misma web —
     // es una ruta real (https://tu-dominio.example/servicios), no un
@@ -236,13 +236,11 @@ const UNITS = [
 
 
 /* ============================================================================
-   [BETA] SERVICIOS — listado de la vista de servicios (dentro de esta misma
+   SERVICIOS — listado de la vista de servicios (dentro de esta misma
    web, no una página aparte — se abre desde la fila "SERVICIOS" de UNITS,
    con "url: '/servicios'")
    ============================================================================
-   Función en beta: funciona, pero el diseño y el contenido de esta sección
-   todavía pueden cambiar bastante antes de darla por terminada. No
-   sustituye a la fila "SERVICIOS" de arriba en UNITS — esa sigue siendo el
+   No sustituye a la fila "SERVICIOS" de arriba en UNITS — esa sigue siendo el
    enlace que aparece en el índice principal; esto es lo que se ve dentro
    de la vista de servicios que abre.
 
