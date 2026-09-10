@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <!-- Título, meta tags y og-servicios-image.png: se generan solos desde
+       config.js con Docker (ver scripts/sync-meta.js) — no los edites
+       aquí a mano, se sobrescriben. Los valores de abajo son solo la
+       plantilla genérica que ves antes de la primera sincronización.
+
+       Este archivo es el "gemelo" de index.html para la ruta /servicios
+       (ver nginx.conf y SERVICES_VIEW_URL en script.js): mismo cuerpo,
+       mismo script.js/config.js — la vista de servicios se pinta igual
+       que siempre en cuanto carga JS — pero con sus PROPIAS etiquetas de
+       SEO/redes, para que compartir tu-dominio.example/servicios muestre
+       una previsualización propia (título "SERVICIOS", los 4 puntos a
+       favor con sus iconos como imagen) en vez de repetir la del índice.
+       Si alguna vez cambias la estructura del <body> en index.html,
+       cópiala también aquí para que no se desincronicen. -->
+  <title>Servicios — Tu Nombre / Alias</title>
+  <meta name="description" content="Ejemplos orientativos de en qué puede ayudarte Tu Nombre / Alias con tus equipos: más rápido · menos errores · seguro · trato cercano.">
+  <meta name="robots" content="index, follow">
+  <!-- Debe coincidir con --light-bg / --dark-bg del theme-pack activo en
+       style.css (SITE_CONFIG.theme en config.js) — no se puede calcular en
+       CSS, así que si cambias de tema actualiza esto a mano. Valores
+       actuales: "azul". -->
+  <meta name="theme-color" content="#E6EBF7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0D131C" media="(prefers-color-scheme: dark)">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:title" content="Servicios — Tu Nombre / Alias">
+  <meta property="og:description" content="Más rápido · Menos errores · Seguro · Trato cercano">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="og-servicios-image.png">
+  <meta property="og:url" content="https://tu-dominio.example/servicios">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Servicios — Tu Nombre / Alias">
+  <meta name="twitter:description" content="Más rápido · Menos errores · Seguro · Trato cercano">
+  <meta name="twitter:image" content="og-servicios-image.png">
+  <link rel="canonical" href="https://tu-dominio.example/servicios">
+
+  <!-- Icons & PWA -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=5">
+  <!-- Fallback clásico: navegadores/crawlers viejos piden /favicon.ico por
+       defecto aunque haya un <link rel="icon"> más moderno; sin este archivo
+       esa petición cae en 404. -->
+  <link rel="alternate icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Sin fuentes externas: usa la pila tipográfica nativa del sistema (ver style.css) -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Evita el parpadeo de tema al recargar cuando hay una preferencia manual
+       guardada. Externo (no inline) para que la CSP de nginx.conf pueda ser
+       estricta (script-src 'self', sin "unsafe-inline"). -->
+  <script src="theme-init.js"></script>
+
+  <script type="application/ld+json" src="ld.json"></script>
+</head>
+<body>
+  <a class="skip-link" href="#index">Saltar al índice de proyectos</a>
+
+  <div class="page">
+
+    <!-- Masthead: identidad, tema y contacto -->
+    <aside class="masthead">
+      <div class="masthead-top">
+        <span class="flag status-disponible" id="status-flag">
+          <span class="flag-dot" aria-hidden="true"></span>
+          <span class="flag-text">DISPONIBLE</span>
+        </span>
+
+        <button id="theme-toggle" class="theme-toggle" data-state="auto" aria-label="Cambiar modo claro / oscuro" title="Cambiar tema">
+          <span class="theme-dial" aria-hidden="true"></span>
+          <span id="theme-label">AUTO</span>
+        </button>
+      </div>
+
+      <div class="identity">
+        <p class="identity-kicker">
+          <span id="kicker-text">ÍNDICE PERSONAL</span>
+          <span class="beta-badge" id="kicker-beta-badge" title="Función en beta: contenido y diseño todavía pueden cambiar" hidden>BETA</span>
+        </p>
+        <h1 class="identity-name" id="operator-name">Tu Nombre / Alias</h1>
+        <p class="identity-role" id="operator-subtitle">DESARROLLO SOFTWARE // INGENIERÍA &amp; SISTEMAS</p>
+      </div>
+
+      <!-- Solo visible en la vista de servicios (ver initViewSwitcher en
+           script.js) — nunca es una página distinta, es la misma index.html
+           cambiando de contenido con una transición. -->
+      <div class="masthead-service-extra" id="masthead-service-extra" hidden>
+        <p class="masthead-back">
+          <a href="#" class="back-link" id="back-to-index-link">← Volver al índice</a>
+        </p>
+      </div>
+
+      <div class="contact-block" id="contact-block">
+        <span class="contact-kicker">CONTACTO</span>
+        <a href="mailto:contacto@ejemplo.com" class="contact-email" id="contact-email-link">
+          <span id="contact-email-text">contacto@ejemplo.com</span>
+        </a>
+        <button id="copy-email-btn" class="copy-btn" aria-label="Copiar correo al portapapeles">
+          <span id="copy-btn-text">Copiar dirección</span>
+        </button>
+        <span class="visually-hidden" id="copy-status" role="status" aria-live="polite"></span>
+
+        <!-- [BETA] Solo se muestra en la vista de servicios y solo si hay
+             teléfono configurado. El número no se escribe en texto plano
+             hasta el clic — filtro básico contra bots que solo leen el
+             HTML, no una verificación real (ver initPhoneReveal). -->
+        <div class="phone-gate" id="phone-gate" hidden>
+          <button type="button" id="phone-reveal-btn" class="phone-reveal-btn">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24 11.36 11.36 0 0 0 3.57.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.57 1 1 0 0 1-.25 1.01Z"/>
+            </svg>
+            Mostrar teléfono
+          </button>
+          <p class="phone-gate-note">Un clic de por medio, para que no se lo lleve gratis cualquier bot que solo lea el HTML.</p>
+        </div>
+        <a href="#" id="phone-link" class="contact-phone" hidden></a>
+
+        <!-- [BETA] Solo se muestra en la vista de servicios y solo si hay
+             ubicación configurada (SITE_CONFIG.location). -->
+        <p class="service-location" id="service-location" hidden>
+          <svg class="location-pin" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 6.19 12.13 6.46 12.42a.75.75 0 0 0 1.08 0C12.81 21.13 19 14.25 19 9c0-3.86-3.14-7-7-7Zm0 9.75A2.75 2.75 0 1 1 12 6.25a2.75 2.75 0 0 1 0 5.5Z"/>
+          </svg>
+          <span id="location-text"></span>
+        </p>
+      </div>
+
+      <p class="masthead-footer">
+        <span aria-hidden="true">·</span> Actualizado <span id="sync-timestamp">—</span>
+      </p>
+    </aside>
+
+    <!-- Índice de proyectos y enlaces — también hace de vista de servicios:
+         cambia de contenido en el sitio (sin navegar a otra página) al
+         pulsar la fila SERVICIOS o el enlace "Volver al índice" del
+         masthead (ver initViewSwitcher en script.js). -->
+    <main class="index" id="index" aria-label="Proyectos y enlaces">
+      <!-- Solo se muestra en la vista de servicios, por encima del
+           encabezado "N° SERVICIOS" — a modo de titular de la sección,
+           no de aviso aparte. -->
+      <p class="services-intro" id="services-intro" hidden>
+        Un vistazo a en qué puedo ayudarte con tu equipo, sin catálogo cerrado ni tarifas fijas, cada caso se habla de forma personalizada.
+        <strong>¿Te interesa alguno?</strong> Contáctame por email, WhatsApp o por teléfono.
+      </p>
+
+      <!-- Solo en la vista de servicios, igual que la entradilla de arriba
+           (ver initViewSwitcher en script.js). Tres puntos a favor, no
+           tres tarjetas: iconos de línea a juego con el pin de ubicación
+           del masthead, sin cajas ni sombras — el mismo idioma visual que
+           el resto del sitio. -->
+      <div class="services-highlights" id="services-highlights" hidden>
+        <div class="service-highlight">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>
+          <div class="service-highlight-text">
+            <span class="service-highlight-label">Más rápido</span>
+            <span class="service-highlight-desc">Optimizo tu equipo para que vaya fluido, sin ralentizaciones ni cuelgues.</span>
+          </div>
+        </div>
+        <div class="service-highlight">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.7 7.2-5.4 5.4a1 1 0 0 1-1.4 0l-2.6-2.6a1 1 0 1 1 1.4-1.4l1.9 1.9 4.7-4.7a1 1 0 0 1 1.4 1.4Z"/></svg>
+          <div class="service-highlight-text">
+            <span class="service-highlight-label">Menos errores</span>
+            <span class="service-highlight-desc">Reviso conflictos y programas innecesarios antes de que den problemas de verdad.</span>
+          </div>
+        </div>
+        <div class="service-highlight">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5l-8-3Z"/></svg>
+          <div class="service-highlight-text">
+            <span class="service-highlight-label">Seguro</span>
+            <span class="service-highlight-desc">Tu equipo y tus datos, tratados con el mismo cuidado que si fueran los míos.</span>
+          </div>
+        </div>
+        <div class="service-highlight">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-4.4 3.3A1 1 0 0 1 3 19.5V5a1 1 0 0 1 1-1Z"/></svg>
+          <div class="service-highlight-text">
+            <span class="service-highlight-label">Trato cercano</span>
+            <span class="service-highlight-desc">Soluciones reales, explicadas en claro y sin venderte de más.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="index-head">
+        <span class="index-head-number" aria-hidden="true">N°</span>
+        <span class="index-head-title" id="content-title" tabindex="-1">PROYECTOS Y ENLACES</span>
+      </div>
+
+      <!-- Página estática (ver style.css, @media 860px arriba): esta es la
+           ÚNICA parte de todo el sitio que hace scroll — la entradilla y
+           el título de arriba no se mueven nunca. Las filas se desvanecen
+           (mask-image, no un bloque de color) al acercarse al borde
+           superior, y en cuanto quedan aunque sea mínimamente tapadas
+           script.js las marca no-clicables de verdad (ver
+           initListFadeGuard) — no solo visualmente ocultas. -->
+      <div class="index-scroll" id="index-scroll">
+        <ol class="index-list" id="content-list">
+          <!-- Se inserta dinámicamente desde config.js / script.js: UNITS
+               en la vista de índice, SERVICES en la de servicios. -->
+        </ol>
+
+        <p class="row-desc" id="services-empty" hidden>Todavía no hay servicios listados aquí.</p>
+      </div>
+
+      <!-- Alternativa accesible para navegadores/crawlers sin JavaScript
+           (la transición a la vista de servicios necesita JS; sin él se
+           queda en el índice de proyectos). -->
+      <noscript>
+        <ol class="index-list">
+          <li class="index-row">
+            <a class="index-link" href="https://ejemplo.com" target="_blank" rel="noopener noreferrer">
+              <span class="row-number">01</span>
+              <span class="row-body">
+                <span class="row-head">
+                  <span class="row-name">PROYECTO EJEMPLO</span>
+                  <span class="row-flag status-activo"><span class="flag-dot"></span>ACTIVO</span>
+                </span>
+                <span class="row-desc">Descripción del proyecto o plataforma en producción.</span>
+              </span>
+              <span class="row-url">ejemplo.com →</span>
+            </a>
+          </li>
+          <li class="index-row">
+            <a class="index-link" href="https://github.com/tuusuario" target="_blank" rel="noopener noreferrer">
+              <span class="row-number">02</span>
+              <span class="row-body">
+                <span class="row-head">
+                  <span class="row-name">GITHUB</span>
+                  <span class="row-flag status-activo"><span class="flag-dot"></span>REPOSITORIO</span>
+                </span>
+                <span class="row-desc">Código, herramientas y proyectos open source.</span>
+              </span>
+              <span class="row-url">github.com/tuusuario →</span>
+            </a>
+          </li>
+        </ol>
+        <p class="row-desc">¿Buscas los servicios? Escribe directamente a <a href="mailto:contacto@ejemplo.com">contacto@ejemplo.com</a>.</p>
+      </noscript>
+    </main>
+
+  </div>
+
+  <footer class="credit">
+    <a href="https://github.com/tronarite/kardex" target="_blank" rel="noopener noreferrer">Powered by Kardex</a>
+  </footer>
+
+  <!-- [BETA] Modal de contacto: se abre al pulsar cualquier servicio (ver
+       initContactModal en script.js) — una versión más grande y centrada
+       del bloque de contacto del masthead, con sus propios controles
+       (mismo comportamiento, wireado por separado con initContactManager/
+       initPhoneReveal para no duplicar lógica). -->
+  <div class="modal-backdrop" id="contact-modal-backdrop" hidden>
+    <div class="contact-modal" id="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+      <button type="button" class="modal-close" id="contact-modal-close" aria-label="Cerrar">✕</button>
+
+      <span class="contact-kicker" id="contact-modal-title">CONTACTO</span>
+      <a href="mailto:contacto@ejemplo.com" class="contact-email contact-email--modal" id="modal-contact-email-link">
+        <span id="modal-contact-email-text">contacto@ejemplo.com</span>
+      </a>
+      <button type="button" id="modal-copy-email-btn" class="copy-btn copy-btn--modal">
+        <span id="modal-copy-btn-text">Copiar dirección</span>
+      </button>
+      <span class="visually-hidden" id="modal-copy-status" role="status" aria-live="polite"></span>
+
+      <div class="phone-gate" id="modal-phone-gate" hidden>
+        <button type="button" id="modal-phone-reveal-btn" class="phone-reveal-btn phone-reveal-btn--modal">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24 11.36 11.36 0 0 0 3.57.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.57 1 1 0 0 1-.25 1.01Z"/>
+          </svg>
+          Mostrar teléfono
+        </button>
+        <p class="phone-gate-note">Un clic de por medio, para que no se lo lleve gratis cualquier bot que solo lea el HTML.</p>
+      </div>
+      <a href="#" id="modal-phone-link" class="contact-phone contact-phone--modal" hidden></a>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

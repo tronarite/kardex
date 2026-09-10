@@ -210,10 +210,10 @@ Si además quieres que tu icono se vea bien al "añadir a inicio" en móvil o al
 
 ## Vista de servicios `[BETA]`
 
-Función en beta: funciona de punta a punta, pero el diseño y el contenido de esta sección todavía pueden cambiar. Es un listado aparte, pensado para ofertar servicios propios (no proyectos/enlaces), que vive **dentro de la misma página** — no hay recarga ni HTML aparte, cambia de contenido con una transición animada (el masthead sale por un lado y entra por el otro; la lista de proyectos se disuelve y aparece la de servicios), aunque sí es una URL real y compartible (`/servicios`, ver más abajo).
+Función en beta: funciona de punta a punta, pero el diseño y el contenido de esta sección todavía pueden cambiar. Es un listado aparte, pensado para ofertar servicios propios (no proyectos/enlaces), que vive **dentro de la misma página** — para quien la visita no hay recarga, cambia de contenido con una transición animada (el masthead sale por un lado y entra por el otro; la lista de proyectos se disuelve y aparece la de servicios), aunque sí es una URL real y compartible (`/servicios`, ver más abajo).
 
 ### Activarla
-Por defecto no se muestra ningún enlace hacia ella. Para activarla, añade (o edita) un bloque en `UNITS` cuyo `url` sea exactamente `"/servicios"` — ese valor especial lo reconoce `script.js` y, en vez de abrir un enlace, dispara la transición (nginx.conf ya sabe servir `index.html` en esa ruta, no hace falta tocar nada del servidor):
+Por defecto no se muestra ningún enlace hacia ella. Para activarla, añade (o edita) un bloque en `UNITS` cuyo `url` sea exactamente `"/servicios"` — ese valor especial lo reconoce `script.js` y, en vez de abrir un enlace, dispara la transición (nginx.conf ya sabe servir `public/servicios.html` en esa ruta, no hace falta tocar nada del servidor):
 
 ```javascript
 {
@@ -259,6 +259,9 @@ const SITE_CONFIG = {
 
 Si quitas cualquiera de los dos campos (o los dejas vacíos), esa parte simplemente no se muestra — no hace falta desactivar nada más.
 
+### Previsualización enriquecida propia al compartir `/servicios`
+Compartir `tu-dominio.example/servicios` (Discord, WhatsApp, Twitter/X...) muestra su propia tarjeta — título "SERVICIOS", descripción y una imagen con los 4 puntos a favor y sus iconos — en vez de repetir la del índice principal. Esto funciona porque `/servicios` no reutiliza `index.html`: nginx sirve su propio archivo gemelo, `public/servicios.html` (mismo `<body>`, mismo `script.js`/`config.js` — la vista se pinta exactamente igual una vez carga JS), pero con sus propias etiquetas de SEO/redes. `scripts/sync-meta.js` las sincroniza automáticamente desde `config.js`, igual que hace con `index.html`, y genera `public/og-servicios-image.png` desde cero (no es una captura de pantalla). No hace falta configurar nada de esto a mano.
+
 ---
 
 ## Estructura del proyecto
@@ -267,6 +270,7 @@ Si quitas cualquiera de los dos campos (o los dejas vacíos), esa parte simpleme
 Kardex/
 ├── public/                  # Todo lo que se sirve tal cual en el navegador
 │   ├── index.html            # Estructura semántica; sus meta tags OG/Twitter se sincronizan solas (ver Meta tags y dominio)
+│   ├── servicios.html         # [BETA] Gemelo de index.html para /servicios — mismo body, meta tags propios (ver Vista de servicios)
 │   ├── 404.html                # Página de error, mismo diseño y tema que el resto del sitio
 │   ├── style.css              # Design system: tokens light-dark(), layout, componentes
 │   ├── config.example.js       # Plantilla genérica — SÍ se sube al repo
@@ -279,6 +283,7 @@ Kardex/
 │   ├── favicon.ico                    # Fallback clásico del favicon
 │   ├── preview.jpg                     # Captura de la interfaz, usada en el README
 │   ├── og-image.png                     # Tarjeta og:image / twitter:image — se genera sola (ver Meta tags y dominio)
+│   ├── og-servicios-image.png            # [BETA] Misma idea, para /servicios — se genera sola (ver Vista de servicios)
 │   ├── icons/                             # apple-touch-icon.png, icon-192.png, icon-512.png
 │   ├── manifest.json                       # Manifest PWA (instalable)
 │   ├── robots.txt                           # Directivas para crawlers, se sincroniza solo
