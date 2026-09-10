@@ -60,7 +60,62 @@
        estricta (script-src 'self', sin "unsafe-inline"). -->
   <script src="theme-init.js"></script>
 
-  <script type="application/ld+json" src="ld.json"></script>
+  <!-- Datos estructurados schema.org. Van INLINE a propósito: Google
+       ignora el atributo "src" en un bloque ld+json, tiene que estar
+       aquí escrito. Lo rellena sync-meta.js desde config.js; lo de abajo
+       es solo la plantilla genérica. Un bloque de datos ld+json no lo
+       ejecuta el navegador, así que la CSP estricta de nginx.conf
+       (script-src 'self', sin unsafe-inline) no lo bloquea. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Servicios — Tu Nombre / Alias",
+    "description": "Servicios de Tu Nombre / Alias para tus equipos y tu negocio — ejemplos orientativos de en qué puedo ayudarte, sin catálogo cerrado ni tarifas fijas. Escríbeme y lo vemos.",
+    "url": "https://tu-dominio.example/servicios",
+    "inLanguage": "es",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Tu Nombre / Alias",
+      "url": "https://tu-dominio.example/"
+    },
+    "about": {
+      "@type": "Person",
+      "name": "Tu Nombre / Alias"
+    },
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "item": {
+            "@type": "Service",
+            "name": "NOMBRE DEL SERVICIO",
+            "description": "Descripción de en qué consiste este servicio, qué incluye y qué no.",
+            "provider": {
+              "@type": "Person",
+              "name": "Tu Nombre / Alias"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "item": {
+            "@type": "Service",
+            "name": "OTRO SERVICIO",
+            "description": "Otra descripción, tan larga como haga falta.",
+            "provider": {
+              "@type": "Person",
+              "name": "Tu Nombre / Alias"
+            }
+          }
+        }
+      ]
+    }
+  }
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#index">Saltar al índice de proyectos</a>

@@ -60,7 +60,22 @@
        estricta (script-src 'self', sin "unsafe-inline"). -->
   <script src="theme-init.js"></script>
 
-  <script type="application/ld+json" src="ld.json"></script>
+  <!-- Datos estructurados schema.org. Van INLINE a propósito: Google
+       ignora el atributo "src" en un bloque ld+json, tiene que estar
+       aquí escrito. Lo rellena sync-meta.js desde config.js; lo de abajo
+       es solo la plantilla genérica. Un bloque de datos ld+json no lo
+       ejecuta el navegador, así que la CSP estricta de nginx.conf
+       (script-src 'self', sin unsafe-inline) no lo bloquea. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Tu Nombre / Alias",
+    "description": "DESARROLLO SOFTWARE · INGENIERÍA & SISTEMAS",
+    "url": "https://tu-dominio.example/",
+    "inLanguage": "es"
+  }
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#index">Saltar al índice de proyectos</a>

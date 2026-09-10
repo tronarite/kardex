@@ -185,7 +185,7 @@ Para un proyecto que en realidad es algo que ofreces (no un enlace a tu propio t
 Esto también cambia la vista previa al compartir el enlace (WhatsApp, Twitter/X, Discord...) — ver [Meta tags y dominio](#meta-tags-y-dominio), que incluye `og:title`/`twitter:title` y la propia imagen de la tarjeta.
 
 ### Meta tags y dominio
-`<title>`, la meta description, `og:*`/`twitter:*` (incluida la URL absoluta de la imagen), `canonical`, `public/ld.json`, `public/robots.txt`, `public/sitemap.xml` (raíz + `/servicios`), **la imagen de la tarjeta** (`public/og-image.png`) y, si usas la vista de servicios, `public/servicios.html` entero + `public/og-servicios-image.png` **se generan solos** a partir de `operatorName`, `operatorRole`, `pageTitle`, `theme`, `siteUrl` y `SERVICES` de tu `config.js` — no los edites a mano, se sobrescriben. El contenedor Docker lo sincroniza al arrancar y también en caliente: si editas `config.js` mientras el contenedor sigue arriba, se vuelve a aplicar solo, sin reiniciar nada (`scripts/docker-entrypoint-meta.sh` vigila el archivo con `inotifywait` — en Windows/Docker Desktop esa vigilancia en caliente no siempre detecta cambios hechos desde fuera del propio contenedor; si no ves el cambio, `docker compose restart` lo fuerza).
+`<title>`, la meta description, `og:*`/`twitter:*` (incluida la URL absoluta de la imagen), `canonical`, el bloque **JSON-LD** (`<script type="application/ld+json">` inline en el `<head>` — Google ignora el `src` en ese tipo de script), `public/robots.txt`, `public/sitemap.xml` (raíz + `/servicios`), **la imagen de la tarjeta** (`public/og-image.png`) y, si usas la vista de servicios, `public/servicios.html` entero + `public/og-servicios-image.png` **se generan solos** a partir de `operatorName`, `operatorRole`, `pageTitle`, `theme`, `siteUrl` y `SERVICES` de tu `config.js` — no los edites a mano, se sobrescriben. El contenedor Docker lo sincroniza al arrancar y también en caliente: si editas `config.js` mientras el contenedor sigue arriba, se vuelve a aplicar solo, sin reiniciar nada (`scripts/docker-entrypoint-meta.sh` vigila el archivo con `inotifywait` — en Windows/Docker Desktop esa vigilancia en caliente no siempre detecta cambios hechos desde fuera del propio contenedor; si no ves el cambio, `docker compose restart` lo fuerza).
 
 `og-image.png` es una tarjeta 1200×630 generada de cero (no una plantilla con el texto encima): mismo icono/kicker/nombre/rol que el sitio, con el fondo y el acento del `theme` activo. Para dibujarla hace falta rasterizar un SVG a PNG — dentro de Docker se usa `rsvg-convert` (instalado vía `apk` en el `Dockerfile`, con `ttf-dejavu` para que haya con qué dibujar el texto: Alpine no trae fuentes por defecto); en local sin Docker cae en `sips` si estás en macOS. Si no encuentra ninguna de las dos, avisa y no toca la imagen que ya hubiera — el resto de la sincronización sigue igual.
 
@@ -193,11 +193,11 @@ Esto también cambia la vista previa al compartir el enlace (WhatsApp, Twitter/X
 
 Si sirves el sitio sin Docker, ejecuta `node scripts/sync-meta.js` a mano cada vez que cambies esos campos.
 
-`public/index.html`, `public/servicios.html`, `public/ld.json`, `public/robots.txt`, `public/sitemap.xml`, `public/og-image.png` y `public/og-servicios-image.png` sí están en git (a diferencia de `config.js`) — al publicar con tus datos reales, tu copia local queda "sucia" frente a la plantilla genérica del repo. Trátalos igual que `config.js`:
+`public/index.html`, `public/servicios.html`, `public/robots.txt`, `public/sitemap.xml`, `public/og-image.png` y `public/og-servicios-image.png` sí están en git (a diferencia de `config.js`) — al publicar con tus datos reales, tu copia local queda "sucia" frente a la plantilla genérica del repo. Trátalos igual que `config.js`:
 
 ```bash
 git update-index --skip-worktree public/index.html public/servicios.html \
-  public/ld.json public/robots.txt public/sitemap.xml \
+  public/robots.txt public/sitemap.xml \
   public/og-image.png public/og-servicios-image.png
 ```
 
@@ -282,7 +282,6 @@ Kardex/
 │   ├── script.js                 # Renderizado, gestión de tema y copiado — lógica, no toques datos aquí
 │   ├── theme-init.js              # Evita el parpadeo de tema al recargar (externo por la CSP)
 │   ├── 404-theme.js                # Aplica el theme-pack en la página 404
-│   ├── ld.json                      # JSON-LD (schema.org), se sincroniza solo desde config.js
 │   ├── favicon.svg                   # Marca vectorial (tarjeta de índice)
 │   ├── favicon.ico                    # Fallback clásico del favicon
 │   ├── preview.jpg                     # Captura de la interfaz, usada en el README

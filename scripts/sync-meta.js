@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
  * Sincroniza las etiquetas "estáticas" de SEO/redes con los datos de
- * config.js: <title>, meta description/author, og:*, twitter:* y
- * <link rel="canonical"> en index.html, más robots.txt, sitemap.xml
- * (raíz + /servicios) y ld.json.
+ * config.js: <title>, meta description/author, og:*, twitter:*,
+ * <link rel="canonical"> y el bloque <script type="application/ld+json">
+ * (inline) en index.html, más robots.txt y sitemap.xml (raíz + /servicios).
  *
  * Genera además de cero (no solo texto):
  *   - og-image.png y og-servicios-image.png, las imágenes de
@@ -33,13 +33,13 @@
  *
  *   node scripts/sync-meta.js
  *
- * Nota: index.html, servicios.html, robots.txt, sitemap.xml, ld.json,
+ * Nota: index.html, servicios.html, robots.txt, sitemap.xml,
  * og-image.png y og-servicios-image.png SÍ están en git (a diferencia de
  * config.js). Publicar con tus datos reales los deja "sucios" en tu copia
  * local — trátalos igual que config.js:
  *
  *   git update-index --skip-worktree public/index.html public/servicios.html \
- *     public/ld.json public/robots.txt public/sitemap.xml \
+ *     public/robots.txt public/sitemap.xml \
  *     public/og-image.png public/og-servicios-image.png
  *
  * (revierte con --no-skip-worktree si alguna vez necesitas tocar de
@@ -392,11 +392,37 @@ const applyMeta = (content, fileLabel, tags) => {
   set(/<meta name="twitter:image" content="[^"]*">/, `<meta name="twitter:image" content="${tags.image}">`, "twitter:image");
   set(/<meta name="twitter:image:alt" content="[^"]*">/, `<meta name="twitter:image:alt" content="${tags.imageAlt}">`, "twitter:image:alt");
   set(/<link rel="canonical" href="[^"]*">/, `<link rel="canonical" href="${tags.url}">`, "canonical");
+
+  // Datos estructurados: bloque <script type="application/ld+json"> INLINE
+  // (Google ignora el atributo src en este tipo de script). Se reemplaza
+  // con función para no interpretar "$..." del JSON como grupos de captura.
+  if (tags.jsonLd) {
+    const ldPattern = /<script type="application\/ld\+json">[\s\S]*?<\/script>/;
+    if (ldPattern.test(content)) {
+      const json = JSON.stringify(tags.jsonLd, null, 2)
+        .replace(/</g, "\\u003c") // que un "</script>" en un valor no cierre el bloque
+        .split("\n")
+        .map((line) => `  ${line}`)
+        .join("\n");
+      content = content.replace(ldPattern, () => `<script type="application/ld+json">\n${json}\n  </script>`);
+    } else {
+      console.warn(`  ! [${fileLabel}] no se encontró el <script type="application/ld+json"> — no se tocó`);
+      warnings++;
+    }
+  }
   return content;
 };
 
 // ---- index.html ----
 const indexPath = path.join(PUBLIC_DIR, "index.html");
+const indexJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: config.operatorName || "Kardex",
+  description: roleFlat || description,
+  url: siteUrl,
+  inLanguage: "es",
+};
 const indexHtmlSynced = applyMeta(fs.readFileSync(indexPath, "utf8"), "index.html", {
   title,
   description,
@@ -404,6 +430,7 @@ const indexHtmlSynced = applyMeta(fs.readFileSync(indexPath, "utf8"), "index.htm
   image: `${siteUrl}og-image.png`,
   imageAlt: config.operatorName ? `Índice personal de ${config.operatorName}` : "Índice personal",
   url: siteUrl,
+  jsonLd: indexJsonLd,
 });
 writeFileAtomic(indexPath, indexHtmlSynced);
 console.log("✓ index.html");
@@ -453,6 +480,34 @@ ${noscriptList}
         }
       </noscript>`;
 
+const servicesJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: servicesTitle,
+  description: servicesDescription,
+  url: servicesUrl,
+  inLanguage: "es",
+  isPartOf: { "@type": "WebSite", name: config.operatorName || "Kardex", url: siteUrl },
+  ...(config.operatorName ? { about: { "@type": "Person", name: config.operatorName } } : {}),
+  ...(sortedServices.length
+    ? {
+        mainEntity: {
+          "@type": "ItemList",
+          itemListElement: sortedServices.map((s, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            item: {
+              "@type": "Service",
+              name: s.name,
+              ...(s.description ? { description: s.description } : {}),
+              ...(config.operatorName ? { provider: { "@type": "Person", name: config.operatorName } } : {}),
+            },
+          })),
+        },
+      }
+    : {}),
+};
+
 let serviciosHtml = applyMeta(indexHtmlSynced, "servicios.html", {
   title: servicesTitle,
   description: servicesDescription,
@@ -460,6 +515,7 @@ let serviciosHtml = applyMeta(indexHtmlSynced, "servicios.html", {
   image: `${siteUrl}og-servicios-image.png`,
   imageAlt: config.operatorName ? `Servicios de ${config.operatorName}` : "Servicios",
   url: servicesUrl,
+  jsonLd: servicesJsonLd,
 });
 serviciosHtml = replaceOne(
   serviciosHtml,
@@ -471,14 +527,9 @@ serviciosHtml = replaceOne(
 writeFileAtomic(serviciosPath, serviciosHtml);
 console.log("✓ servicios.html");
 
-// ---- ld.json ----
-const ldPath = path.join(PUBLIC_DIR, "ld.json");
-const ld = JSON.parse(fs.readFileSync(ldPath, "utf8"));
-ld.name = config.operatorName || ld.name;
-ld.description = roleFlat || ld.description;
-ld.url = siteUrl;
-writeFileAtomic(ldPath, `${JSON.stringify(ld, null, 2)}\n`);
-console.log("✓ ld.json");
+// (El JSON-LD ya no es un archivo aparte: va inline en index.html y
+// servicios.html, ver applyMeta arriba — Google ignora el src en un
+// <script type="application/ld+json">.)
 
 // ---- robots.txt ----
 const robotsPath = path.join(PUBLIC_DIR, "robots.txt");
