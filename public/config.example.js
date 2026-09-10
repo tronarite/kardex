@@ -106,8 +106,17 @@ const SITE_CONFIG = {
                                   contenido a menudo) o que ya cuenta la
                                   "description". Si lo omites del todo, se
                                   usa el texto por defecto de ese "type".
-     displayUrl    Opcional      Texto del enlace a mostrar. Si lo omites,
-                                  se genera solo a partir de "url".
+     displayUrl    Opcional      Texto del enlace a mostrar (se le añade
+                                  " →" automáticamente). Si lo omites, se
+                                  genera solo a partir de "url".
+     ctaText       Opcional      Sustituye del todo el texto de la derecha
+                                  por uno propio (también con " →" al
+                                  final) en vez de mostrar una URL — pensado
+                                  para enlaces que no tiene sentido mostrar
+                                  como dirección web (rutas internas, un
+                                  correo, etc.), ej. "Ver servicios" en vez
+                                  de "/servicios →". Si lo indicas, gana
+                                  siempre a "displayUrl".
      priceRange    Opcional      Texto libre junto al indicador, ej. "20€ –
                                   50€" o "Desde 30€". Si lo omites, no se
                                   muestra nada.
@@ -197,17 +206,22 @@ const UNITS = [
     label: "RRSS",
   },
   {
-    // [BETA] "#servicios" es un valor especial que reconoce script.js: en
+    // [BETA] "/servicios" es un valor especial que reconoce script.js: en
     // vez de enlazar a otra página, abre la vista de servicios (ver
-    // SERVICES más abajo) con una transición, dentro de esta misma web.
-    // Si prefieres enlazar a una web externa en su lugar, cambia "url" por
-    // esa dirección normal (como en los demás bloques de arriba).
+    // SERVICES más abajo) con una transición, dentro de esta misma web —
+    // es una ruta real (https://tu-dominio.example/servicios), no un
+    // enlace externo. Si prefieres enlazar a una web externa en su lugar,
+    // cambia "url" por esa dirección normal (como en los demás bloques de
+    // arriba) y quita "ctaText" (se generará el texto a partir de esa URL).
+    // "ctaText" es lo que hace que aquí se lea "Ver servicios →" en vez de
+    // "/servicios →" — si lo quitas, usa "Ver servicios" por defecto.
     name: "SERVICIOS",
     order: 5,
-    url: "#servicios",
+    url: "/servicios",
     description: "Ejemplos orientativos de en qué puedo ayudarte.",
     type: "proximamente",
     label: "SERVICIO",
+    ctaText: "Ver servicios",
   },
 ];
 
@@ -215,7 +229,7 @@ const UNITS = [
 /* ============================================================================
    [BETA] SERVICIOS — listado de la vista de servicios (dentro de esta misma
    web, no una página aparte — se abre desde la fila "SERVICIOS" de UNITS,
-   con "url: '#servicios'")
+   con "url: '/servicios'")
    ============================================================================
    Función en beta: funciona, pero el diseño y el contenido de esta sección
    todavía pueden cambiar bastante antes de darla por terminada. No

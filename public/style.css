@@ -804,11 +804,13 @@ body {
   min-width: 0;
 }
 
+/* Flujo de texto normal (no flex): así, si el título es largo y salta de
+   línea, la etiqueta de estado (y el precio, si lo hay) quedan pegados a
+   la derecha de la última palabra del título en vez de bajar solos a una
+   línea aparte — el mismo comportamiento que tendría cualquier texto
+   seguido de un elemento en línea. */
 .row-head {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.6rem 0.75rem;
+  display: block;
 }
 
 .row-name {
@@ -819,12 +821,18 @@ body {
   letter-spacing: -0.005em;
 }
 
+.row-flag {
+  margin-left: 0.75rem;
+  vertical-align: middle;
+}
 
 .row-price {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 600;
   color: var(--accent);
+  margin-left: 0.6rem;
+  vertical-align: middle;
 }
 
 .row-desc {

@@ -94,12 +94,15 @@ const createFlagElement = (type, label) => {
   return flag;
 };
 
-// "#servicios" es el único valor especial de "url": en vez de un enlace de
+// "/servicios" es el único valor especial de "url": en vez de un enlace de
 // verdad, script.js lo reconoce (createUnitRow) y lo convierte en el botón
 // que dispara la transición a la vista de servicios de esta misma página
 // (ver initViewSwitcher) — no es una página distinta, así que no lleva
-// target="_blank" ni rel de enlace externo.
-const SERVICES_VIEW_URL = "#servicios";
+// target="_blank" ni rel de enlace externo. Es una ruta real (no un hash)
+// para que https://tudominio.example/servicios sea una URL "de verdad"
+// compartible/indexable — nginx.conf tiene una regla exacta para servir
+// index.html en esa ruta (ver el comentario en nginx.conf).
+const SERVICES_VIEW_URL = "/servicios";
 
 // Rellenadas más abajo (initViewSwitcher e initContactModal, cada una en
 // su sección). Declaradas aquí arriba porque createUnitRow/createServiceRow
@@ -162,8 +165,14 @@ const createUnitRow = (unit, index) => {
 
   const url = document.createElement("span");
   url.className = "row-url";
-  if (isServicesTrigger) {
-    url.textContent = "Ver servicios →";
+  // "ctaText" sustituye del todo el texto de la URL por un texto propio
+  // (ej. "Ver servicios") — útil para enlaces que no tiene sentido mostrar
+  // como URL (rutas internas, anclas...). Si no se indica, se sigue
+  // generando a partir de "displayUrl"/"url" como siempre. El enlace a la
+  // vista de servicios usa "Ver servicios" por defecto si no se personaliza.
+  const ctaText = unit.ctaText || (isServicesTrigger ? "Ver servicios" : null);
+  if (ctaText) {
+    url.textContent = `${ctaText} →`;
   } else {
     const displayLink = unit.displayUrl || unit.url.replace(/^https?:\/\//, "");
     url.textContent = `${displayLink} →`;
@@ -433,8 +442,8 @@ const initViewSwitcher = (config) => {
 
   // Si en algún momento de esta visita se ha visto el índice, el botón de
   // servicios dice "Volver al índice" (de verdad se vuelve a algún sitio).
-  // Si se ha llegado directo a "#servicios" (por ejemplo, alguien comparte
-  // tu-dominio.example/#servicios), todavía no se "volvió" de ninguna
+  // Si se ha llegado directo a "/servicios" (por ejemplo, alguien comparte
+  // tu-dominio.example/servicios), todavía no se "volvió" de ninguna
   // parte, así que dice solo "Índice" — mismo botón, mismo destino, texto
   // honesto según de dónde viene cada visita.
   let hasShownIndexView = false;
@@ -493,17 +502,22 @@ const initViewSwitcher = (config) => {
     if (scrollArea) scrollArea.scrollTop = 0;
   };
 
-  // No usamos location.hash directamente para "volver al índice" porque
-  // asignar un hash vacío no siempre limpia el "#" de la barra de
-  // direcciones en todos los navegadores.
-  const setHash = (view) => {
-    history.pushState(null, "", view === "services" ? "#servicios" : location.pathname + location.search);
+  // Rutas reales (no un hash): el sitio se sirve siempre desde la raíz del
+  // dominio (ver siteUrl en config.js y nginx.conf), así que "/" es siempre
+  // el índice y "/servicios" es siempre la vista de servicios.
+  const INDEX_PATH = "/";
+
+  const setPath = (view) => {
+    history.pushState(null, "", view === "services" ? SERVICES_VIEW_URL : INDEX_PATH);
   };
+
+  const isServicesPath = () =>
+    location.pathname === SERVICES_VIEW_URL || location.pathname === `${SERVICES_VIEW_URL}/`;
 
   const goTo = (view, { animate = true, updateHash = true } = {}) => {
     if (view === currentView || viewIsAnimating) return;
 
-    if (updateHash) setHash(view);
+    if (updateHash) setPath(view);
 
     if (animate && !prefersReducedMotion()) {
       viewIsAnimating = true;
@@ -566,14 +580,14 @@ const initViewSwitcher = (config) => {
   }
 
   window.addEventListener("popstate", () => {
-    const view = location.hash === "#servicios" ? "services" : "index";
+    const view = isServicesPath() ? "services" : "index";
     goTo(view, { updateHash: false });
   });
 
-  // Vista inicial según el hash de la URL (enlace compartido a #servicios),
+  // Vista inicial según la ruta de la URL (enlace compartido a /servicios),
   // sin animación — la animación es solo para cuando cambia mientras se
   // está viendo la página.
-  const initialView = location.hash === "#servicios" ? "services" : "index";
+  const initialView = isServicesPath() ? "services" : "index";
   page.classList.toggle("page--services", initialView === "services");
   paintView(initialView);
   currentView = initialView;

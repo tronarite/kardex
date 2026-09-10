@@ -210,22 +210,23 @@ Si además quieres que tu icono se vea bien al "añadir a inicio" en móvil o al
 
 ## Vista de servicios `[BETA]`
 
-Función en beta: funciona de punta a punta, pero el diseño y el contenido de esta sección todavía pueden cambiar. Es un listado aparte, pensado para ofertar servicios propios (no proyectos/enlaces), que vive **dentro de la misma página** — no navega a ninguna URL nueva, cambia de contenido con una transición animada (el masthead sale por un lado y entra por el otro; la lista de proyectos se disuelve y aparece la de servicios).
+Función en beta: funciona de punta a punta, pero el diseño y el contenido de esta sección todavía pueden cambiar. Es un listado aparte, pensado para ofertar servicios propios (no proyectos/enlaces), que vive **dentro de la misma página** — no hay recarga ni HTML aparte, cambia de contenido con una transición animada (el masthead sale por un lado y entra por el otro; la lista de proyectos se disuelve y aparece la de servicios), aunque sí es una URL real y compartible (`/servicios`, ver más abajo).
 
 ### Activarla
-Por defecto no se muestra ningún enlace hacia ella. Para activarla, añade (o edita) un bloque en `UNITS` cuyo `url` sea exactamente `"#servicios"` — ese valor especial lo reconoce `script.js` y, en vez de abrir un enlace, dispara la transición:
+Por defecto no se muestra ningún enlace hacia ella. Para activarla, añade (o edita) un bloque en `UNITS` cuyo `url` sea exactamente `"/servicios"` — ese valor especial lo reconoce `script.js` y, en vez de abrir un enlace, dispara la transición (nginx.conf ya sabe servir `index.html` en esa ruta, no hace falta tocar nada del servidor):
 
 ```javascript
 {
   name: "SERVICIOS",
-  url: "#servicios",   // valor especial: abre la vista de servicios, no navega
+  url: "/servicios",   // valor especial: abre la vista de servicios, no navega
   description: "Ejemplos orientativos de en qué puedo ayudarte.",
   type: "proximamente",
   label: "SERVICIO",
+  ctaText: "Ver servicios",   // opcional: texto de la derecha en vez de "/servicios →"
 }
 ```
 
-También se puede enlazar directamente compartiendo `tu-dominio.example/#servicios` — si alguien llega así (en vez de pulsar el enlace desde el índice), el botón para salir de la vista dice "Índice" en vez de "Volver al índice", porque de verdad no viene de ningún sitio.
+También se puede enlazar directamente compartiendo `tu-dominio.example/servicios` — si alguien llega así (en vez de pulsar el enlace desde el índice), el botón para salir de la vista dice "Índice" en vez de "Volver al índice", porque de verdad no viene de ningún sitio.
 
 ### Listar los servicios (`SERVICES`)
 Cada bloque de `SERVICES` en `config.js` es una tarjeta de la vista. Solo `name` es obligatorio:
