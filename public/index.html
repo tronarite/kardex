@@ -4,13 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <!-- Título, meta tags y og-image.png: se generan solos desde config.js
-       con Docker (ver scripts/sync-meta.js) — no los edites aquí a mano,
-       se sobrescriben. Los valores de abajo son solo la plantilla
-       genérica que ves antes de la primera sincronización. -->
+  <!-- Título, meta tags y la imagen de previsualización se generan solos
+       desde config.js con Docker (ver scripts/sync-meta.js) — no los
+       edites aquí a mano, se sobrescriben. Los valores de abajo son solo
+       la plantilla genérica que ves antes de la primera sincronización.
+       La ruta /servicios (servicios.html) también se genera en esa misma
+       sincronización a partir de este archivo: cuerpo idéntico, solo
+       cambian la cabecera y la alternativa sin JavaScript. -->
   <title>Tu Nombre — Índice personal</title>
   <meta name="description" content="Índice personal de proyectos y enlaces de Tu Nombre / Alias. DESARROLLO SOFTWARE · INGENIERÍA & SISTEMAS.">
   <meta name="robots" content="index, follow">
+  <meta name="author" content="Tu Nombre / Alias">
   <!-- Debe coincidir con --light-bg / --dark-bg del theme-pack activo en
        style.css (SITE_CONFIG.theme en config.js) — no se puede calcular en
        CSS, así que si cambias de tema actualiza esto a mano. Valores
@@ -18,16 +22,25 @@
   <meta name="theme-color" content="#E6EBF7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0D131C" media="(prefers-color-scheme: dark)">
 
-  <!-- Open Graph / Twitter -->
+  <!-- Open Graph / Twitter. og:image / twitter:image llevan la URL
+       absoluta (la rellena sync-meta.js desde siteUrl) — varias apps
+       (LinkedIn, iMessage...) no resuelven una ruta relativa y se quedan
+       sin imagen. -->
   <meta property="og:title" content="Tu Nombre — Índice personal">
   <meta property="og:description" content="DESARROLLO SOFTWARE · INGENIERÍA & SISTEMAS">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="og-image.png">
+  <meta property="og:site_name" content="Tu Nombre / Alias">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:image" content="https://tu-dominio.example/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Índice personal de Tu Nombre / Alias">
   <meta property="og:url" content="https://tu-dominio.example/">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Tu Nombre — Índice personal">
   <meta name="twitter:description" content="DESARROLLO SOFTWARE · INGENIERÍA & SISTEMAS">
-  <meta name="twitter:image" content="og-image.png">
+  <meta name="twitter:image" content="https://tu-dominio.example/og-image.png">
+  <meta name="twitter:image:alt" content="Índice personal de Tu Nombre / Alias">
   <link rel="canonical" href="https://tu-dominio.example/">
 
   <!-- Icons & PWA -->

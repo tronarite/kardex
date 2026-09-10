@@ -1,13 +1,19 @@
 #!/usr/bin/env node
 /**
  * Sincroniza las etiquetas "estáticas" de SEO/redes con los datos de
- * config.js: <title>, meta description, og:title/og:description/og:url,
- * twitter:title/twitter:description, <link rel="canonical"> en
- * index.html (y en servicios.html [BETA], su "gemelo" para la ruta
- * /servicios — ver el comentario dentro de ese archivo), más robots.txt,
- * sitemap.xml, ld.json y — generadas de cero, no solo texto —
- * og-image.png y og-servicios-image.png, las imágenes que se ven al
- * compartir el enlace (Discord, WhatsApp, Twitter/X...).
+ * config.js: <title>, meta description/author, og:*, twitter:* y
+ * <link rel="canonical"> en index.html, más robots.txt, sitemap.xml
+ * (raíz + /servicios) y ld.json.
+ *
+ * Genera además de cero (no solo texto):
+ *   - og-image.png y og-servicios-image.png, las imágenes de
+ *     previsualización al compartir el enlace (Discord, WhatsApp,
+ *     Twitter/X...).
+ *   - servicios.html [BETA]: la ruta /servicios. Se construye ENTERA a
+ *     partir de index.html ya sincronizado — mismo <body>, solo cambian
+ *     el <head> (meta propios) y el <noscript> (lista real de servicios
+ *     desde SERVICES, para que un crawler sin JS vea contenido). Así su
+ *     estructura nunca se desincroniza de index.html.
  *
  * Por qué existe: bots como los de Discord, Twitter/X, WhatsApp o
  * Slack — y en parte también Google — leen estas etiquetas directamente
@@ -62,17 +68,24 @@ if (!fs.existsSync(CONFIG_PATH)) {
 // sin tener que parsear el objeto a mano. Ojo: un "const" de nivel
 // superior NO cuelga del objeto global aunque se ejecute con
 // runInContext (es una particularidad del propio motor de JS, no un bug
-// de Node) — por eso se añade esa línea final para engancharlo a mano.
+// de Node) — por eso se añaden esas líneas finales para engancharlo a mano.
 const configSource = fs.readFileSync(CONFIG_PATH, "utf8");
 const sandbox = {};
 vm.createContext(sandbox);
-vm.runInContext(`${configSource}\nthis.SITE_CONFIG = SITE_CONFIG;`, sandbox, { filename: "config.js" });
+vm.runInContext(
+  `${configSource}
+   this.SITE_CONFIG = SITE_CONFIG;
+   this.SERVICES = typeof SERVICES !== "undefined" ? SERVICES : [];`,
+  sandbox,
+  { filename: "config.js" }
+);
 
 const config = sandbox.SITE_CONFIG;
 if (!config) {
   console.error("✗ config.js no define SITE_CONFIG — revisa el archivo.");
   process.exit(1);
 }
+const services = Array.isArray(sandbox.SERVICES) ? sandbox.SERVICES : [];
 
 const siteUrl = (config.siteUrl || "https://tu-dominio.example/").replace(/\/?$/, "/");
 const title = config.pageTitle || `${config.operatorName} — Índice`;
@@ -202,33 +215,41 @@ const buildOgImageSvg = (cfg, palette) => {
 };
 
 // ---- og-servicios-image.png [BETA]: los mismos 4 puntos a favor de la
-// vista de servicios (ver .services-highlights en index.html), como
-// imagen de previsualización al compartir /servicios. Contenido fijo
-// (no viene de config.js, igual que en el propio index.html) — si algún
-// día cambias los textos o iconos ahí, cambia también esta lista para
-// que no se desincronicen. ----
-const SERVICE_HIGHLIGHTS = [
-  {
-    label: "Más rápido",
-    desc: "Optimizo tu equipo para que vaya fluido, sin ralentizaciones ni cuelgues.",
-    icon: "M13 2 4 14h6l-1 8 9-12h-6l1-8Z",
-  },
-  {
-    label: "Menos errores",
-    desc: "Reviso conflictos y programas innecesarios antes de que den problemas de verdad.",
-    icon: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.7 7.2-5.4 5.4a1 1 0 0 1-1.4 0l-2.6-2.6a1 1 0 1 1 1.4-1.4l1.9 1.9 4.7-4.7a1 1 0 0 1 1.4 1.4Z",
-  },
-  {
-    label: "Seguro",
-    desc: "Tu equipo y tus datos, tratados con el mismo cuidado que si fueran los míos.",
-    icon: "M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5l-8-3Z",
-  },
-  {
-    label: "Trato cercano",
-    desc: "Soluciones reales, explicadas en claro y sin venderte de más.",
-    icon: "M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-4.4 3.3A1 1 0 0 1 3 19.5V5a1 1 0 0 1 1-1Z",
-  },
+// vista de servicios (icono + label + desc) que ya muestra index.html en
+// .services-highlights, ahora como imagen de previsualización al
+// compartir /servicios. ----
+
+// Fuente de verdad: el propio markup de index.html (así no hay que
+// mantener los textos en dos sitios). Si el parseo falla porque la
+// estructura del HTML ha cambiado, se usa esta copia y se avisa.
+const SERVICE_HIGHLIGHTS_FALLBACK = [
+  { label: "Más rápido", desc: "Optimizo tu equipo para que vaya fluido, sin ralentizaciones ni cuelgues.", icon: "M13 2 4 14h6l-1 8 9-12h-6l1-8Z" },
+  { label: "Menos errores", desc: "Reviso conflictos y programas innecesarios antes de que den problemas de verdad.", icon: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.7 7.2-5.4 5.4a1 1 0 0 1-1.4 0l-2.6-2.6a1 1 0 1 1 1.4-1.4l1.9 1.9 4.7-4.7a1 1 0 0 1 1.4 1.4Z" },
+  { label: "Seguro", desc: "Tu equipo y tus datos, tratados con el mismo cuidado que si fueran los míos.", icon: "M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5l-8-3Z" },
+  { label: "Trato cercano", desc: "Soluciones reales, explicadas en claro y sin venderte de más.", icon: "M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-4.4 3.3A1 1 0 0 1 3 19.5V5a1 1 0 0 1 1-1Z" },
 ];
+
+const decodeEntities = (s) =>
+  s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'");
+
+const parseServiceHighlights = (indexHtml) => {
+  const blockRe = /<div class="service-highlight">([\s\S]*?)<\/div>\s*<\/div>/g;
+  const found = [];
+  let m;
+  while ((m = blockRe.exec(indexHtml)) !== null) {
+    const chunk = m[1];
+    const icon = (chunk.match(/<path d="([^"]+)"/) || [])[1];
+    const label = (chunk.match(/<span class="service-highlight-label">([\s\S]*?)<\/span>/) || [])[1];
+    const desc = (chunk.match(/<span class="service-highlight-desc">([\s\S]*?)<\/span>/) || [])[1];
+    if (icon && label && desc) {
+      found.push({ icon, label: decodeEntities(label.trim()), desc: decodeEntities(desc.trim()) });
+    }
+  }
+  if (found.length) return found;
+  console.warn("  ! no se pudieron leer los .services-highlights de index.html — se usa la copia de reserva de este script");
+  warnings++;
+  return SERVICE_HIGHLIGHTS_FALLBACK;
+};
 
 // Reparte "text" en como mucho "maxLines" líneas de hasta "maxChars"
 // caracteres, sin cortar palabras — SVG <text> no hace word-wrap solo,
@@ -259,7 +280,7 @@ const wrapWords = (text, maxChars, maxLines) => {
   return lines;
 };
 
-const buildServicesOgImageSvg = (cfg, palette) => {
+const buildServicesOgImageSvg = (cfg, palette, highlights) => {
   const textDim = mixHex(palette.text, palette.bg, 0.6);
   const monoStack = "Menlo, 'DejaVu Sans Mono', Consolas, monospace";
   const serifStack = "Georgia, 'DejaVu Serif', 'Times New Roman', serif";
@@ -270,25 +291,24 @@ const buildServicesOgImageSvg = (cfg, palette) => {
   // diferencia del layout real, que es responsive).
   const marginX = 90;
   const colGap = 70;
-  const rowGap = 46;
+  const rowGap = 52;
   const colWidth = (1200 - marginX * 2 - colGap) / 2;
   const iconTextGap = 50; // separación entre el icono y el texto de cada punto
 
-  // Alto real de cada fila = icono/label (34px) + hueco (14px) + 2 líneas
-  // de descripción (26px de interlineado) — las 4 descripciones actuales
-  // caben siempre en 2 líneas a este ancho de columna; si algún día se
-  // alargan y necesitan una tercera, se solaparían con la fila de abajo
-  // (revisa visualmente og-servicios-image.png tras tocar los textos).
-  const rowHeight = 34 + 14 + 26 * 2;
-  const gridTop = 260;
+  // Alto de fila reservado para el peor caso: icono/label (34px) + hueco
+  // (14px) + hasta 3 líneas de descripción (26px de interlineado). Así
+  // las dos filas quedan bien separadas aunque una descripción sea más
+  // larga que las demás.
+  const rowHeight = 34 + 14 + 26 * 3;
+  const gridTop = 278;
   const rowYs = [gridTop, gridTop + rowHeight + rowGap];
 
-  const cells = SERVICE_HIGHLIGHTS.map((item, index) => {
+  const cells = highlights.map((item, index) => {
     const col = index % 2;
     const row = Math.floor(index / 2);
     const x = marginX + col * (colWidth + colGap);
     const y = rowYs[row];
-    const lines = wrapWords(item.desc, 40, 2);
+    const lines = wrapWords(item.desc, 40, 3);
     const descText = lines
       // x del tspan relativo al <g> ya trasladado (no volver a sumar "x":
       // eso duplicaba el desplazamiento y sacaba la descripción de la
@@ -351,60 +371,105 @@ const rasterizeSvg = (svgContent, outPath) => {
 };
 
 // ---- HTML: título + meta tags de SEO/redes ----
-// Misma lógica para index.html y su "gemelo" servicios.html (ver el
-// comentario dentro de ese archivo) — cada uno con sus propios valores,
-// para que compartir /servicios tenga su propia previsualización en vez
-// de repetir la del índice.
-const syncHtmlMeta = (filePath, fileLabel, tags) => {
-  let content = fs.readFileSync(filePath, "utf8");
-  content = replaceOne(content, /<title>.*?<\/title>/, `<title>${tags.title}</title>`, "title", fileLabel);
-  content = replaceOne(content, /<meta name="description" content="[^"]*">/, `<meta name="description" content="${tags.description}">`, "meta description", fileLabel);
-  content = replaceOne(content, /<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${tags.ogTitle}">`, "og:title", fileLabel);
-  content = replaceOne(content, /<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${tags.ogDescription}">`, "og:description", fileLabel);
-  content = replaceOne(content, /<meta property="og:url" content="[^"]*">/, `<meta property="og:url" content="${tags.url}">`, "og:url", fileLabel);
-  content = replaceOne(content, /<meta name="twitter:title" content="[^"]*">/, `<meta name="twitter:title" content="${tags.twitterTitle}">`, "twitter:title", fileLabel);
-  content = replaceOne(content, /<meta name="twitter:description" content="[^"]*">/, `<meta name="twitter:description" content="${tags.twitterDescription}">`, "twitter:description", fileLabel);
-  content = replaceOne(content, /<link rel="canonical" href="[^"]*">/, `<link rel="canonical" href="${tags.url}">`, "canonical", fileLabel);
-  writeFileAtomic(filePath, content);
-  console.log(`✓ ${fileLabel}`);
+// applyMeta() es pura (devuelve el HTML modificado, no escribe) — la usan
+// index.html y servicios.html, que se genera a partir del propio
+// index.html ya sincronizado (así su <body> nunca se desincroniza).
+const applyMeta = (content, fileLabel, tags) => {
+  const set = (pattern, replacement, label) => {
+    content = replaceOne(content, pattern, replacement, label, fileLabel);
+  };
+  set(/<title>.*?<\/title>/, `<title>${tags.title}</title>`, "title");
+  set(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${tags.description}">`, "meta description");
+  set(/<meta name="author" content="[^"]*">/, `<meta name="author" content="${config.operatorName || ""}">`, "author");
+  set(/<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${tags.title}">`, "og:title");
+  set(/<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${tags.ogDescription}">`, "og:description");
+  set(/<meta property="og:site_name" content="[^"]*">/, `<meta property="og:site_name" content="${config.operatorName || ""}">`, "og:site_name");
+  set(/<meta property="og:image" content="[^"]*">/, `<meta property="og:image" content="${tags.image}">`, "og:image");
+  set(/<meta property="og:image:alt" content="[^"]*">/, `<meta property="og:image:alt" content="${tags.imageAlt}">`, "og:image:alt");
+  set(/<meta property="og:url" content="[^"]*">/, `<meta property="og:url" content="${tags.url}">`, "og:url");
+  set(/<meta name="twitter:title" content="[^"]*">/, `<meta name="twitter:title" content="${tags.title}">`, "twitter:title");
+  set(/<meta name="twitter:description" content="[^"]*">/, `<meta name="twitter:description" content="${tags.ogDescription}">`, "twitter:description");
+  set(/<meta name="twitter:image" content="[^"]*">/, `<meta name="twitter:image" content="${tags.image}">`, "twitter:image");
+  set(/<meta name="twitter:image:alt" content="[^"]*">/, `<meta name="twitter:image:alt" content="${tags.imageAlt}">`, "twitter:image:alt");
+  set(/<link rel="canonical" href="[^"]*">/, `<link rel="canonical" href="${tags.url}">`, "canonical");
+  return content;
 };
 
 // ---- index.html ----
 const indexPath = path.join(PUBLIC_DIR, "index.html");
-syncHtmlMeta(indexPath, "index.html", {
+const indexHtmlSynced = applyMeta(fs.readFileSync(indexPath, "utf8"), "index.html", {
   title,
   description,
-  ogTitle: title,
   ogDescription: roleFlat || description,
-  twitterTitle: title,
-  twitterDescription: roleFlat || description,
+  image: `${siteUrl}og-image.png`,
+  imageAlt: config.operatorName ? `Índice personal de ${config.operatorName}` : "Índice personal",
   url: siteUrl,
 });
+writeFileAtomic(indexPath, indexHtmlSynced);
+console.log("✓ index.html");
 
 // ---- servicios.html [BETA] ----
-// Mismo título que pinta script.js en el <head> real al entrar en la
-// vista (ver initViewSwitcher) — "Servicios — {nombre}" o solo
-// "Servicios" si no hay operatorName configurado.
-const servicesTagline = "Más rápido · Menos errores · Seguro · Trato cercano";
+// Se genera ENTERA a partir de index.html (ya sincronizado): mismo
+// <body>, solo cambian el <head> (meta propios) y el <noscript> (lista
+// real de servicios en vez de la de proyectos, para que un crawler que
+// no ejecuta JS —o Google en su primer pase— vea contenido de verdad).
+const serviciosPath = path.join(PUBLIC_DIR, "servicios.html");
+const servicesUrl = `${siteUrl}servicios`;
 const servicesTitle = config.operatorName ? `Servicios — ${config.operatorName}` : "Servicios";
 const servicesDescription = config.operatorName
-  ? `Ejemplos orientativos de en qué puede ayudarte ${config.operatorName} con tus equipos: ${servicesTagline.toLowerCase()}.`
-  : `Ejemplos orientativos de servicios: ${servicesTagline.toLowerCase()}.`;
-const serviciosPath = path.join(PUBLIC_DIR, "servicios.html");
-if (fs.existsSync(serviciosPath)) {
-  syncHtmlMeta(serviciosPath, "servicios.html", {
-    title: servicesTitle,
-    description: servicesDescription,
-    ogTitle: servicesTitle,
-    ogDescription: servicesTagline,
-    twitterTitle: servicesTitle,
-    twitterDescription: servicesTagline,
-    url: `${siteUrl}servicios`,
-  });
-} else {
-  console.warn("  ! servicios.html no encontrado — se omite (¿está activada la vista de servicios? ver README)");
-  warnings++;
-}
+  ? `Servicios de ${config.operatorName} para tus equipos y tu negocio — ejemplos orientativos de en qué puedo ayudarte, sin catálogo cerrado ni tarifas fijas. Escríbeme y lo vemos.`
+  : "Ejemplos orientativos de servicios para tus equipos y tu negocio, sin catálogo cerrado ni tarifas fijas.";
+const servicesOgDescription =
+  "Más rápido, menos errores, seguro y con trato cercano — ejemplos orientativos de en qué puedo ayudarte con tu equipo.";
+
+const sortedServices = services
+  .map((s, i) => ({ s, i }))
+  .sort((a, b) => (a.s.order ?? Infinity) - (b.s.order ?? Infinity) || a.i - b.i)
+  .map(({ s }) => s)
+  .filter((s) => s && s.name);
+
+const noscriptList = sortedServices.length
+  ? `        <ol class="index-list">
+${sortedServices
+  .map(
+    (s) =>
+      `          <li class="index-row"><span class="row-body"><span class="row-head"><span class="row-name">${escapeXml(s.name)}</span></span>${
+        s.description ? `<span class="row-desc">${escapeXml(s.description)}</span>` : ""
+      }</span></li>`
+  )
+  .join("\n")}
+        </ol>`
+  : `        <p class="row-desc">Todavía no hay servicios listados.</p>`;
+
+const contactEmail = config.contactEmail || "";
+const servicesNoscript = `<noscript>
+        <h1>${escapeXml(servicesTitle)}</h1>
+        <p class="row-desc">Ejemplos orientativos de en qué puedo ayudarte con tu equipo, sin catálogo cerrado ni tarifas fijas. Para la versión interactiva necesitas activar JavaScript.</p>
+${noscriptList}
+        ${
+          contactEmail
+            ? `<p class="row-desc">¿Te interesa alguno? Escribe a <a href="mailto:${escapeXml(contactEmail)}">${escapeXml(contactEmail)}</a>.</p>`
+            : ""
+        }
+      </noscript>`;
+
+let serviciosHtml = applyMeta(indexHtmlSynced, "servicios.html", {
+  title: servicesTitle,
+  description: servicesDescription,
+  ogDescription: servicesOgDescription,
+  image: `${siteUrl}og-servicios-image.png`,
+  imageAlt: config.operatorName ? `Servicios de ${config.operatorName}` : "Servicios",
+  url: servicesUrl,
+});
+serviciosHtml = replaceOne(
+  serviciosHtml,
+  /<noscript>[\s\S]*?<\/noscript>/,
+  servicesNoscript,
+  "noscript",
+  "servicios.html"
+);
+writeFileAtomic(serviciosPath, serviciosHtml);
+console.log("✓ servicios.html");
 
 // ---- ld.json ----
 const ldPath = path.join(PUBLIC_DIR, "ld.json");
@@ -423,9 +488,12 @@ writeFileAtomic(robotsPath, robots);
 console.log("✓ robots.txt");
 
 // ---- sitemap.xml ----
+// Dos <loc>: la raíz y /servicios (ver el comentario dentro del propio
+// sitemap.xml). Se sustituye el dominio de cada una conservando su ruta.
 const sitemapPath = path.join(PUBLIC_DIR, "sitemap.xml");
 let sitemap = fs.readFileSync(sitemapPath, "utf8");
-sitemap = replaceOne(sitemap, /<loc>[^<]*<\/loc>/, `<loc>${siteUrl}</loc>`, "loc", "sitemap.xml");
+sitemap = replaceOne(sitemap, /<loc>https?:\/\/[^<]*?\/servicios<\/loc>/, `<loc>${siteUrl}servicios</loc>`, "loc /servicios", "sitemap.xml");
+sitemap = replaceOne(sitemap, /<loc>https?:\/\/[^<]*?\/<\/loc>/, `<loc>${siteUrl}</loc>`, "loc raíz", "sitemap.xml");
 writeFileAtomic(sitemapPath, sitemap);
 console.log("✓ sitemap.xml");
 
@@ -440,14 +508,15 @@ if (rasterizeSvg(buildOgImageSvg(config, palette), ogImagePath)) {
 }
 
 // ---- og-servicios-image.png [BETA] ----
-if (fs.existsSync(serviciosPath)) {
-  const ogServiciosImagePath = path.join(PUBLIC_DIR, "og-servicios-image.png");
-  if (rasterizeSvg(buildServicesOgImageSvg(config, palette), ogServiciosImagePath)) {
-    console.log("✓ og-servicios-image.png");
-  } else {
-    console.warn("  ! og-servicios-image.png: no se encontró rsvg-convert ni sips — no se ha regenerado, se sigue sirviendo la que ya había");
-    warnings++;
-  }
+// Los 4 puntos a favor se leen del markup ya sincronizado de index.html
+// (fuente de verdad única — ver parseServiceHighlights).
+const highlights = parseServiceHighlights(indexHtmlSynced);
+const ogServiciosImagePath = path.join(PUBLIC_DIR, "og-servicios-image.png");
+if (rasterizeSvg(buildServicesOgImageSvg(config, palette, highlights), ogServiciosImagePath)) {
+  console.log("✓ og-servicios-image.png");
+} else {
+  console.warn("  ! og-servicios-image.png: no se encontró rsvg-convert ni sips — no se ha regenerado, se sigue sirviendo la que ya había");
+  warnings++;
 }
 
 console.log(`\nListo — dominio usado: ${siteUrl}`);

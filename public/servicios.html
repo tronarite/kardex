@@ -4,23 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <!-- Título, meta tags y og-servicios-image.png: se generan solos desde
-       config.js con Docker (ver scripts/sync-meta.js) — no los edites
-       aquí a mano, se sobrescriben. Los valores de abajo son solo la
-       plantilla genérica que ves antes de la primera sincronización.
-
-       Este archivo es el "gemelo" de index.html para la ruta /servicios
-       (ver nginx.conf y SERVICES_VIEW_URL en script.js): mismo cuerpo,
-       mismo script.js/config.js — la vista de servicios se pinta igual
-       que siempre en cuanto carga JS — pero con sus PROPIAS etiquetas de
-       SEO/redes, para que compartir tu-dominio.example/servicios muestre
-       una previsualización propia (título "SERVICIOS", los 4 puntos a
-       favor con sus iconos como imagen) en vez de repetir la del índice.
-       Si alguna vez cambias la estructura del <body> en index.html,
-       cópiala también aquí para que no se desincronicen. -->
+  <!-- Título, meta tags y la imagen de previsualización se generan solos
+       desde config.js con Docker (ver scripts/sync-meta.js) — no los
+       edites aquí a mano, se sobrescriben. Los valores de abajo son solo
+       la plantilla genérica que ves antes de la primera sincronización.
+       La ruta /servicios (servicios.html) también se genera en esa misma
+       sincronización a partir de este archivo: cuerpo idéntico, solo
+       cambian la cabecera y la alternativa sin JavaScript. -->
   <title>Servicios — Tu Nombre / Alias</title>
-  <meta name="description" content="Ejemplos orientativos de en qué puede ayudarte Tu Nombre / Alias con tus equipos: más rápido · menos errores · seguro · trato cercano.">
+  <meta name="description" content="Servicios de Tu Nombre / Alias para tus equipos y tu negocio — ejemplos orientativos de en qué puedo ayudarte, sin catálogo cerrado ni tarifas fijas. Escríbeme y lo vemos.">
   <meta name="robots" content="index, follow">
+  <meta name="author" content="Tu Nombre / Alias">
   <!-- Debe coincidir con --light-bg / --dark-bg del theme-pack activo en
        style.css (SITE_CONFIG.theme en config.js) — no se puede calcular en
        CSS, así que si cambias de tema actualiza esto a mano. Valores
@@ -28,16 +22,25 @@
   <meta name="theme-color" content="#E6EBF7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0D131C" media="(prefers-color-scheme: dark)">
 
-  <!-- Open Graph / Twitter -->
+  <!-- Open Graph / Twitter. og:image / twitter:image llevan la URL
+       absoluta (la rellena sync-meta.js desde siteUrl) — varias apps
+       (LinkedIn, iMessage...) no resuelven una ruta relativa y se quedan
+       sin imagen. -->
   <meta property="og:title" content="Servicios — Tu Nombre / Alias">
-  <meta property="og:description" content="Más rápido · Menos errores · Seguro · Trato cercano">
+  <meta property="og:description" content="Más rápido, menos errores, seguro y con trato cercano — ejemplos orientativos de en qué puedo ayudarte con tu equipo.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="og-servicios-image.png">
+  <meta property="og:site_name" content="Tu Nombre / Alias">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:image" content="https://tu-dominio.example/og-servicios-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Servicios de Tu Nombre / Alias">
   <meta property="og:url" content="https://tu-dominio.example/servicios">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Servicios — Tu Nombre / Alias">
-  <meta name="twitter:description" content="Más rápido · Menos errores · Seguro · Trato cercano">
-  <meta name="twitter:image" content="og-servicios-image.png">
+  <meta name="twitter:description" content="Más rápido, menos errores, seguro y con trato cercano — ejemplos orientativos de en qué puedo ayudarte con tu equipo.">
+  <meta name="twitter:image" content="https://tu-dominio.example/og-servicios-image.png">
+  <meta name="twitter:image:alt" content="Servicios de Tu Nombre / Alias">
   <link rel="canonical" href="https://tu-dominio.example/servicios">
 
   <!-- Icons & PWA -->
@@ -210,35 +213,13 @@
            (la transición a la vista de servicios necesita JS; sin él se
            queda en el índice de proyectos). -->
       <noscript>
+        <h1>Servicios — Tu Nombre / Alias</h1>
+        <p class="row-desc">Ejemplos orientativos de en qué puedo ayudarte con tu equipo, sin catálogo cerrado ni tarifas fijas. Para la versión interactiva necesitas activar JavaScript.</p>
         <ol class="index-list">
-          <li class="index-row">
-            <a class="index-link" href="https://ejemplo.com" target="_blank" rel="noopener noreferrer">
-              <span class="row-number">01</span>
-              <span class="row-body">
-                <span class="row-head">
-                  <span class="row-name">PROYECTO EJEMPLO</span>
-                  <span class="row-flag status-activo"><span class="flag-dot"></span>ACTIVO</span>
-                </span>
-                <span class="row-desc">Descripción del proyecto o plataforma en producción.</span>
-              </span>
-              <span class="row-url">ejemplo.com →</span>
-            </a>
-          </li>
-          <li class="index-row">
-            <a class="index-link" href="https://github.com/tuusuario" target="_blank" rel="noopener noreferrer">
-              <span class="row-number">02</span>
-              <span class="row-body">
-                <span class="row-head">
-                  <span class="row-name">GITHUB</span>
-                  <span class="row-flag status-activo"><span class="flag-dot"></span>REPOSITORIO</span>
-                </span>
-                <span class="row-desc">Código, herramientas y proyectos open source.</span>
-              </span>
-              <span class="row-url">github.com/tuusuario →</span>
-            </a>
-          </li>
+          <li class="index-row"><span class="row-body"><span class="row-head"><span class="row-name">NOMBRE DEL SERVICIO</span></span><span class="row-desc">Descripción de en qué consiste este servicio, qué incluye y qué no.</span></span></li>
+          <li class="index-row"><span class="row-body"><span class="row-head"><span class="row-name">OTRO SERVICIO</span></span><span class="row-desc">Otra descripción, tan larga como haga falta.</span></span></li>
         </ol>
-        <p class="row-desc">¿Buscas los servicios? Escribe directamente a <a href="mailto:contacto@ejemplo.com">contacto@ejemplo.com</a>.</p>
+        <p class="row-desc">¿Te interesa alguno? Escribe a <a href="mailto:contacto@ejemplo.com">contacto@ejemplo.com</a>.</p>
       </noscript>
     </main>
 

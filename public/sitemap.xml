@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Sustituye el dominio de ejemplo por el tuyo antes de publicar -->
+<!-- El dominio lo rellena solo sync-meta.js desde config.js (siteUrl).
+     La entrada de /servicios solo tiene sentido si has activado la vista
+     de servicios (fila con url: "/servicios" en UNITS); si no la usas,
+     bórrala a mano — es inofensiva pero no apunta a nada útil. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://tu-dominio.example/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://tu-dominio.example/servicios</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

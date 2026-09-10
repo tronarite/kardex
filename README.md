@@ -185,7 +185,7 @@ Para un proyecto que en realidad es algo que ofreces (no un enlace a tu propio t
 Esto también cambia la vista previa al compartir el enlace (WhatsApp, Twitter/X, Discord...) — ver [Meta tags y dominio](#meta-tags-y-dominio), que incluye `og:title`/`twitter:title` y la propia imagen de la tarjeta.
 
 ### Meta tags y dominio
-`<title>`, la meta description, `og:title`/`og:description`/`og:url`, `twitter:title`/`twitter:description`, `canonical`, `public/ld.json`, el Sitemap de `public/robots.txt`/`public/sitemap.xml` **y la propia imagen de la tarjeta** (`public/og-image.png`) **se generan solos** a partir de `operatorName`, `operatorRole`, `pageTitle`, `theme` y `siteUrl` de tu `config.js` — no los edites a mano, se sobrescriben. El contenedor Docker lo sincroniza al arrancar y también en caliente: si editas `config.js` mientras el contenedor sigue arriba, se vuelve a aplicar solo, sin reiniciar nada (`scripts/docker-entrypoint-meta.sh` vigila el archivo con `inotifywait` — en Windows/Docker Desktop esa vigilancia en caliente no siempre detecta cambios hechos desde fuera del propio contenedor; si no ves el cambio, `docker compose restart` lo fuerza).
+`<title>`, la meta description, `og:*`/`twitter:*` (incluida la URL absoluta de la imagen), `canonical`, `public/ld.json`, `public/robots.txt`, `public/sitemap.xml` (raíz + `/servicios`), **la imagen de la tarjeta** (`public/og-image.png`) y, si usas la vista de servicios, `public/servicios.html` entero + `public/og-servicios-image.png` **se generan solos** a partir de `operatorName`, `operatorRole`, `pageTitle`, `theme`, `siteUrl` y `SERVICES` de tu `config.js` — no los edites a mano, se sobrescriben. El contenedor Docker lo sincroniza al arrancar y también en caliente: si editas `config.js` mientras el contenedor sigue arriba, se vuelve a aplicar solo, sin reiniciar nada (`scripts/docker-entrypoint-meta.sh` vigila el archivo con `inotifywait` — en Windows/Docker Desktop esa vigilancia en caliente no siempre detecta cambios hechos desde fuera del propio contenedor; si no ves el cambio, `docker compose restart` lo fuerza).
 
 `og-image.png` es una tarjeta 1200×630 generada de cero (no una plantilla con el texto encima): mismo icono/kicker/nombre/rol que el sitio, con el fondo y el acento del `theme` activo. Para dibujarla hace falta rasterizar un SVG a PNG — dentro de Docker se usa `rsvg-convert` (instalado vía `apk` en el `Dockerfile`, con `ttf-dejavu` para que haya con qué dibujar el texto: Alpine no trae fuentes por defecto); en local sin Docker cae en `sips` si estás en macOS. Si no encuentra ninguna de las dos, avisa y no toca la imagen que ya hubiera — el resto de la sincronización sigue igual.
 
@@ -193,10 +193,12 @@ Esto también cambia la vista previa al compartir el enlace (WhatsApp, Twitter/X
 
 Si sirves el sitio sin Docker, ejecuta `node scripts/sync-meta.js` a mano cada vez que cambies esos campos.
 
-`public/index.html`, `public/ld.json`, `public/robots.txt`, `public/sitemap.xml` y `public/og-image.png` sí están en git (a diferencia de `config.js`) — al publicar con tus datos reales, tu copia local queda "sucia" frente a la plantilla genérica del repo. Trátalos igual que `config.js`:
+`public/index.html`, `public/servicios.html`, `public/ld.json`, `public/robots.txt`, `public/sitemap.xml`, `public/og-image.png` y `public/og-servicios-image.png` sí están en git (a diferencia de `config.js`) — al publicar con tus datos reales, tu copia local queda "sucia" frente a la plantilla genérica del repo. Trátalos igual que `config.js`:
 
 ```bash
-git update-index --skip-worktree public/index.html public/ld.json public/robots.txt public/sitemap.xml public/og-image.png
+git update-index --skip-worktree public/index.html public/servicios.html \
+  public/ld.json public/robots.txt public/sitemap.xml \
+  public/og-image.png public/og-servicios-image.png
 ```
 
 (revierte con `--no-skip-worktree` sobre el archivo si alguna vez necesitas tocar de verdad la plantilla, no solo tus datos).
@@ -259,8 +261,10 @@ const SITE_CONFIG = {
 
 Si quitas cualquiera de los dos campos (o los dejas vacíos), esa parte simplemente no se muestra — no hace falta desactivar nada más.
 
-### Previsualización enriquecida propia al compartir `/servicios`
-Compartir `tu-dominio.example/servicios` (Discord, WhatsApp, Twitter/X...) muestra su propia tarjeta — título "SERVICIOS", descripción y una imagen con los 4 puntos a favor y sus iconos — en vez de repetir la del índice principal. Esto funciona porque `/servicios` no reutiliza `index.html`: nginx sirve su propio archivo gemelo, `public/servicios.html` (mismo `<body>`, mismo `script.js`/`config.js` — la vista se pinta exactamente igual una vez carga JS), pero con sus propias etiquetas de SEO/redes. `scripts/sync-meta.js` las sincroniza automáticamente desde `config.js`, igual que hace con `index.html`, y genera `public/og-servicios-image.png` desde cero (no es una captura de pantalla). No hace falta configurar nada de esto a mano.
+### Aparecer en buscadores y al compartir `/servicios`
+`/servicios` es una URL de verdad, no un `#hash`: tiene su propio `<title>`, meta description, `canonical`, entrada en `sitemap.xml` y tarjeta social (título "SERVICIOS", descripción e imagen con los 4 puntos a favor y sus iconos) — distinta de la del índice. Además, el `<noscript>` de esa página lleva la lista real de tus `SERVICES` (nombre + descripción), así que un crawler que no ejecuta JavaScript —o Google en su primer pase— ya ve contenido de verdad, no una página en blanco.
+
+Todo esto lo monta `scripts/sync-meta.js` en la misma sincronización que `index.html`: **genera `public/servicios.html` entero a partir de `index.html`** (cuerpo idéntico, solo cambian la cabecera y el `<noscript>`), así que su estructura nunca se desincroniza — no lo edites a mano. nginx sirve ese archivo en la ruta `/servicios` (regla en `nginx.conf`). `public/og-servicios-image.png` se dibuja de cero, con el fondo y el acento del `theme` activo, igual que `og-image.png`.
 
 ---
 
@@ -270,7 +274,7 @@ Compartir `tu-dominio.example/servicios` (Discord, WhatsApp, Twitter/X...) muest
 Kardex/
 ├── public/                  # Todo lo que se sirve tal cual en el navegador
 │   ├── index.html            # Estructura semántica; sus meta tags OG/Twitter se sincronizan solas (ver Meta tags y dominio)
-│   ├── servicios.html         # [BETA] Gemelo de index.html para /servicios — mismo body, meta tags propios (ver Vista de servicios)
+│   ├── servicios.html         # [BETA] Ruta /servicios — se genera sola desde index.html (ver Vista de servicios); no lo edites a mano
 │   ├── 404.html                # Página de error, mismo diseño y tema que el resto del sitio
 │   ├── style.css              # Design system: tokens light-dark(), layout, componentes
 │   ├── config.example.js       # Plantilla genérica — SÍ se sube al repo
