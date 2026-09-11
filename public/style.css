@@ -1177,6 +1177,14 @@ body {
   transition: color 0.15s ease, border-color 0.15s ease;
 }
 
+/* Dentro de .contact-actions ocupa el mismo sitio en la fila que
+   #phone-reveal-btn (se muestran alternándose, nunca los dos a la vez) —
+   el margen de arriba de .contact-phone es para cuando aparece solo,
+   debajo de todo; aquí, entre botones, solo lo descentraría. */
+.contact-actions .contact-phone {
+  margin-top: 0;
+}
+
 .contact-phone:hover {
   color: var(--accent);
   border-color: var(--accent);
