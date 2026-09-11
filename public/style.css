@@ -219,9 +219,6 @@ body {
   background-color: var(--bg);
   background-image:
     radial-gradient(ellipse at top, light-dark(rgba(23,20,15,0.035), rgba(255,255,255,0.03)), transparent 60%);
-  /* La transición índice ↔ servicios saca los paneles fuera del viewport
-     (ver .panel-slide-* más abajo) — sin esto aparecería una barra de
-     scroll horizontal fantasma mientras dura la animación. */
   overflow-x: hidden;
 }
 
@@ -269,10 +266,10 @@ body {
 
 @media (min-width: 860px) {
   /* Página estática: nada de scroll (ni de "rebote" al forzarlo) en todo
-     el sitio — lo único que se desplaza es la propia lista de enlaces/
-     servicios, dentro de su propio hueco (ver .index-list más abajo). En
-     móvil se deja el scroll normal de toda la página (una sola columna,
-     sin masthead fijo al lado con el que compaginar el desplazamiento). */
+     el sitio — lo único que se desplaza es la propia lista de enlaces,
+     dentro de su propio hueco (ver .index-list más abajo). En móvil se
+     deja el scroll normal de toda la página (una sola columna, sin
+     masthead fijo al lado con el que compaginar el desplazamiento). */
   html, body {
     height: 100%;
     overflow: hidden;
@@ -292,46 +289,6 @@ body {
     padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
   }
 
-  /* Vista de servicios (ver initViewSwitcher en script.js): el masthead
-     pasa a la columna derecha y la lista de contenido a la izquierda —
-     solo tiene sentido "el otro lado" cuando hay dos columnas; en una sola
-     columna (móvil) el swap queda desactivado y solo se ve la animación.
-     "order" por sí solo NO basta: solo decide qué elemento va en qué
-     columna, pero las columnas del grid mantienen su ancho (15.5rem/1fr)
-     donde estaban — sin invertir también grid-template-columns, la lista
-     de servicios quedaría apretada en la columna estrecha. */
-  .page--services {
-    grid-template-columns: 1fr 15.5rem;
-  }
-  .page--services .masthead { order: 2; }
-  .page--services .index { order: 1; }
-}
-
-/* --------------------------------------------------------------------------
-   Transición índice ↔ servicios
-   El masthead sale de pantalla por la izquierda y vuelve a entrar por la
-   derecha (colocándose al otro lado del grid); la lista de contenido hace
-   el movimiento espejo. translateX en vw (no en % del propio ancho) para
-   que "salir"/"entrar" sea siempre respecto al viewport, sin importar en
-   qué columna esté el elemento en ese momento.
-   -------------------------------------------------------------------------- */
-.masthead,
-.index {
-  transition: transform 0.42s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.3s ease;
-}
-
-.panel-slide-left {
-  transform: translateX(-120vw);
-  opacity: 0;
-}
-
-.panel-slide-right {
-  transform: translateX(120vw);
-  opacity: 0;
-}
-
-.no-transition {
-  transition: none !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -490,26 +447,6 @@ body {
   gap: 0.5rem;
 }
 
-/* Botones de acción (copiar correo, mostrar teléfono, WhatsApp): en fila
-   por defecto (pantalla estrecha, donde el masthead ocupa todo el ancho y
-   sobra sitio de sobra para varios botones uno junto a otro) y en columna
-   a partir de 860px, donde el masthead pasa a ser una columna lateral
-   estrecha (15.5rem) en la que una fila de 2-3 botones no cabría. */
-.contact-actions {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-@media (min-width: 860px) {
-  .contact-actions {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
 .contact-kicker {
   font-family: var(--font-mono);
   font-size: 0.65rem;
@@ -564,117 +501,6 @@ body {
 .copy-btn.copied {
   border-color: var(--c-activo);
   color: var(--c-activo);
-}
-
-/* Distinto a propósito de .copy-btn: aunque esté justo al lado del botón
-   de copiar correo, este REVELA algo que no estaba (no copia algo que ya
-   se ve) — con el mismo borde sólido se confundía con "otro botón más"
-   de la misma familia. Borde discontinuo + icono en el color de acento
-   marcan que es una acción distinta. */
-.phone-reveal-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: transparent;
-  border: 1px dashed var(--accent);
-  color: var(--accent);
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  padding: 0.4rem 0.7rem;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.phone-reveal-btn svg {
-  width: 13px;
-  height: 13px;
-  fill: currentColor;
-  flex-shrink: 0;
-}
-
-.phone-reveal-btn:hover {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border-style: solid;
-}
-
-.phone-reveal-btn:focus-visible {
-  outline: 2px solid var(--line-strong);
-  outline-offset: 2px;
-}
-
-.phone-reveal-btn--modal {
-  font-size: 0.78rem;
-  padding: 0.55rem 0.9rem;
-}
-
-.phone-reveal-btn--modal svg {
-  width: 15px;
-  height: 15px;
-}
-
-/* display:inline-flex de arriba gana por especificidad al [hidden] del
-   user-agent stylesheet — el botón ahora se oculta/muestra directamente
-   (antes lo envolvía .phone-gate, que ya llevaba este mismo ajuste). */
-.phone-reveal-btn[hidden] {
-  display: none;
-}
-
-/* Mismo tratamiento que .phone-reveal-btn (borde discontinuo + icono en
-   el acento, para que se lea como "otra vía de contacto" y no como un
-   botón más de la misma familia que .copy-btn) — con su propio icono para
-   distinguirlo a simple vista del de teléfono. */
-.whatsapp-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: transparent;
-  border: 1px dashed var(--accent);
-  color: var(--accent);
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  padding: 0.4rem 0.7rem;
-  border-radius: var(--radius);
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.whatsapp-btn svg {
-  width: 13px;
-  height: 13px;
-  fill: currentColor;
-  flex-shrink: 0;
-}
-
-.whatsapp-btn:hover {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border-style: solid;
-}
-
-.whatsapp-btn:focus-visible {
-  outline: 2px solid var(--line-strong);
-  outline-offset: 2px;
-}
-
-.whatsapp-btn[hidden] {
-  display: none;
-}
-
-.whatsapp-btn--modal {
-  font-size: 0.78rem;
-  padding: 0.55rem 0.9rem;
-}
-
-.whatsapp-btn--modal svg {
-  width: 15px;
-  height: 15px;
 }
 
 .masthead-footer {
@@ -807,9 +633,6 @@ body {
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
-/* .index-link también se usa en la vista de servicios como <button> (abre
-   el modal de contacto en vez de navegar) — estos resets no afectan a su
-   uso normal como <a>, solo hacen que un <button> se vea idéntico. */
 .index-link {
   display: grid;
   grid-template-columns: 2.25rem 1fr auto;
@@ -1022,315 +845,6 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   Vista de servicios
-   No es una página aparte: es index.html cambiando de contenido (ver
-   initViewSwitcher en script.js). Reutiliza casi todo lo de arriba
-   (.index-row, .row-*, .contact-block...); esto es solo lo que no existía:
-   el enlace de volver, el "portón" del teléfono y el párrafo
-   introductorio orientativo.
-   -------------------------------------------------------------------------- */
-/* Entradilla editorial (como el "deck" bajo el titular de un artículo):
-   serif en cursiva, más grande que el cuerpo normal, sin caja ni borde —
-   funciona como subtítulo de la sección, por encima de "N° SERVICIOS",
-   no como un aviso aparte. */
-.services-intro {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 1.05rem;
-  font-weight: 500;
-  color: var(--text-body);
-  line-height: 1.45;
-  max-width: 34rem;
-  margin-bottom: 1.25rem;
-}
-
-/* La parte que de verdad importa leer (la pregunta/CTA) resalta en el
-   color de acento del tema activo y sin cursiva, para que el ojo vaya
-   directo a lo accionable en vez de perderse en el resto de la frase. */
-.services-intro strong {
-  font-style: normal;
-  font-weight: 600;
-  color: var(--accent);
-}
-
-/* Tres puntos a favor, no tres tarjetas: sin cajas, sombras ni fondos de
-   color de por medio — solo icono + texto, con una línea fina debajo para
-   separarlos de la lista, igual que el resto de divisores del sitio. */
-/* Sin línea propia debajo: justo después va .index-head, que ya trae la
-   suya — dos rayas casi seguidas se veían redundantes. El espacio lo da
-   solo el margen. */
-.services-highlights {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem 2rem;
-  margin-bottom: 1.25rem;
-}
-
-.services-highlights[hidden] {
-  display: none;
-}
-
-.service-highlight {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  flex: 1 1 200px;
-  min-width: 0;
-}
-
-.service-highlight svg {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  margin-top: 0.2rem;
-  fill: var(--accent);
-}
-
-.service-highlight-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
-}
-
-.service-highlight-label {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text);
-}
-
-.service-highlight-desc {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 0.8rem;
-  color: var(--text-body);
-  line-height: 1.45;
-}
-
-.masthead-service-extra {
-  display: flex;
-  flex-direction: column;
-  gap: 1.75rem;
-}
-
-/* Ver el porqué de esta regla en .phone-reveal-btn[hidden] más arriba:
-   mismo problema de especificidad contra el [hidden] del user-agent. */
-.masthead-service-extra[hidden] {
-  display: none;
-}
-
-.masthead-back {
-  margin: 0;
-}
-
-/* Antes era un enlace de texto discreto — ahora es el único camino de
-   vuelta desde la vista de servicios, así que se trata como un botón de
-   verdad: borde y relleno tenue del acento, y se invierte a "lleno" al
-   pasar el ratón/foco para que destaque claramente. */
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border: 1.5px solid var(--accent);
-  border-radius: var(--radius);
-  padding: 0.5rem 0.9rem;
-  text-decoration: none;
-  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
-}
-
-.back-link:hover {
-  background: var(--accent);
-  color: var(--bg);
-  transform: translateX(-2px);
-}
-
-.back-link:focus-visible {
-  outline: 2px solid var(--line-strong);
-  outline-offset: 2px;
-}
-
-.phone-gate-note {
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  color: var(--text-muted);
-  max-width: 20rem;
-  line-height: 1.4;
-}
-
-.contact-phone {
-  font-family: var(--font-mono);
-  font-size: 0.86rem;
-  font-weight: 600;
-  color: var(--text);
-  text-decoration: none;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 0.1rem;
-  margin-top: 0.4rem;
-  transition: color 0.15s ease, border-color 0.15s ease;
-}
-
-/* Dentro de .contact-actions ocupa el mismo sitio en la fila que
-   #phone-reveal-btn (se muestran alternándose, nunca los dos a la vez) —
-   el margen de arriba de .contact-phone es para cuando aparece solo,
-   debajo de todo; aquí, entre botones, solo lo descentraría. */
-.contact-actions .contact-phone {
-  margin-top: 0;
-}
-
-.contact-phone:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-.contact-phone:focus-visible {
-  outline: 2px solid var(--line-strong);
-  outline-offset: 2px;
-}
-
-/* Ubicación — solo en la vista de servicios (ver
-   SITE_CONFIG.location y initViewSwitcher en script.js). Mismo tratamiento
-   tipográfico que .contact-phone (para que no desentone), con un pin en
-   el color de acento del tema — un icono da más peso visual a este dato
-   que otro simple renglón de texto suelto. */
-.service-location {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.6rem;
-  font-family: var(--font-mono);
-  font-size: 0.86rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.service-location[hidden] {
-  display: none;
-}
-
-.location-pin {
-  width: 15px;
-  height: 15px;
-  flex-shrink: 0;
-  fill: var(--accent);
-}
-
-/* --------------------------------------------------------------------------
-   Modal de contacto
-   Se abre al pulsar cualquier servicio (ver initContactModal en script.js):
-   una versión más grande y centrada del bloque de contacto, sobre un fondo
-   oscurecido que tapa el resto de la página.
-   -------------------------------------------------------------------------- */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  background: light-dark(rgba(23, 20, 15, 0.45), rgba(0, 0, 0, 0.65));
-  animation: modal-fade-in 0.18s ease;
-}
-
-/* display:flex de arriba gana por especificidad al [hidden] del user-agent
-   stylesheet — mismo patrón que .phone-reveal-btn/.masthead-service-extra más arriba. */
-.modal-backdrop[hidden] {
-  display: none;
-}
-
-@keyframes modal-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.contact-modal {
-  position: relative;
-  width: 100%;
-  max-width: 26rem;
-  max-height: calc(100vh - 3rem);
-  overflow-y: auto;
-  background: var(--surface);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-elevated);
-  padding: 2.5rem 2rem 2.25rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.75rem;
-  animation: modal-pop-in 0.22s cubic-bezier(0.2, 0.8, 0.3, 1.1);
-}
-
-@keyframes modal-pop-in {
-  from { opacity: 0; transform: translateY(8px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.modal-close {
-  position: absolute;
-  top: 0.9rem;
-  right: 0.9rem;
-  width: 2rem;
-  height: 2rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  color: var(--text-dim);
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.modal-close:hover {
-  border-color: var(--line-strong);
-  color: var(--text);
-}
-
-.modal-close:focus-visible {
-  outline: 2px solid var(--line-strong);
-  outline-offset: 2px;
-}
-
-/* Reutiliza .contact-kicker, .contact-email, .copy-btn, .contact-actions y
-   .contact-phone tal cual (mismos componentes que el masthead) — estos
-   modificadores solo agrandan la tipografía para que se lea bien como
-   pieza central de la pantalla, no de refilón en una barra lateral. */
-.contact-email--modal {
-  font-size: 1.35rem;
-  font-weight: 700;
-  padding-bottom: 0.15rem;
-}
-
-.copy-btn--modal {
-  font-size: 0.78rem;
-  padding: 0.55rem 0.9rem;
-}
-
-/* Mismo peso visual que .contact-email--modal — antes se quedaba bastante
-   más pequeño y sin negrita, como si importara menos que el correo. */
-.contact-phone--modal {
-  font-size: 1.35rem;
-  font-weight: 700;
-  padding-bottom: 0.15rem;
-}
-
-body.modal-open {
-  overflow: hidden;
-}
-
-/* --------------------------------------------------------------------------
    Accessibility & Reduced Motion
    -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
@@ -1344,20 +858,6 @@ body.modal-open {
   .index-row.animate-init {
     opacity: 1 !important;
     transform: none !important;
-  }
-
-  /* Cinturón y tirantes: script.js ya evita animar la transición de vista
-     cuando hay preferencia de movimiento reducido, esto es solo por si
-     alguna de estas clases quedara puesta. */
-  .panel-slide-left,
-  .panel-slide-right {
-    transform: none !important;
-    opacity: 1 !important;
-  }
-
-  .modal-backdrop,
-  .contact-modal {
-    animation: none !important;
   }
 }
 

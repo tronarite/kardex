@@ -4,17 +4,10 @@
  * config.js: <title>, meta description/author, og:*, twitter:*,
  * <link rel="canonical">, el "?v=" de cache-busting del favicon
  * (SITE_CONFIG.faviconVersion) y el bloque <script type="application/ld+json">
- * (inline) en index.html, más robots.txt y sitemap.xml (raíz + /servicios).
+ * (inline) en index.html, más robots.txt y sitemap.xml.
  *
- * Genera además de cero (no solo texto):
- *   - og-image.png y og-servicios-image.png, las imágenes de
- *     previsualización al compartir el enlace (Discord, WhatsApp,
- *     Twitter/X...).
- *   - servicios.html: la ruta /servicios. Se construye ENTERA a
- *     partir de index.html ya sincronizado — mismo <body>, solo cambian
- *     el <head> (meta propios) y el <noscript> (lista real de servicios
- *     desde SERVICES, para que un crawler sin JS vea contenido). Así su
- *     estructura nunca se desincroniza de index.html.
+ * Genera además de cero (no solo texto) og-image.png, la imagen de
+ * previsualización al compartir el enlace (Discord, WhatsApp, Twitter/X...).
  *
  * Por qué existe: bots como los de Discord, Twitter/X, WhatsApp o
  * Slack — y en parte también Google — leen estas etiquetas directamente
@@ -34,14 +27,12 @@
  *
  *   node scripts/sync-meta.js
  *
- * Nota: index.html, servicios.html, robots.txt, sitemap.xml,
- * og-image.png y og-servicios-image.png SÍ están en git (a diferencia de
- * config.js). Publicar con tus datos reales los deja "sucios" en tu copia
- * local — trátalos igual que config.js:
+ * Nota: index.html, robots.txt, sitemap.xml y og-image.png SÍ están en git
+ * (a diferencia de config.js). Publicar con tus datos reales los deja
+ * "sucios" en tu copia local — trátalos igual que config.js:
  *
- *   git update-index --skip-worktree public/index.html public/servicios.html \
- *     public/robots.txt public/sitemap.xml \
- *     public/og-image.png public/og-servicios-image.png
+ *   git update-index --skip-worktree public/index.html \
+ *     public/robots.txt public/sitemap.xml public/og-image.png
  *
  * (revierte con --no-skip-worktree si alguna vez necesitas tocar de
  * verdad la plantilla, no solo tus datos).
@@ -73,20 +64,13 @@ if (!fs.existsSync(CONFIG_PATH)) {
 const configSource = fs.readFileSync(CONFIG_PATH, "utf8");
 const sandbox = {};
 vm.createContext(sandbox);
-vm.runInContext(
-  `${configSource}
-   this.SITE_CONFIG = SITE_CONFIG;
-   this.SERVICES = typeof SERVICES !== "undefined" ? SERVICES : [];`,
-  sandbox,
-  { filename: "config.js" }
-);
+vm.runInContext(`${configSource}\nthis.SITE_CONFIG = SITE_CONFIG;`, sandbox, { filename: "config.js" });
 
 const config = sandbox.SITE_CONFIG;
 if (!config) {
   console.error("✗ config.js no define SITE_CONFIG — revisa el archivo.");
   process.exit(1);
 }
-const services = Array.isArray(sandbox.SERVICES) ? sandbox.SERVICES : [];
 
 const siteUrl = (config.siteUrl || "https://tu-dominio.example/").replace(/\/?$/, "/");
 const title = config.pageTitle || `${config.operatorName} — Índice`;
@@ -226,126 +210,6 @@ const buildOgImageSvg = (cfg, palette) => {
 </svg>`;
 };
 
-// ---- og-servicios-image.png: los mismos 4 puntos a favor de la
-// vista de servicios (icono + label + desc) que ya muestra index.html en
-// .services-highlights, ahora como imagen de previsualización al
-// compartir /servicios. ----
-
-// Fuente de verdad: el propio markup de index.html (así no hay que
-// mantener los textos en dos sitios). Si el parseo falla porque la
-// estructura del HTML ha cambiado, se usa esta copia y se avisa.
-const SERVICE_HIGHLIGHTS_FALLBACK = [
-  { label: "Más rápido", desc: "Optimizo tu equipo para que vaya fluido, sin ralentizaciones ni cuelgues.", icon: "M13 2 4 14h6l-1 8 9-12h-6l1-8Z" },
-  { label: "Menos errores", desc: "Reviso conflictos y programas innecesarios antes de que den problemas de verdad.", icon: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.7 7.2-5.4 5.4a1 1 0 0 1-1.4 0l-2.6-2.6a1 1 0 1 1 1.4-1.4l1.9 1.9 4.7-4.7a1 1 0 0 1 1.4 1.4Z" },
-  { label: "Seguro", desc: "Tu equipo y tus datos, tratados con el mismo cuidado que si fueran los míos.", icon: "M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5l-8-3Z" },
-  { label: "Trato cercano", desc: "Soluciones reales, explicadas en claro y sin venderte de más.", icon: "M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-4.4 3.3A1 1 0 0 1 3 19.5V5a1 1 0 0 1 1-1Z" },
-];
-
-const decodeEntities = (s) =>
-  s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'");
-
-const parseServiceHighlights = (indexHtml) => {
-  const blockRe = /<div class="service-highlight">([\s\S]*?)<\/div>\s*<\/div>/g;
-  const found = [];
-  let m;
-  while ((m = blockRe.exec(indexHtml)) !== null) {
-    const chunk = m[1];
-    const icon = (chunk.match(/<path d="([^"]+)"/) || [])[1];
-    const label = (chunk.match(/<span class="service-highlight-label">([\s\S]*?)<\/span>/) || [])[1];
-    const desc = (chunk.match(/<span class="service-highlight-desc">([\s\S]*?)<\/span>/) || [])[1];
-    if (icon && label && desc) {
-      found.push({ icon, label: decodeEntities(label.trim()), desc: decodeEntities(desc.trim()) });
-    }
-  }
-  if (found.length) return found;
-  console.warn("  ! no se pudieron leer los .services-highlights de index.html — se usa la copia de reserva de este script");
-  warnings++;
-  return SERVICE_HIGHLIGHTS_FALLBACK;
-};
-
-// Reparte "text" en como mucho "maxLines" líneas de hasta "maxChars"
-// caracteres, sin cortar palabras — SVG <text> no hace word-wrap solo,
-// hay que calcular los saltos de línea a mano. Si sobran palabras tras
-// llenar todas las líneas permitidas, la última se recorta con "…".
-const wrapWords = (text, maxChars, maxLines) => {
-  const words = text.split(/\s+/);
-  const lines = [];
-  let current = "";
-  let i = 0;
-
-  while (i < words.length && lines.length < maxLines) {
-    const word = words[i];
-    const candidate = current ? `${current} ${word}` : word;
-    if (candidate.length > maxChars && current) {
-      lines.push(current);
-      current = "";
-      continue; // reintenta esta misma palabra ya en la línea nueva
-    }
-    current = candidate;
-    i++;
-  }
-  if (current) lines.push(current);
-
-  if (i < words.length && lines.length) {
-    lines[lines.length - 1] = `${lines[lines.length - 1].replace(/[.,;:]+$/, "")}…`;
-  }
-  return lines;
-};
-
-const buildServicesOgImageSvg = (cfg, palette, highlights) => {
-  const textDim = mixHex(palette.text, palette.bg, 0.6);
-  const monoStack = "Menlo, 'DejaVu Sans Mono', Consolas, monospace";
-  const serifStack = "Georgia, 'DejaVu Serif', 'Times New Roman', serif";
-  const sansStack = "-apple-system, 'DejaVu Sans', Roboto, sans-serif";
-
-  // Rejilla 2x2: misma idea que .services-highlights en la propia página,
-  // adaptada a un lienzo fijo de 1200x630 (aquí sí puede ser fija, a
-  // diferencia del layout real, que es responsive).
-  const marginX = 90;
-  const colGap = 70;
-  const rowGap = 52;
-  const colWidth = (1200 - marginX * 2 - colGap) / 2;
-  const iconTextGap = 50; // separación entre el icono y el texto de cada punto
-
-  // Alto de fila reservado para el peor caso: icono/label (34px) + hueco
-  // (14px) + hasta 3 líneas de descripción (26px de interlineado). Así
-  // las dos filas quedan bien separadas aunque una descripción sea más
-  // larga que las demás.
-  const rowHeight = 34 + 14 + 26 * 3;
-  const gridTop = 278;
-  const rowYs = [gridTop, gridTop + rowHeight + rowGap];
-
-  const cells = highlights.map((item, index) => {
-    const col = index % 2;
-    const row = Math.floor(index / 2);
-    const x = marginX + col * (colWidth + colGap);
-    const y = rowYs[row];
-    const lines = wrapWords(item.desc, 40, 3);
-    const descText = lines
-      // x del tspan relativo al <g> ya trasladado (no volver a sumar "x":
-      // eso duplicaba el desplazamiento y sacaba la descripción de la
-      // columna derecha fuera del lienzo).
-      .map((line, i) => `<tspan x="${iconTextGap}" dy="${i === 0 ? 0 : 26}">${escapeXml(line)}</tspan>`)
-      .join("");
-
-    return `
-  <g transform="translate(${x}, ${y})">
-    <g transform="scale(1.4167)" fill="${palette.accent}">
-      <path d="${item.icon}"/>
-    </g>
-    <text x="${iconTextGap}" y="24" font-family="${monoStack}" font-size="25" font-weight="700" fill="${palette.text}">${escapeXml(item.label)}</text>
-    <text y="48" font-family="${sansStack}" font-size="20" fill="${textDim}">${descText}</text>
-  </g>`;
-  }).join("");
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="${palette.bg}"/>
-  <text x="${marginX}" y="130" font-family="${monoStack}" font-size="24" font-weight="700" letter-spacing="4" fill="${textDim}">${escapeXml((cfg.operatorName || "").toUpperCase())}</text>
-  <text x="${marginX}" y="200" font-family="${serifStack}" font-size="72" fill="${palette.text}">SERVICIOS</text>
-  ${cells}
-</svg>`;
-};
-
 /**
  * Rasteriza el SVG a PNG probando, en orden, las herramientas que puede
  * haber disponibles: rsvg-convert (Linux/Docker, instalado vía apk en el
@@ -383,9 +247,7 @@ const rasterizeSvg = (svgContent, outPath) => {
 };
 
 // ---- HTML: título + meta tags de SEO/redes ----
-// applyMeta() es pura (devuelve el HTML modificado, no escribe) — la usan
-// index.html y servicios.html, que se genera a partir del propio
-// index.html ya sincronizado (así su <body> nunca se desincroniza).
+// applyMeta() es pura (devuelve el HTML modificado, no escribe).
 const applyMeta = (content, fileLabel, tags) => {
   const set = (pattern, replacement, label) => {
     content = replaceOne(content, pattern, replacement, label, fileLabel);
@@ -449,98 +311,6 @@ const indexHtmlSynced = applyMeta(fs.readFileSync(indexPath, "utf8"), "index.htm
 writeFileAtomic(indexPath, indexHtmlSynced);
 console.log("✓ index.html");
 
-// ---- servicios.html ----
-// Se genera ENTERA a partir de index.html (ya sincronizado): mismo
-// <body>, solo cambian el <head> (meta propios) y el <noscript> (lista
-// real de servicios en vez de la de proyectos, para que un crawler que
-// no ejecuta JS —o Google en su primer pase— vea contenido de verdad).
-const serviciosPath = path.join(PUBLIC_DIR, "servicios.html");
-const servicesUrl = `${siteUrl}servicios`;
-const servicesTitle = config.operatorName ? `Servicios — ${config.operatorName}` : "Servicios";
-const servicesDescription = config.operatorName
-  ? `Servicios de ${config.operatorName} para tus equipos y tu negocio — ejemplos orientativos de en qué puedo ayudarte, sin catálogo cerrado ni tarifas fijas. Escríbeme y lo vemos.`
-  : "Ejemplos orientativos de servicios para tus equipos y tu negocio, sin catálogo cerrado ni tarifas fijas.";
-const servicesOgDescription =
-  "Más rápido, menos errores, seguro y con trato cercano — ejemplos orientativos de en qué puedo ayudarte con tu equipo.";
-
-const sortedServices = services
-  .map((s, i) => ({ s, i }))
-  .sort((a, b) => (a.s.order ?? Infinity) - (b.s.order ?? Infinity) || a.i - b.i)
-  .map(({ s }) => s)
-  .filter((s) => s && s.name);
-
-const noscriptList = sortedServices.length
-  ? `        <ol class="index-list">
-${sortedServices
-  .map(
-    (s) =>
-      `          <li class="index-row"><span class="row-body"><span class="row-head"><span class="row-name">${escapeXml(s.name)}</span></span>${
-        s.description ? `<span class="row-desc">${escapeXml(s.description)}</span>` : ""
-      }</span></li>`
-  )
-  .join("\n")}
-        </ol>`
-  : `        <p class="row-desc">Todavía no hay servicios listados.</p>`;
-
-const contactEmail = config.contactEmail || "";
-const servicesNoscript = `<noscript>
-        <h1>${escapeXml(servicesTitle)}</h1>
-        <p class="row-desc">Ejemplos orientativos de en qué puedo ayudarte con tu equipo, sin catálogo cerrado ni tarifas fijas. Para la versión interactiva necesitas activar JavaScript.</p>
-${noscriptList}
-        ${
-          contactEmail
-            ? `<p class="row-desc">¿Te interesa alguno? Escribe a <a href="mailto:${escapeXml(contactEmail)}">${escapeXml(contactEmail)}</a>.</p>`
-            : ""
-        }
-      </noscript>`;
-
-const servicesJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  name: servicesTitle,
-  description: servicesDescription,
-  url: servicesUrl,
-  inLanguage: "es",
-  isPartOf: { "@type": "WebSite", name: config.operatorName || "Kardex", url: siteUrl },
-  ...(config.operatorName ? { about: { "@type": "Person", name: config.operatorName } } : {}),
-  ...(sortedServices.length
-    ? {
-        mainEntity: {
-          "@type": "ItemList",
-          itemListElement: sortedServices.map((s, i) => ({
-            "@type": "ListItem",
-            position: i + 1,
-            item: {
-              "@type": "Service",
-              name: s.name,
-              ...(s.description ? { description: s.description } : {}),
-              ...(config.operatorName ? { provider: { "@type": "Person", name: config.operatorName } } : {}),
-            },
-          })),
-        },
-      }
-    : {}),
-};
-
-let serviciosHtml = applyMeta(indexHtmlSynced, "servicios.html", {
-  title: servicesTitle,
-  description: servicesDescription,
-  ogDescription: servicesOgDescription,
-  image: `${siteUrl}og-servicios-image.png`,
-  imageAlt: config.operatorName ? `Servicios de ${config.operatorName}` : "Servicios",
-  url: servicesUrl,
-  jsonLd: servicesJsonLd,
-});
-serviciosHtml = replaceOne(
-  serviciosHtml,
-  /<noscript>[\s\S]*?<\/noscript>/,
-  servicesNoscript,
-  "noscript",
-  "servicios.html"
-);
-writeFileAtomic(serviciosPath, serviciosHtml);
-console.log("✓ servicios.html");
-
 // ---- 404.html: solo la versión del favicon ----
 // (no lleva meta de SEO/redes propias; lo único que sincroniza es el
 // "?v=" del favicon, para que no se quede desfasado del resto).
@@ -554,8 +324,8 @@ if (fs.existsSync(notFoundPath)) {
   }
 }
 
-// (El JSON-LD ya no es un archivo aparte: va inline en index.html y
-// servicios.html, ver applyMeta arriba — Google ignora el src en un
+// (El JSON-LD ya no es un archivo aparte: va inline en index.html, ver
+// applyMeta arriba — Google ignora el src en un
 // <script type="application/ld+json">.)
 
 // ---- robots.txt ----
@@ -566,11 +336,8 @@ writeFileAtomic(robotsPath, robots);
 console.log("✓ robots.txt");
 
 // ---- sitemap.xml ----
-// Dos <loc>: la raíz y /servicios (ver el comentario dentro del propio
-// sitemap.xml). Se sustituye el dominio de cada una conservando su ruta.
 const sitemapPath = path.join(PUBLIC_DIR, "sitemap.xml");
 let sitemap = fs.readFileSync(sitemapPath, "utf8");
-sitemap = replaceOne(sitemap, /<loc>https?:\/\/[^<]*?\/servicios<\/loc>/, `<loc>${siteUrl}servicios</loc>`, "loc /servicios", "sitemap.xml");
 sitemap = replaceOne(sitemap, /<loc>https?:\/\/[^<]*?\/<\/loc>/, `<loc>${siteUrl}</loc>`, "loc raíz", "sitemap.xml");
 writeFileAtomic(sitemapPath, sitemap);
 console.log("✓ sitemap.xml");
@@ -585,17 +352,6 @@ if (rasterizeSvg(buildOgImageSvg(config, palette), ogImagePath)) {
   warnings++;
 }
 
-// ---- og-servicios-image.png ----
-// Los 4 puntos a favor se leen del markup ya sincronizado de index.html
-// (fuente de verdad única — ver parseServiceHighlights).
-const highlights = parseServiceHighlights(indexHtmlSynced);
-const ogServiciosImagePath = path.join(PUBLIC_DIR, "og-servicios-image.png");
-if (rasterizeSvg(buildServicesOgImageSvg(config, palette, highlights), ogServiciosImagePath)) {
-  console.log("✓ og-servicios-image.png");
-} else {
-  console.warn("  ! og-servicios-image.png: no se encontró rsvg-convert ni sips — no se ha regenerado, se sigue sirviendo la que ya había");
-  warnings++;
-}
 
 console.log(`\nListo — dominio usado: ${siteUrl}`);
 if (warnings > 0) {

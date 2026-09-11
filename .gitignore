@@ -13,3 +13,6 @@ public/config.js
 # Notas/borradores sueltos en la raíz (p. ej. un export de otro CMS que
 # uses como material de partida) — no forman parte del proyecto.
 /servicios.html
+
+# Sitio estatico independiente de servicios (fuera del control de git de Kardex)
+/servicios-standalone/

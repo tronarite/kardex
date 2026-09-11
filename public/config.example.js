@@ -25,25 +25,6 @@ const SITE_CONFIG = {
   // de copiar al portapapeles.
   contactEmail: "contacto@ejemplo.com",
 
-  // Tu teléfono de contacto, solo para la vista de servicios (ver
-  // SERVICES más abajo). Opcional: si lo quitas, esa vista simplemente no
-  // muestra el bloque de teléfono ni el botón de WhatsApp (ver abajo). No
-  // aparece en texto plano hasta que alguien pulsa "mostrar teléfono" —
-  // un filtro básico contra bots que solo leen el HTML, no una
-  // verificación real (para eso haría falta un backend, que este sitio no
-  // tiene). Escríbelo con el prefijo de país (formato "+NN NNN NNN NNN"):
-  // de aquí también sale el botón de WhatsApp, que necesita esos mismos
-  // dígitos con el prefijo para armar el enlace a wa.me — y ese botón SÍ
-  // lleva el número directo en el enlace (sin filtro de clic), porque no
-  // tiene sentido "revelar" un wa.me que ya funciona en cuanto se ve.
-  contactPhone: "+34 600 000 000",
-
-  // Tu ubicación, solo para la vista de servicios — pensada para
-  // dar una idea de dónde trabajas, no una dirección exacta (ej. "Madrid,
-  // España" o "Remoto (España)"). Opcional: si la quitas o la dejas
-  // vacía, esa vista simplemente no muestra el bloque de ubicación.
-  location: "Madrid, España",
-
   // Título de la pestaña del navegador. Opcional: si lo quitas o lo dejas
   // vacío, se usa automáticamente "{operatorName} — Índice".
   pageTitle: "Tu Nombre — Índice personal",
@@ -125,12 +106,8 @@ const SITE_CONFIG = {
                                   genera solo a partir de "url".
      ctaText       Opcional      Sustituye del todo el texto de la derecha
                                   por uno propio (también con " →" al
-                                  final) en vez de mostrar una URL — pensado
-                                  para enlaces que no tiene sentido mostrar
-                                  como dirección web (rutas internas, un
-                                  correo, etc.), ej. "Ver servicios" en vez
-                                  de "/servicios →". Si lo indicas, gana
-                                  siempre a "displayUrl".
+                                  final) en vez de mostrar una URL. Si lo
+                                  indicas, gana siempre a "displayUrl".
      priceRange    Opcional      Texto libre junto al indicador, ej. "20€ –
                                   50€" o "Desde 30€". Si lo omites, no se
                                   muestra nada.
@@ -218,61 +195,5 @@ const UNITS = [
     description: "Historial musical y estadísticas en tiempo real.",
     type: "activo",
     label: "RRSS",
-  },
-  {
-    // "/servicios" es un valor especial que reconoce script.js: en
-    // vez de enlazar a otra página, abre la vista de servicios (ver
-    // SERVICES más abajo) con una transición, dentro de esta misma web —
-    // es una ruta real (https://tu-dominio.example/servicios), no un
-    // enlace externo. Si prefieres enlazar a una web externa en su lugar,
-    // cambia "url" por esa dirección normal (como en los demás bloques de
-    // arriba) y quita "ctaText" (se generará el texto a partir de esa URL).
-    // "ctaText" es lo que hace que aquí se lea "Ver servicios →" en vez de
-    // "/servicios →" — si lo quitas, usa "Ver servicios" por defecto.
-    name: "SERVICIOS",
-    order: 5,
-    url: "/servicios",
-    description: "Ejemplos orientativos de en qué puedo ayudarte.",
-    type: "proximamente",
-    label: "SERVICIO",
-    ctaText: "Ver servicios",
-  },
-];
-
-
-/* ============================================================================
-   SERVICIOS — listado de la vista de servicios (dentro de esta misma
-   web, no una página aparte — se abre desde la fila "SERVICIOS" de UNITS,
-   con "url: '/servicios'")
-   ============================================================================
-   No sustituye a la fila "SERVICIOS" de arriba en UNITS — esa sigue siendo el
-   enlace que aparece en el índice principal; esto es lo que se ve dentro
-   de la vista de servicios que abre.
-
-   Cada bloque es una tarjeta de servicio. Solo "name" es obligatorio.
-
-     name          Obligatorio   Nombre del servicio.
-     description   Opcional      En qué consiste, con el detalle que quieras
-                                  (a diferencia de la description de UNITS,
-                                  aquí no hace falta que sea una frase corta).
-     order         Opcional      Igual que en UNITS: fija la posición sin
-                                  mover el bloque.
-
-   Deliberadamente NO hay campo de precio ni de tarifa por hora: la idea es
-   que sean ejemplos orientativos de lo que sabes hacer, no un catálogo
-   cerrado con tarifario — quien esté interesado escribe (usa el correo o
-   el teléfono del bloque de contacto, o el canal que prefieras) y ahí se
-   habla el alcance y el precio según cada caso.
-   ============================================================================ */
-const SERVICES = [
-  {
-    name: "NOMBRE DEL SERVICIO",
-    order: 1,
-    description: "Descripción de en qué consiste este servicio, qué incluye y qué no.",
-  },
-  {
-    name: "OTRO SERVICIO",
-    order: 2,
-    description: "Otra descripción, tan larga como haga falta.",
   },
 ];
