@@ -27,10 +27,15 @@ const SITE_CONFIG = {
 
   // Tu teléfono de contacto, solo para la vista de servicios (ver
   // SERVICES más abajo). Opcional: si lo quitas, esa vista simplemente no
-  // muestra el bloque de teléfono. No aparece en texto plano hasta que
-  // alguien pulsa "mostrar teléfono" — un filtro básico contra bots que
-  // solo leen el HTML, no una verificación real (para eso haría falta un
-  // backend, que este sitio no tiene).
+  // muestra el bloque de teléfono ni el botón de WhatsApp (ver abajo). No
+  // aparece en texto plano hasta que alguien pulsa "mostrar teléfono" —
+  // un filtro básico contra bots que solo leen el HTML, no una
+  // verificación real (para eso haría falta un backend, que este sitio no
+  // tiene). Escríbelo con el prefijo de país (formato "+NN NNN NNN NNN"):
+  // de aquí también sale el botón de WhatsApp, que necesita esos mismos
+  // dígitos con el prefijo para armar el enlace a wa.me — y ese botón SÍ
+  // lleva el número directo en el enlace (sin filtro de clic), porque no
+  // tiene sentido "revelar" un wa.me que ya funciona en cuanto se ve.
   contactPhone: "+34 600 000 000",
 
   // Tu ubicación, solo para la vista de servicios — pensada para

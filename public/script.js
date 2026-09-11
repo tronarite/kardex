@@ -391,20 +391,41 @@ const renderServices = (services) => {
  * initContactModal) sin duplicar el manejador de clic.
  */
 const initPhoneReveal = (config, ids = {}) => {
-  const gate = document.getElementById(ids.gate || "phone-gate");
   const revealBtn = document.getElementById(ids.revealBtn || "phone-reveal-btn");
+  const note = document.getElementById(ids.note || "phone-gate-note");
   const phoneLink = document.getElementById(ids.phoneLink || "phone-link");
   const phone = config.contactPhone;
 
-  if (!gate || !revealBtn || !phoneLink || !phone) return;
+  if (!revealBtn || !phoneLink || !phone) return;
 
   revealBtn.addEventListener("click", () => {
     phoneLink.textContent = phone;
     phoneLink.href = `tel:${phone.replace(/[^+\d]/g, "")}`;
     phoneLink.hidden = false;
-    gate.hidden = true;
+    revealBtn.hidden = true;
+    if (note) note.hidden = true;
     phoneLink.focus();
   });
+};
+
+/**
+ * Enlace directo a WhatsApp (wa.me), a partir del mismo
+ * SITE_CONFIG.contactPhone que usa initPhoneReveal — un único número que
+ * alimenta tanto el "mostrar teléfono" como este botón, en vez de pedir un
+ * campo de config aparte. wa.me solo necesita los dígitos con el prefijo
+ * de país, sin "+" ni espacios (contactPhone ya lo lleva, ej. "+34 600 000
+ * 000" → "34600000000"). A diferencia del teléfono, aquí no tiene sentido
+ * "ocultarlo hasta el clic": el número ya va en el propio href en cuanto
+ * se pinta la vista de servicios (ver initViewSwitcher), así que no
+ * aporta ninguna protección extra retrasar el href unos milisegundos más.
+ */
+const initWhatsApp = (config, ids = {}) => {
+  const link = document.getElementById(ids.link || "whatsapp-link");
+  const phone = config.contactPhone;
+  if (!link || !phone) return;
+
+  const digits = phone.replace(/\D/g, "");
+  link.href = `https://wa.me/${digits}`;
 };
 
 // ==========================================================================
@@ -428,7 +449,9 @@ const initViewSwitcher = (config) => {
   const main = document.getElementById("index");
   const kickerText = document.getElementById("kicker-text");
   const serviceExtra = document.getElementById("masthead-service-extra");
-  const phoneGate = document.getElementById("phone-gate");
+  const phoneRevealBtn = document.getElementById("phone-reveal-btn");
+  const phoneGateNote = document.getElementById("phone-gate-note");
+  const whatsappLink = document.getElementById("whatsapp-link");
   const phoneLink = document.getElementById("phone-link");
   const serviceLocation = document.getElementById("service-location");
   const locationText = document.getElementById("location-text");
@@ -463,10 +486,14 @@ const initViewSwitcher = (config) => {
     kickerText.textContent = isServices ? "SERVICIOS" : "ÍNDICE PERSONAL";
     if (serviceExtra) serviceExtra.hidden = !isServices;
 
-    // El teléfono solo tiene sentido en la vista de servicios; si ya se
-    // había revelado y se vuelve al índice, se oculta otra vez (no hay
-    // razón para dejarlo pintado fuera de contexto).
-    if (phoneGate) phoneGate.hidden = !isServices || !config.contactPhone;
+    // El teléfono (y WhatsApp, que sale del mismo número) solo tienen
+    // sentido en la vista de servicios; si el teléfono ya se había
+    // revelado y se vuelve al índice, se oculta otra vez (no hay razón
+    // para dejarlo pintado fuera de contexto).
+    const showPhoneActions = isServices && Boolean(config.contactPhone);
+    if (phoneRevealBtn) phoneRevealBtn.hidden = !showPhoneActions;
+    if (phoneGateNote) phoneGateNote.hidden = !showPhoneActions;
+    if (whatsappLink) whatsappLink.hidden = !showPhoneActions;
     if (phoneLink) phoneLink.hidden = true;
 
     // La ubicación solo se muestra en la vista de servicios y solo si hay
@@ -734,14 +761,16 @@ const initContactManager = (config, ids = {}) => {
 // Se abre al pulsar cualquier fila de la vista de servicios (ver
 // createServiceRow) — una versión más grande y centrada del bloque de
 // contacto del masthead, con sus propios elementos (wireados por separado
-// con initContactManager/initPhoneReveal de arriba, pasándoles los ids del
-// modal, para no duplicar la lógica de copiar/revelar teléfono).
+// con initContactManager/initPhoneReveal/initWhatsApp de arriba, pasándoles
+// los ids del modal, para no duplicar lógica).
 // ==========================================================================
 const initContactModal = (config) => {
   const backdrop = document.getElementById("contact-modal-backdrop");
   const modal = document.getElementById("contact-modal");
   const closeBtn = document.getElementById("contact-modal-close");
-  const phoneGate = document.getElementById("modal-phone-gate");
+  const phoneRevealBtn = document.getElementById("modal-phone-reveal-btn");
+  const phoneGateNote = document.getElementById("modal-phone-gate-note");
+  const whatsappLink = document.getElementById("modal-whatsapp-link");
   const phoneLink = document.getElementById("modal-phone-link");
 
   if (!backdrop || !modal || !closeBtn) return;
@@ -759,8 +788,12 @@ const initContactModal = (config) => {
 
     // Cada vez que se abre se resetea el teléfono a "sin revelar" — igual
     // que al cambiar de vista en el masthead, no tiene sentido dejarlo
-    // pintado de una apertura anterior.
-    if (phoneGate) phoneGate.hidden = !config.contactPhone;
+    // pintado de una apertura anterior. WhatsApp no se "revela", solo
+    // depende de si hay número configurado.
+    const hasPhone = Boolean(config.contactPhone);
+    if (phoneRevealBtn) phoneRevealBtn.hidden = !hasPhone;
+    if (phoneGateNote) phoneGateNote.hidden = !hasPhone;
+    if (whatsappLink) whatsappLink.hidden = !hasPhone;
     if (phoneLink) phoneLink.hidden = true;
 
     backdrop.hidden = false;
@@ -882,10 +915,12 @@ document.addEventListener("DOMContentLoaded", () => {
     copyStatus: "modal-copy-status",
   });
   initPhoneReveal(SITE_CONFIG, {
-    gate: "modal-phone-gate",
     revealBtn: "modal-phone-reveal-btn",
+    note: "modal-phone-gate-note",
     phoneLink: "modal-phone-link",
   });
+  initWhatsApp(SITE_CONFIG);
+  initWhatsApp(SITE_CONFIG, { link: "modal-whatsapp-link" });
   initContactModal(SITE_CONFIG);
   // Pinta la vista inicial (índice o servicios, según la URL) y deja
   // preparada la transición entre ambas — sustituye a la llamada directa a

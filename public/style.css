@@ -490,6 +490,26 @@ body {
   gap: 0.5rem;
 }
 
+/* Botones de acción (copiar correo, mostrar teléfono, WhatsApp): en fila
+   por defecto (pantalla estrecha, donde el masthead ocupa todo el ancho y
+   sobra sitio de sobra para varios botones uno junto a otro) y en columna
+   a partir de 860px, donde el masthead pasa a ser una columna lateral
+   estrecha (15.5rem) en la que una fila de 2-3 botones no cabría. */
+.contact-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (min-width: 860px) {
+  .contact-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 .contact-kicker {
   font-family: var(--font-mono);
   font-size: 0.65rem;
@@ -592,6 +612,67 @@ body {
 }
 
 .phone-reveal-btn--modal svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* display:inline-flex de arriba gana por especificidad al [hidden] del
+   user-agent stylesheet — el botón ahora se oculta/muestra directamente
+   (antes lo envolvía .phone-gate, que ya llevaba este mismo ajuste). */
+.phone-reveal-btn[hidden] {
+  display: none;
+}
+
+/* Mismo tratamiento que .phone-reveal-btn (borde discontinuo + icono en
+   el acento, para que se lea como "otra vía de contacto" y no como un
+   botón más de la misma familia que .copy-btn) — con su propio icono para
+   distinguirlo a simple vista del de teléfono. */
+.whatsapp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: transparent;
+  border: 1px dashed var(--accent);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.whatsapp-btn svg {
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.whatsapp-btn:hover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-style: solid;
+}
+
+.whatsapp-btn:focus-visible {
+  outline: 2px solid var(--line-strong);
+  outline-offset: 2px;
+}
+
+.whatsapp-btn[hidden] {
+  display: none;
+}
+
+.whatsapp-btn--modal {
+  font-size: 0.78rem;
+  padding: 0.55rem 0.9rem;
+}
+
+.whatsapp-btn--modal svg {
   width: 15px;
   height: 15px;
 }
@@ -1034,7 +1115,7 @@ body {
   gap: 1.75rem;
 }
 
-/* Ver el porqué de esta regla en .phone-gate[hidden] un poco más abajo:
+/* Ver el porqué de esta regla en .phone-reveal-btn[hidden] más arriba:
    mismo problema de especificidad contra el [hidden] del user-agent. */
 .masthead-service-extra[hidden] {
   display: none;
@@ -1074,21 +1155,6 @@ body {
 .back-link:focus-visible {
   outline: 2px solid var(--line-strong);
   outline-offset: 2px;
-}
-
-.phone-gate {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.35rem;
-  margin-top: 0.4rem;
-}
-
-/* display:flex de arriba gana por especificidad al [hidden] del user-agent
-   stylesheet (que solo pone display:none) — sin esto, ocultar el portón
-   tras revelar el teléfono no hacía nada visualmente. */
-.phone-gate[hidden] {
-  display: none;
 }
 
 .phone-gate-note {
@@ -1167,7 +1233,7 @@ body {
 }
 
 /* display:flex de arriba gana por especificidad al [hidden] del user-agent
-   stylesheet — mismo patrón que .phone-gate/.masthead-service-extra más arriba. */
+   stylesheet — mismo patrón que .phone-reveal-btn/.masthead-service-extra más arriba. */
 .modal-backdrop[hidden] {
   display: none;
 }
@@ -1229,7 +1295,7 @@ body {
   outline-offset: 2px;
 }
 
-/* Reutiliza .contact-kicker, .contact-email, .copy-btn, .phone-gate y
+/* Reutiliza .contact-kicker, .contact-email, .copy-btn, .contact-actions y
    .contact-phone tal cual (mismos componentes que el masthead) — estos
    modificadores solo agrandan la tipografía para que se lea bien como
    pieza central de la pantalla, no de refilón en una barra lateral. */

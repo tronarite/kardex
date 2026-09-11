@@ -118,24 +118,41 @@
         <a href="mailto:contacto@ejemplo.com" class="contact-email" id="contact-email-link">
           <span id="contact-email-text">contacto@ejemplo.com</span>
         </a>
-        <button id="copy-email-btn" class="copy-btn" aria-label="Copiar correo al portapapeles">
-          <span id="copy-btn-text">Copiar dirección</span>
-        </button>
-        <span class="visually-hidden" id="copy-status" role="status" aria-live="polite"></span>
+        <!-- Los botones de acción (copiar correo, mostrar teléfono, WhatsApp)
+             van en un contenedor propio para poder ponerlos en fila cuando
+             la pantalla es estrecha (ver .contact-actions en style.css) sin
+             afectar al resto de líneas del bloque de contacto. -->
+        <div class="contact-actions" id="contact-actions">
+          <button id="copy-email-btn" class="copy-btn" aria-label="Copiar correo al portapapeles">
+            <span id="copy-btn-text">Copiar dirección</span>
+          </button>
 
-        <!-- Solo se muestra en la vista de servicios y solo si hay
-             teléfono configurado. El número no se escribe en texto plano
-             hasta el clic — filtro básico contra bots que solo leen el
-             HTML, no una verificación real (ver initPhoneReveal). -->
-        <div class="phone-gate" id="phone-gate" hidden>
-          <button type="button" id="phone-reveal-btn" class="phone-reveal-btn">
+          <!-- Solo se muestra en la vista de servicios y solo si hay
+               teléfono configurado. El número no se escribe en texto plano
+               hasta el clic — filtro básico contra bots que solo leen el
+               HTML, no una verificación real (ver initPhoneReveal). -->
+          <button type="button" id="phone-reveal-btn" class="phone-reveal-btn" hidden>
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24 11.36 11.36 0 0 0 3.57.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.57 1 1 0 0 1-.25 1.01Z"/>
             </svg>
             Mostrar teléfono
           </button>
-          <p class="phone-gate-note">Un clic de por medio, para que no se lo lleve gratis cualquier bot que solo lea el HTML.</p>
+
+          <!-- Solo se muestra en la vista de servicios y solo si hay
+               teléfono configurado (ver initWhatsApp en script.js) — el
+               número va directo en el enlace, así que a diferencia del
+               botón de arriba no tiene sentido "ocultarlo" hasta el clic:
+               quien vea el botón ya puede leer el número en el propio
+               href. -->
+          <a href="#" id="whatsapp-link" class="whatsapp-btn" hidden target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-4.4 3.3A1 1 0 0 1 3 19.5V5a1 1 0 0 1 1-1Z"/>
+            </svg>
+            WhatsApp
+          </a>
         </div>
+        <span class="visually-hidden" id="copy-status" role="status" aria-live="polite"></span>
+        <p class="phone-gate-note" id="phone-gate-note" hidden>Un clic de por medio, para que no se lo lleve gratis cualquier bot que solo lea el HTML.</p>
         <a href="#" id="phone-link" class="contact-phone" hidden></a>
 
         <!-- Solo se muestra en la vista de servicios y solo si hay
@@ -278,20 +295,27 @@
       <a href="mailto:contacto@ejemplo.com" class="contact-email contact-email--modal" id="modal-contact-email-link">
         <span id="modal-contact-email-text">contacto@ejemplo.com</span>
       </a>
-      <button type="button" id="modal-copy-email-btn" class="copy-btn copy-btn--modal">
-        <span id="modal-copy-btn-text">Copiar dirección</span>
-      </button>
-      <span class="visually-hidden" id="modal-copy-status" role="status" aria-live="polite"></span>
+      <div class="contact-actions" id="modal-contact-actions">
+        <button type="button" id="modal-copy-email-btn" class="copy-btn copy-btn--modal">
+          <span id="modal-copy-btn-text">Copiar dirección</span>
+        </button>
 
-      <div class="phone-gate" id="modal-phone-gate" hidden>
-        <button type="button" id="modal-phone-reveal-btn" class="phone-reveal-btn phone-reveal-btn--modal">
+        <button type="button" id="modal-phone-reveal-btn" class="phone-reveal-btn phone-reveal-btn--modal" hidden>
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24 11.36 11.36 0 0 0 3.57.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.57 1 1 0 0 1-.25 1.01Z"/>
           </svg>
           Mostrar teléfono
         </button>
-        <p class="phone-gate-note">Un clic de por medio, para que no se lo lleve gratis cualquier bot que solo lea el HTML.</p>
+
+        <a href="#" id="modal-whatsapp-link" class="whatsapp-btn whatsapp-btn--modal" hidden target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-4.4 3.3A1 1 0 0 1 3 19.5V5a1 1 0 0 1 1-1Z"/>
+          </svg>
+          WhatsApp
+        </a>
       </div>
+      <span class="visually-hidden" id="modal-copy-status" role="status" aria-live="polite"></span>
+      <p class="phone-gate-note" id="modal-phone-gate-note" hidden>Un clic de por medio, para que no se lo lleve gratis cualquier bot que solo lea el HTML.</p>
       <a href="#" id="modal-phone-link" class="contact-phone contact-phone--modal" hidden></a>
     </div>
   </div>

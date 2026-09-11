@@ -247,7 +247,7 @@ const SERVICES = [
 
 Deliberadamente **no hay campo de precio ni de tarifa por hora**: la idea es que sean ejemplos orientativos de lo que sabes hacer, no un catálogo cerrado con tarifario. Al pulsar cualquier tarjeta se abre un modal de contacto ampliado (el mismo correo/teléfono del masthead, en grande) — quien esté interesado escribe y ahí se habla el alcance y el precio según cada caso.
 
-### Teléfono y ubicación (opcionales, solo en esta vista)
+### Teléfono, WhatsApp y ubicación (opcionales, solo en esta vista)
 Dos campos opcionales de `SITE_CONFIG` que **solo se muestran en la vista de servicios**, no en el índice principal:
 
 ```javascript
@@ -258,10 +258,12 @@ const SITE_CONFIG = {
 };
 ```
 
-- `contactPhone` no aparece en texto plano hasta que alguien pulsa "Mostrar teléfono" — un filtro básico contra bots que solo leen el HTML, **no una verificación real** (para eso haría falta un backend, que este sitio no tiene).
+- `contactPhone` alimenta DOS botones: "Mostrar teléfono" (el número no aparece en texto plano hasta el clic — un filtro básico contra bots que solo leen el HTML, **no una verificación real**, para eso haría falta un backend que este sitio no tiene) y "WhatsApp" (enlace directo a `wa.me` con ese mismo número — este SÍ lleva el número en el propio enlace desde que se pinta la vista, sin filtro de clic, porque no aporta protección extra retrasarlo). Escríbelo con el prefijo de país (`+34 ...`): de ahí sale el `wa.me/34...` del botón.
 - `location` es orientativa (ciudad/zona, o "Remoto"), no una dirección exacta.
 
 Si quitas cualquiera de los dos campos (o los dejas vacíos), esa parte simplemente no se muestra — no hace falta desactivar nada más.
+
+En pantallas estrechas, los botones de acción (copiar correo, teléfono, WhatsApp) se muestran en fila con salto de línea automático en vez de uno debajo de otro — a partir de 860px (donde el masthead pasa a ser una columna lateral angosta) vuelven a apilarse en columna (ver `.contact-actions` en `style.css`).
 
 ### Aparecer en buscadores y al compartir `/servicios`
 `/servicios` es una URL de verdad, no un `#hash`: tiene su propio `<title>`, meta description, `canonical`, entrada en `sitemap.xml` y tarjeta social (título "SERVICIOS", descripción e imagen con los 4 puntos a favor y sus iconos) — distinta de la del índice. Además, el `<noscript>` de esa página lleva la lista real de tus `SERVICES` (nombre + descripción), así que un crawler que no ejecuta JavaScript —o Google en su primer pase— ya ve contenido de verdad, no una página en blanco.
