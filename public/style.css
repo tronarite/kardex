@@ -1252,35 +1252,35 @@ body {
   text-decoration-color: var(--accent);
 }
 
-/* Mismo lenguaje visual que .back-link (borde + relleno tenue del
-   acento, sólido al pasar el ratón/foco) — los dos son botones de
-   acción del propio panel de detalle, así que deben pesar igual; un
-   poco más grande para que se note como el cierre del panel, no un
-   enlace de "seguir leyendo". */
+/* Mismo tratamiento que .phone-reveal-btn/.whatsapp-btn del sitio de
+   servicios aparte (marceloananga.neocities.org): borde discontinuo en
+   acento, sin relleno — se lee como "otra acción", no como un botón
+   sólido más de la misma familia que la insignia del precio. Al pasar
+   el ratón/foco el borde se cierra a línea continua y se rellena de un
+   tinte de acento, sin invertir a acento sólido/texto claro. */
 .service-detail-hablamos {
   display: inline-flex;
   align-items: center;
   align-self: flex-start;
   gap: 0.4rem;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--text-dim);
   background: transparent;
-  border: 2px dotted var(--line-strong);
+  border: 1px dashed var(--accent);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 0.7rem;
   border-radius: var(--radius);
-  padding: 0.45rem 0.8rem;
   margin-top: 0.5rem;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .service-detail-hablamos:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
-  transform: translateX(2px);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-style: solid;
 }
 
 .service-detail-hablamos:focus-visible {
@@ -1322,19 +1322,29 @@ body {
 }
 
 /* "← Volver a servicios" vive dentro del panel de detalle, junto a
-   "¿Hablamos?" (ver .service-detail-hablamos) — un pelín más pequeño que
-   el "← Volver al índice" del masthead (mismo .back-link), con borde de
-   puntos bien visible en vez de línea continua, y deliberadamente más
-   apagado (gris, sin relleno) que la insignia del precio — que los dos
-   no se confundan a simple vista. Al pasar el ratón/foco siguen
-   llenándose de acento como el resto de .back-link (herencia, sin
-   redefinir aquí). Sin tocar el .back-link de fuera del panel. */
+   "¿Hablamos?" (ver .service-detail-hablamos) — mismo tratamiento de
+   marceloananga.neocities.org: borde discontinuo en acento, sin
+   relleno, en vez de la línea continua/relleno tenue del
+   "← Volver al índice" del masthead (mismo .back-link, sin tocar esa
+   versión). Un pelín más pequeño, y el hover propio se queda en tinte +
+   borde continuo (no invierte a acento sólido como el resto de
+   .back-link). */
 .service-detail .back-link {
-  font-size: 0.72rem;
-  padding: 0.45rem 0.8rem;
-  color: var(--text-dim);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 0.7rem;
+  color: var(--accent);
   background: transparent;
-  border: 2px dotted var(--line-strong);
+  border: 1px dashed var(--accent);
+}
+
+.service-detail .back-link:hover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-style: solid;
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: none;
 }
 
 /* Ubicación — solo en la vista de servicios (ver
