@@ -1266,18 +1266,19 @@ body {
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border: 1.5px dotted var(--accent);
+  color: var(--text-dim);
+  background: transparent;
+  border: 2px dotted var(--line-strong);
   border-radius: var(--radius);
   padding: 0.45rem 0.8rem;
   margin-top: 0.5rem;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
 .service-detail-hablamos:hover {
   background: var(--accent);
+  border-color: var(--accent);
   color: var(--bg);
   transform: translateX(2px);
 }
@@ -1305,11 +1306,12 @@ body {
   border-radius: var(--radius);
   padding: 0.5rem 0.9rem;
   text-decoration: none;
-  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
 .back-link:hover {
   background: var(--accent);
+  border-color: var(--accent);
   color: var(--bg);
   transform: translateX(-2px);
 }
@@ -1321,13 +1323,18 @@ body {
 
 /* "← Volver a servicios" vive dentro del panel de detalle, junto a
    "¿Hablamos?" (ver .service-detail-hablamos) — un pelín más pequeño que
-   el "← Volver al índice" del masthead (mismo .back-link) y con borde de
-   puntos en vez de línea continua, para que los dos botones del panel
-   hagan pareja. Sin tocar el .back-link de fuera del panel. */
+   el "← Volver al índice" del masthead (mismo .back-link), con borde de
+   puntos bien visible en vez de línea continua, y deliberadamente más
+   apagado (gris, sin relleno) que la insignia del precio — que los dos
+   no se confundan a simple vista. Al pasar el ratón/foco siguen
+   llenándose de acento como el resto de .back-link (herencia, sin
+   redefinir aquí). Sin tocar el .back-link de fuera del panel. */
 .service-detail .back-link {
   font-size: 0.72rem;
   padding: 0.45rem 0.8rem;
-  border-style: dotted;
+  color: var(--text-dim);
+  background: transparent;
+  border: 2px dotted var(--line-strong);
 }
 
 /* Ubicación — solo en la vista de servicios (ver
