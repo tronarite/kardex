@@ -675,6 +675,14 @@ body {
   margin-bottom: 0.25rem;
 }
 
+/* display:flex de arriba gana por especificidad al [hidden] del
+   user-agent stylesheet — mismo patrón que .whatsapp-cta[hidden] y
+   compañía. Solo initServiceDetail oculta "#index-head" al entrar en el
+   detalle de un servicio (ver script.js). */
+.index-head[hidden] {
+  display: none;
+}
+
 /* Único elemento con scroll de toda la página (ver @media 860px de .page
    más arriba) — la entradilla y "N° ..." quedan fuera, así que nunca se
    mueven. El desvanecido (arriba Y abajo) es un mask-image sobre el
@@ -1143,6 +1151,55 @@ a.row-name:focus-visible {
 
 .masthead-back {
   margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Detalle de servicio (ver initServiceDetail en script.js) — sustituye
+   la lista dentro de ".index" al pulsar "Saber más"/el título de un
+   servicio, o al cargar "#servicio-slug" directamente.
+   -------------------------------------------------------------------------- */
+.service-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.service-detail[hidden] {
+  display: none;
+}
+
+.service-detail .index-head {
+  margin-top: 0.5rem;
+}
+
+/* .row-price está pensado para ir en línea junto a un título (margin-left
+   + vertical-align) — aquí va suelto en su propia línea, así que se
+   resetea esa parte y se deja un poco de aire respecto al título. */
+.service-detail-price {
+  display: block;
+  margin: -0.75rem 0 0;
+  vertical-align: baseline;
+}
+
+.service-detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  max-width: 46rem;
+}
+
+/* Bloque de contacto al final del detalle — mismo contenido que el modal
+   (nota "sin compromiso" + WhatsApp/correo/teléfono), pero incrustado
+   aquí en vez de flotando encima como modal: es el cierre natural de
+   "ya sabes de qué va, ¿hablamos?" en vez de una interrupción aparte. */
+.service-detail-contact {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  max-width: 32rem;
 }
 
 /* Antes era un enlace de texto discreto — ahora es el único camino de

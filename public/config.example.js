@@ -331,6 +331,15 @@ const UNITS = [
                                   indícalo solo si quieres una URL más
                                   corta o si el nombre cambia pero quieres
                                   mantener el mismo enlace.
+     details       Opcional      Al pulsar "Saber más" (o el propio
+                                  permalink) se abre un panel de detalle
+                                  para ESE servicio, con más contenido y
+                                  el bloque de contacto al final — "details"
+                                  es ese contenido largo (separa párrafos
+                                  con una línea en blanco). Si lo omites,
+                                  el detalle reutiliza "description" tal
+                                  cual, así que funciona ya mismo sin
+                                  escribir nada nuevo.
    ============================================================================ */
 const SERVICES = [
   {

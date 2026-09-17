@@ -171,6 +171,12 @@ const SERVICES_VIEW_URL = "/servicios";
 let goToServicesView = () => {};
 let goToIndexView = () => {};
 let openContactModal = () => {};
+let goToServiceDetail = () => {};
+
+// slug → service, reconstruida en cada renderServices() (ver createServiceRow)
+// — initServiceDetail la usa para resolver "#servicio-slug" sin recorrer
+// SERVICES otra vez.
+let serviceBySlug = new Map();
 
 const createUnitRow = (unit, index) => {
   const row = document.createElement("li");
@@ -345,23 +351,23 @@ const renderUnits = (units) => {
 // "priceRange" es opcional (igual que en UNITS/createUnitRow) — sin él,
 // la tarjeta queda como un ejemplo orientativo sin precio; con él, se
 // muestra junto al nombre con el mismo .row-price de siempre.
-// El CTA de cada fila no abre un mailto directo — lleva al bloque de
-// contacto del propio masthead (#contact-block), donde la persona elige
-// ella misma el canal (email, teléfono si lo revela...) en vez de que se lo
-// impongamos aquí.
 //
 // El nombre de cada servicio es un <h2> con un <a href="#servicio-slug">
 // propio (permalink real, con su "id" en el propio <h2>) — antes toda la
 // fila era un único <button> sin ningún encabezado ni ancla, así que
 // ningún servicio era una entidad direccionable/indexable por separado
-// (ver guía de SEO estructural). El CTA "¿Hablamos?" pasa a ser un
-// <button> aparte que abre el modal de contacto — antes ese mismo botón
-// envolvía toda la fila, lo que impedía anidar un <h2>/<a> dentro (el
-// modelo de contenido de <button> no admite encabezados ni enlaces).
+// (ver guía de SEO estructural). Tanto ese enlace como el botón "Saber
+// más" llevan al detalle de ESE servicio (ver initServiceDetail más
+// abajo) — un panel aparte, con más contenido y el bloque de contacto al
+// final, en vez de abrir el modal directo desde la lista. El <a> conserva
+// su href real (clic derecho, abrir en pestaña nueva, sin JS...); el
+// preventDefault solo evita el salto nativo cuando SÍ hay animación.
 // "slug" es opcional: si no se indica, sale de service.name (slugify);
-// "usedSlugs" evita ids duplicados si dos servicios generan el mismo slug.
+// "usedSlugs" evita ids duplicados si dos servicios generan el mismo slug;
+// "slugMap", si se pasa, guarda slug → service para que initServiceDetail
+// pueda resolver "#servicio-slug" sin recorrer SERVICES otra vez.
 // ==========================================================================
-const createServiceRow = (service, index, usedSlugs) => {
+const createServiceRow = (service, index, usedSlugs, slugMap) => {
   const row = document.createElement("li");
   row.className = "index-row animate-init";
 
@@ -377,11 +383,12 @@ const createServiceRow = (service, index, usedSlugs) => {
     slug = unique;
   }
   const anchorId = `servicio-${slug}`;
+  if (slugMap) slugMap.set(slug, service);
 
   // Reutiliza el layout en grid de .index-link (número/cuerpo/CTA), pero
   // ya no es un único elemento interactivo — ahora hay dos por separado
-  // (el permalink del título y el botón de contacto), así que es un <div>
-  // sin comportamiento propio.
+  // (el permalink del título y el botón "Saber más"), así que es un
+  // <div> sin comportamiento propio.
   const wrap = document.createElement("div");
   wrap.className = "index-link";
 
@@ -400,6 +407,9 @@ const createServiceRow = (service, index, usedSlugs) => {
   name.className = "row-name";
   name.href = `#${anchorId}`;
   name.textContent = service.name;
+  name.addEventListener("click", (event) => {
+    if (goToServiceDetail(slug, { animate: true })) event.preventDefault();
+  });
   head.appendChild(name);
 
   if (service.priceRange) {
@@ -421,8 +431,8 @@ const createServiceRow = (service, index, usedSlugs) => {
   const cta = document.createElement("button");
   cta.type = "button";
   cta.className = "row-url";
-  cta.textContent = "¿Hablamos? →";
-  cta.addEventListener("click", () => openContactModal(cta));
+  cta.textContent = "Saber más →";
+  cta.addEventListener("click", () => goToServiceDetail(slug, { animate: true }));
 
   wrap.appendChild(number);
   wrap.appendChild(body);
@@ -463,8 +473,9 @@ const renderServices = (services) => {
 
   container.innerHTML = "";
   const usedSlugs = new Set();
+  serviceBySlug = new Map();
   const rows = sorted.map((service, index) => {
-    const row = createServiceRow(service, index, usedSlugs);
+    const row = createServiceRow(service, index, usedSlugs, serviceBySlug);
     container.appendChild(row);
     return row;
   });
@@ -797,6 +808,222 @@ const initViewSwitcher = (config) => {
   page.classList.toggle("page--services", initialView === "services");
   paintView(initialView);
   currentView = initialView;
+};
+
+// ==========================================================================
+// DETALLE DE SERVICIO (ver createServiceRow más arriba)
+// Al pulsar el título o "Saber más" de un servicio — o al cargar/compartir
+// "#servicio-slug" directamente — se sustituye la lista de SERVICES
+// dentro del mismo "#index" por el detalle de ese servicio: el masthead
+// no se mueve, solo este panel, reutilizando el mismo mecanismo de
+// deslizamiento que initViewSwitcher (.panel-slide-left/-right) pero
+// sobre un único elemento en vez de dos en espejo. "forward" (a un
+// detalle) entra desde la derecha y sale por la izquierda; "backward" (a
+// la lista) es el espejo — convención habitual de "entrar/volver".
+//
+// El estado vive en el hash de la URL ("#servicio-slug"): permalink real
+// y compartible (con qrPortfolioName/QR aparte, esto era justo lo que
+// faltaba para que el hash hiciera algo más que un scroll — ver el
+// commit de la guía de SEO estructural), y el botón atrás del navegador
+// funciona gratis vía el evento "hashchange" nativo, sin pushState propio.
+// ==========================================================================
+const SERVICE_HASH_PREFIX = "#servicio-";
+
+let serviceDetailAnimating = false;
+let currentServiceSlug = null;
+
+const slugFromHash = () =>
+  location.hash.startsWith(SERVICE_HASH_PREFIX) ? location.hash.slice(SERVICE_HASH_PREFIX.length) : null;
+
+const SERVICE_PANEL_DIRECTIONS = {
+  forward: { out: "panel-slide-left", in: "panel-slide-right" },
+  backward: { out: "panel-slide-right", in: "panel-slide-left" },
+};
+
+// Mismos 4 pasos que goTo() en initViewSwitcher (salir → repintar fuera
+// de pantalla en el lado opuesto → forzar reflow → entrar), pero sobre
+// un solo elemento ("#index") en vez de masthead+index en espejo.
+const slideServicePanel = (direction, paint, focusId) => {
+  const main = document.getElementById("index");
+  const focusAfter = () => {
+    const el = focusId && document.getElementById(focusId);
+    if (el) el.focus();
+  };
+
+  if (!main || prefersReducedMotion()) {
+    paint();
+    focusAfter();
+    return;
+  }
+
+  const { out, in: inClass } = SERVICE_PANEL_DIRECTIONS[direction];
+  serviceDetailAnimating = true;
+  main.classList.add(out);
+
+  setTimeout(() => {
+    paint();
+
+    main.classList.add("no-transition");
+    main.classList.remove(out);
+    main.classList.add(inClass);
+    void main.offsetWidth;
+    main.classList.remove("no-transition");
+
+    requestAnimationFrame(() => {
+      main.classList.remove(inClass);
+    });
+
+    setTimeout(() => {
+      serviceDetailAnimating = false;
+      focusAfter();
+    }, VIEW_TRANSITION_MS);
+  }, VIEW_TRANSITION_MS);
+};
+
+// Sube al principio tanto el scroll contenido de "#index-scroll"
+// (layout de escritorio, ver @media 860px de .index) como el de la
+// propia página (móvil, donde no hay scroll contenido y es el
+// documento el que se desplaza) — cubre los dos casos sin necesidad de
+// saber en cuál está el visitante.
+const resetServiceScroll = () => {
+  const scrollArea = document.getElementById("index-scroll");
+  if (scrollArea) scrollArea.scrollTop = 0;
+  window.scrollTo(0, 0);
+};
+
+const paintServiceList = (config) => {
+  const indexHead = document.getElementById("index-head");
+  const servicesIntro = document.getElementById("services-intro");
+  const servicesHighlights = document.getElementById("services-highlights");
+  const indexScroll = document.getElementById("index-scroll");
+  const detail = document.getElementById("service-detail");
+
+  if (indexHead) indexHead.hidden = false;
+  if (servicesIntro) servicesIntro.hidden = false;
+  if (servicesHighlights) servicesHighlights.hidden = false;
+  if (indexScroll) indexScroll.hidden = false;
+  if (detail) detail.hidden = true;
+
+  document.title = config.operatorName ? `Servicios — ${config.operatorName}` : "Servicios";
+  currentServiceSlug = null;
+  resetServiceScroll();
+};
+
+// "details" es el contenido largo opcional del detalle (separado en
+// párrafos por líneas en blanco, igual que un textarea normal); sin él,
+// se reutiliza "description" tal cual — así el detalle funciona ya
+// mismo con el SERVICES que tengas, sin escribir nada nuevo.
+const paintServiceDetailView = (config, service, slug) => {
+  const indexHead = document.getElementById("index-head");
+  const servicesIntro = document.getElementById("services-intro");
+  const servicesHighlights = document.getElementById("services-highlights");
+  const indexScroll = document.getElementById("index-scroll");
+  const detail = document.getElementById("service-detail");
+  const titleEl = document.getElementById("service-detail-title");
+  const priceEl = document.getElementById("service-detail-price");
+  const bodyEl = document.getElementById("service-detail-body");
+
+  if (indexHead) indexHead.hidden = true;
+  if (servicesIntro) servicesIntro.hidden = true;
+  if (servicesHighlights) servicesHighlights.hidden = true;
+  if (indexScroll) indexScroll.hidden = true;
+  if (detail) detail.hidden = false;
+
+  if (titleEl) titleEl.textContent = service.name;
+
+  if (priceEl) {
+    priceEl.hidden = !service.priceRange;
+    priceEl.textContent = service.priceRange || "";
+  }
+
+  if (bodyEl) {
+    bodyEl.innerHTML = "";
+    const text = service.details || service.description || "";
+    text.split(/\n{2,}/).forEach((paragraph) => {
+      if (!paragraph.trim()) return;
+      const p = document.createElement("p");
+      p.className = "row-desc";
+      p.textContent = paragraph.trim();
+      bodyEl.appendChild(p);
+    });
+  }
+
+  document.title = `${service.name} — ${config.operatorName || "Servicios"}`;
+  currentServiceSlug = slug;
+  resetServiceScroll();
+};
+
+const initServiceDetail = (config) => {
+  initWhatsApp(config, { link: "detail-whatsapp-link" });
+  initContactManager(config, {
+    emailLink: "detail-contact-email-link",
+    emailText: "detail-contact-email-text",
+    copyStatus: "detail-copy-status",
+  });
+  initPhoneCopy(config, {
+    phoneLink: "detail-phone-link",
+    phoneText: "detail-phone-text",
+    copyStatus: "detail-copy-status",
+  });
+
+  // initWhatsApp/initPhoneCopy solo rellenan href/texto — el mismo
+  // "hasPhone" que decide si se muestran en el masthead/modal (ver
+  // applyServicesContent/initContactModal) decide si se muestran aquí.
+  // No cambia durante la sesión, así que basta con hacerlo una vez.
+  const hasPhone = Boolean(config.contactPhone);
+  const detailWhatsapp = document.getElementById("detail-whatsapp-link");
+  const detailPhone = document.getElementById("detail-phone-link");
+  if (detailWhatsapp) detailWhatsapp.hidden = !hasPhone;
+  if (detailPhone) detailPhone.hidden = !hasPhone;
+
+  const backLink = document.getElementById("service-detail-back");
+
+  // Devuelve true si "slug" es un servicio real (para que quien haga
+  // clic en el permalink/CTA pueda cancelar el salto nativo del <a> solo
+  // cuando de verdad vamos a manejarlo nosotros). Cambia el hash y deja
+  // que "hashchange" (más abajo) dispare la animación — así el botón
+  // atrás del navegador reutiliza exactamente el mismo camino.
+  goToServiceDetail = (slug) => {
+    if (!serviceBySlug.has(slug)) return false;
+    if (!serviceDetailAnimating && slug !== currentServiceSlug) {
+      location.hash = `${SERVICE_HASH_PREFIX}${slug}`;
+    }
+    return true;
+  };
+
+  const goBackToList = () => {
+    if (serviceDetailAnimating || currentServiceSlug === null) return;
+    if (location.hash) history.pushState(null, "", location.pathname);
+    slideServicePanel("backward", () => paintServiceList(config), "content-title");
+  };
+
+  if (backLink) {
+    backLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      goBackToList();
+    });
+  }
+
+  window.addEventListener("hashchange", () => {
+    const slug = slugFromHash();
+    if (slug && serviceBySlug.has(slug)) {
+      if (slug === currentServiceSlug || serviceDetailAnimating) return;
+      slideServicePanel(
+        "forward",
+        () => paintServiceDetailView(config, serviceBySlug.get(slug), slug),
+        "service-detail-title"
+      );
+    } else if (currentServiceSlug !== null) {
+      slideServicePanel("backward", () => paintServiceList(config), "content-title");
+    }
+  });
+
+  // Enlace compartido directo a "#servicio-slug": pinta el detalle ya
+  // abierto, sin animación — igual que "initialView" en initViewSwitcher.
+  const initialSlug = slugFromHash();
+  if (initialSlug && serviceBySlug.has(initialSlug)) {
+    paintServiceDetailView(config, serviceBySlug.get(initialSlug), initialSlug);
+  }
 };
 
 // ==========================================================================
@@ -1208,6 +1435,11 @@ document.addEventListener("DOMContentLoaded", () => {
       // de "volver al índice" (no hay a qué volver).
       applyServicesContent(SITE_CONFIG);
     }
+
+    // Después de pintar índice/servicios (renderServices ya corrió y
+    // "serviceBySlug" está listo) — si la URL ya trae "#servicio-slug"
+    // (enlace compartido), initServiceDetail pinta ese detalle abierto.
+    initServiceDetail(SITE_CONFIG);
   } else {
     renderUnits(UNITS);
   }
