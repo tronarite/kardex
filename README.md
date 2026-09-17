@@ -256,11 +256,14 @@ const SERVICES = [
     description: "En qué consiste, con el detalle que quieras.",
     priceRange: "Desde 30€",   // opcional; si lo quitas, queda como ejemplo orientativo sin precio
     slug: "nombre-del-servicio", // opcional; ver más abajo
+    details: "Contenido largo opcional, aparte de \"description\".\n\nSepara párrafos con una línea en blanco.", // opcional; ver más abajo
   },
 ];
 ```
 
-El nombre de cada servicio no es solo texto: es un `<h2>` con su propio permalink real a `#servicio-<slug>` (el `<a>` lleva el `href`, el `<h2>` el `id`) — así cada servicio es una entidad enlazable e indexable por separado, no una fila más de una página sin URLs propias. Si no indicas `slug`, sale solo a partir de `name` (sin tildes/mayúsculas, espacios → guiones); indícalo a mano solo si quieres una URL más corta o si vas a cambiar el nombre pero quieres conservar el mismo enlace. El botón "¿Hablamos?" de cada tarjeta es aparte del permalink: abre el modal de contacto ampliado (el mismo correo/teléfono del masthead, en grande) — quien esté interesado escribe y ahí se habla el alcance y el precio si no lo has puesto ya en `priceRange`.
+El nombre de cada servicio no es solo texto: es un `<h2>` con su propio permalink real a `#servicio-<slug>` (el `<a>` lleva el `href`, el `<h2>` el `id`) — así cada servicio es una entidad enlazable e indexable por separado, no una fila más de una página sin URLs propias. Si no indicas `slug`, sale solo a partir de `name` (sin tildes/mayúsculas, espacios → guiones); indícalo a mano solo si quieres una URL más corta o si vas a cambiar el nombre pero quieres conservar el mismo enlace.
+
+Toda la tarjeta se puede pulsar para desplegar `details` justo debajo de `description` (con animación, sin recargar ni navegar) — la corta se ve siempre, la larga solo si la despliegas y solo si la has escrito; sin `details`, la tarjeta simplemente no se despliega. El botón "¿Hablamos?" es aparte de eso (su propio clic no despliega ni recoge la tarjeta): abre el modal de contacto ampliado (el mismo correo/teléfono del masthead, en grande) — quien esté interesado escribe y ahí se habla el alcance y el precio si no lo has puesto ya en `priceRange`.
 
 ### Los 4 puntos a favor (`servicesHighlights`)
 El bloque de icono + etiqueta + texto que aparece encima del listado también es editable, con `SITE_CONFIG.servicesHighlights`:

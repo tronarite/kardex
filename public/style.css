@@ -675,14 +675,6 @@ body {
   margin-bottom: 0.25rem;
 }
 
-/* display:flex de arriba gana por especificidad al [hidden] del
-   user-agent stylesheet — mismo patrón que .whatsapp-cta[hidden] y
-   compañía. Solo initServiceDetail oculta "#index-head" al entrar en el
-   detalle de un servicio (ver script.js). */
-.index-head[hidden] {
-  display: none;
-}
-
 /* Único elemento con scroll de toda la página (ver @media 860px de .page
    más arriba) — la entradilla y "N° ..." quedan fuera, así que nunca se
    mueven. El desvanecido (arriba Y abajo) es un mask-image sobre el
@@ -790,12 +782,13 @@ body {
 
 /* .index-link es el layout en grid (número/cuerpo/CTA) de cada fila. En
    el índice de proyectos sigue siendo un único <a> interactivo; en
-   servicios ya no envuelve un solo <button> — es un <div> sin
-   comportamiento propio, porque dentro lleva DOS elementos interactivos
-   por separado (el permalink <a> del título y el <button> de contacto,
-   ver createServiceRow) en vez de uno que lo cubra todo. Estos resets de
-   fondo/borde/cursor no molestan al <div>, solo hacen que un <a>/<button>
-   se vean idénticos cuando SÍ es el propio .index-link el interactivo. */
+   servicios es un <div> — dentro lleva el permalink <a> del título y el
+   <button> "¿Hablamos?" por separado (ver createServiceRow), y la caja
+   entera despliega "details" al pulsarla si el servicio lo tiene (ver
+   .index-link--expandable, que es quien pone el cursor de mano — sin
+   "details" no hay nada que desplegar, así que no lo lleva). Estos
+   resets de fondo/borde no molestan al <div>, solo hacen que un <a> se
+   vea igual cuando SÍ es el propio .index-link el interactivo (índice). */
 .index-link {
   display: grid;
   grid-template-columns: 2.25rem 1fr auto;
@@ -810,8 +803,11 @@ body {
   color: inherit;
   text-decoration: none;
   outline: none;
-  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+}
+
+.index-link--expandable {
+  cursor: pointer;
 }
 
 @media (max-width: 620px) {
@@ -966,6 +962,42 @@ a.row-name:focus-visible {
     grid-column: 2 / -1;
     white-space: normal;
   }
+}
+
+/* "¿Hablamos?" de servicios ya no es un hijo directo del grid de
+   .index-link (ver .row-url arriba, pensado para eso en el índice de
+   proyectos) — vive dentro de .row-body, así que "grid-column" de arriba
+   no le afecta (inocuo) y hace falta este ajuste aparte: alineado a la
+   izquierda como el resto del texto, no centrado (align-self de
+   .row-url asume ser un hijo de grid), con hueco respecto a lo de arriba. */
+.row-hablamos {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+}
+
+/* Contenido largo opcional de un servicio ("details", aparte de la
+   "description" corta de siempre) — oculto por defecto, se despliega al
+   pulsar la fila (ver createServiceRow) con la misma técnica que un
+   <details> nativo pero animada: grid-template-rows en vez de max-height,
+   porque no hace falta adivinar ni medir la altura del contenido. */
+.row-expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  transition: grid-template-rows 0.3s ease;
+}
+
+.row-expand-inner {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-top: 0.5rem;
+}
+
+.row-expand.is-open {
+  grid-template-rows: 1fr;
 }
 
 .index-row:hover .row-url {
@@ -1151,55 +1183,6 @@ a.row-name:focus-visible {
 
 .masthead-back {
   margin: 0;
-}
-
-/* --------------------------------------------------------------------------
-   Detalle de servicio (ver initServiceDetail en script.js) — sustituye
-   la lista dentro de ".index" al pulsar "Saber más"/el título de un
-   servicio, o al cargar "#servicio-slug" directamente.
-   -------------------------------------------------------------------------- */
-.service-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.service-detail[hidden] {
-  display: none;
-}
-
-.service-detail .index-head {
-  margin-top: 0.5rem;
-}
-
-/* .row-price está pensado para ir en línea junto a un título (margin-left
-   + vertical-align) — aquí va suelto en su propia línea, así que se
-   resetea esa parte y se deja un poco de aire respecto al título. */
-.service-detail-price {
-  display: block;
-  margin: -0.75rem 0 0;
-  vertical-align: baseline;
-}
-
-.service-detail-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-  max-width: 46rem;
-}
-
-/* Bloque de contacto al final del detalle — mismo contenido que el modal
-   (nota "sin compromiso" + WhatsApp/correo/teléfono), pero incrustado
-   aquí en vez de flotando encima como modal: es el cierre natural de
-   "ya sabes de qué va, ¿hablamos?" en vez de una interrupción aparte. */
-.service-detail-contact {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.6rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--line);
-  max-width: 32rem;
 }
 
 /* Antes era un enlace de texto discreto — ahora es el único camino de
