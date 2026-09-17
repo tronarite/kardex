@@ -331,16 +331,17 @@ const UNITS = [
                                   indícalo solo si quieres una URL más
                                   corta o si el nombre cambia pero quieres
                                   mantener el mismo enlace.
-     details       Opcional      Toda la tarjeta del servicio se puede
-                                  pulsar para desplegar contenido extra
-                                  debajo de "description" (separa párrafos
-                                  con una línea en blanco) — la corta se ve
-                                  siempre, la larga solo si la despliegas.
-                                  Si lo omites, la tarjeta no se despliega
-                                  (no hay nada de más que enseñar); el
-                                  botón "¿Hablamos?" de cada tarjeta no
-                                  depende de esto, sigue abriendo el modal
-                                  de contacto tenga o no "details".
+     details       Opcional      Toda tarjeta de servicio se puede pulsar
+                                  para desplegar el botón "¿Hablamos?"
+                                  (que abre el modal de contacto) junto
+                                  con contenido extra debajo de
+                                  "description", si lo has escrito aquí
+                                  (separa párrafos con una línea en
+                                  blanco) — la corta se ve siempre, la
+                                  larga solo al desplegar. Sin "details"
+                                  la tarjeta se despliega igual, solo que
+                                  no hay párrafos de más, nada más que el
+                                  botón "¿Hablamos?".
    ============================================================================ */
 const SERVICES = [
   {

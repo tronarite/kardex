@@ -966,20 +966,23 @@ a.row-name:focus-visible {
 
 /* "¿Hablamos?" de servicios ya no es un hijo directo del grid de
    .index-link (ver .row-url arriba, pensado para eso en el índice de
-   proyectos) — vive dentro de .row-body, así que "grid-column" de arriba
-   no le afecta (inocuo) y hace falta este ajuste aparte: alineado a la
-   izquierda como el resto del texto, no centrado (align-self de
-   .row-url asume ser un hijo de grid), con hueco respecto a lo de arriba. */
+   proyectos) — vive dentro de .row-expand-inner (ver más abajo), junto a
+   "details" si lo hay, así que "grid-column" de arriba no le afecta
+   (inocuo) y hace falta este ajuste aparte: alineado a la izquierda
+   como el resto del texto, no centrado (align-self de .row-url asume
+   ser un hijo de grid). El hueco respecto a lo de arriba ya lo pone el
+   "gap" de .row-expand-inner. */
 .row-hablamos {
   align-self: flex-start;
-  margin-top: 0.5rem;
 }
 
-/* Contenido largo opcional de un servicio ("details", aparte de la
-   "description" corta de siempre) — oculto por defecto, se despliega al
-   pulsar la fila (ver createServiceRow) con la misma técnica que un
-   <details> nativo pero animada: grid-template-rows en vez de max-height,
-   porque no hace falta adivinar ni medir la altura del contenido. */
+/* Lo que aparece al desplegar una fila de servicio: "details" (el
+   contenido largo, aparte de la "description" corta de siempre, si el
+   servicio lo tiene) y el botón "¿Hablamos?" — oculto por defecto, se
+   despliega al pulsar la fila (ver createServiceRow) con la misma
+   técnica que un <details> nativo pero animada: grid-template-rows en
+   vez de max-height, porque no hace falta adivinar ni medir la altura
+   del contenido. */
 .row-expand {
   display: grid;
   grid-template-rows: 0fr;

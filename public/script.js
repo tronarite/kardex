@@ -356,13 +356,14 @@ const renderUnits = (units) => {
 // servicio es una entidad direccionable/indexable por separado, no solo
 // una fila más de una página única (ver guía de SEO estructural).
 //
-// Toda la caja (".index-link") es clicable para desplegar "details"
-// (el contenido largo, aparte de "description") en el sitio, sin
-// navegar a ningún lado — solo si el servicio tiene "details"; si no,
-// la caja no se despliega (no hay nada que enseñar de más). El botón
-// "¿Hablamos?" es aparte, con su propio "stopPropagation" para no
-// disparar el despliegue a la vez, y abre el modal de contacto de
-// siempre (ver openContactModal/initContactModal).
+// Toda la caja (".index-link") es clicable para desplegar el servicio:
+// dentro aparecen "details" (el contenido largo, aparte de
+// "description" — si el servicio lo tiene) Y el botón "¿Hablamos?", que
+// solo vive ahí, no en la fila cerrada — entrar al detalle es lo que
+// habilita poder escribir, no algo que esté siempre a la vista. Su
+// propio "stopPropagation" evita que un clic en el botón vuelva a
+// plegar la fila a la vez; abre el modal de contacto de siempre (ver
+// openContactModal/initContactModal).
 // "slug" es opcional: si no se indica, sale de service.name (slugify);
 // "usedSlugs" evita ids duplicados si dos servicios generan el mismo slug;
 // "slugMap", si se pasa, guarda slug → service para que renderServices
@@ -423,27 +424,21 @@ const createServiceRow = (service, index, usedSlugs, slugMap) => {
   }
 
   // "details" es opcional y aparte de "description": la corta se ve
-  // siempre, la larga solo si existe y la caja está desplegada.
-  if (service.details) {
-    const expand = document.createElement("div");
-    expand.className = "row-expand";
+  // siempre, la larga (si existe) y "¿Hablamos?" solo al desplegar la
+  // fila — por eso viven juntos dentro de ".row-expand", no la una fuera
+  // y el otro dentro.
+  const expand = document.createElement("div");
+  expand.className = "row-expand";
 
-    const inner = document.createElement("div");
-    inner.className = "row-expand-inner";
+  const inner = document.createElement("div");
+  inner.className = "row-expand-inner";
+  if (service.details) {
     service.details.split(/\n{2,}/).forEach((paragraph) => {
       if (!paragraph.trim()) return;
       const p = document.createElement("p");
       p.className = "row-desc";
       p.textContent = paragraph.trim();
       inner.appendChild(p);
-    });
-
-    expand.appendChild(inner);
-    body.appendChild(expand);
-
-    wrap.classList.add("index-link--expandable");
-    wrap.addEventListener("click", () => {
-      expand.classList.toggle("is-open");
     });
   }
 
@@ -455,7 +450,15 @@ const createServiceRow = (service, index, usedSlugs, slugMap) => {
     event.stopPropagation();
     openContactModal(cta);
   });
-  body.appendChild(cta);
+  inner.appendChild(cta);
+
+  expand.appendChild(inner);
+  body.appendChild(expand);
+
+  wrap.classList.add("index-link--expandable");
+  wrap.addEventListener("click", () => {
+    expand.classList.toggle("is-open");
+  });
 
   wrap.appendChild(number);
   wrap.appendChild(body);
