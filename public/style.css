@@ -1231,6 +1231,17 @@ body {
   outline-offset: 2px;
 }
 
+/* Línea de apoyo bajo "CONTACTO" que quita presión antes de que la
+   persona elija canal — solo aparece aquí (el modal es donde alguien
+   duda si escribir), no en el bloque de contacto del masthead. */
+.contact-modal-note {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-body);
+  line-height: 1.45;
+  margin: -0.3rem 0 0;
+}
+
 /* Reutiliza .contact-kicker, .contact-email, .contact-actions y
    .contact-phone tal cual (mismos componentes que el masthead) — estos
    modificadores solo agrandan la tipografía para que se lea bien como
