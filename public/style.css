@@ -1258,14 +1258,14 @@ body {
   align-self: flex-start;
   gap: 0.4rem;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--accent);
   background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border: 1.5px solid var(--accent);
+  border: 1.5px dotted var(--accent);
   border-radius: var(--radius);
-  padding: 0.6rem 1.1rem;
+  padding: 0.45rem 0.8rem;
   margin-top: 0.5rem;
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
@@ -1312,6 +1312,17 @@ body {
 .back-link:focus-visible {
   outline: 2px solid var(--line-strong);
   outline-offset: 2px;
+}
+
+/* "← Volver a servicios" vive dentro del panel de detalle, junto a
+   "¿Hablamos?" (ver .service-detail-hablamos) — un pelín más pequeño que
+   el "← Volver al índice" del masthead (mismo .back-link) y con borde de
+   puntos en vez de línea continua, para que los dos botones del panel
+   hagan pareja. Sin tocar el .back-link de fuera del panel. */
+.service-detail .back-link {
+  font-size: 0.72rem;
+  padding: 0.45rem 0.8rem;
+  border-style: dotted;
 }
 
 /* Ubicación — solo en la vista de servicios (ver
