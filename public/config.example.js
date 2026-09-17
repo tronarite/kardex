@@ -332,16 +332,18 @@ const UNITS = [
                                   corta o si el nombre cambia pero quieres
                                   mantener el mismo enlace.
      details       Opcional      Toda tarjeta de servicio se puede pulsar
-                                  para desplegar el botón "¿Hablamos?"
-                                  (que abre el modal de contacto) junto
-                                  con contenido extra debajo de
-                                  "description", si lo has escrito aquí
-                                  (separa párrafos con una línea en
-                                  blanco) — la corta se ve siempre, la
-                                  larga solo al desplegar. Sin "details"
-                                  la tarjeta se despliega igual, solo que
-                                  no hay párrafos de más, nada más que el
-                                  botón "¿Hablamos?".
+                                  y lleva al detalle de ESE servicio (la
+                                  misma "otra ventana" que aparece al
+                                  cambiar entre índice y servicios, pero
+                                  para un solo servicio) — ahí se ve
+                                  "description" y, justo debajo, "details"
+                                  si lo has escrito aquí (separa párrafos
+                                  con una línea en blanco): la corta
+                                  siempre, la larga solo dentro del
+                                  detalle. Al final del detalle hay un
+                                  botón discreto "¿Hablamos?" que abre el
+                                  modal de contacto — no depende de
+                                  "details", sigue ahí aunque lo omitas.
    ============================================================================ */
 const SERVICES = [
   {

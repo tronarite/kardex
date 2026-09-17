@@ -194,7 +194,7 @@
            script.js) — no hay tarjetas fijas aquí. -->
       <div class="services-highlights" id="services-highlights" hidden></div>
 
-      <div class="index-head">
+      <div class="index-head" id="index-head">
         <span class="index-head-number" aria-hidden="true">N°</span>
         <span class="index-head-title" id="content-title" tabindex="-1">PROYECTOS Y ENLACES</span>
       </div>
@@ -213,6 +213,32 @@
         </ol>
 
         <p class="row-desc" id="services-empty" hidden>Todavía no hay servicios listados aquí.</p>
+      </div>
+
+      <!-- Detalle de un servicio (ver initServiceDetail en script.js):
+           al pulsar cualquier parte de una fila, o al cargar/compartir
+           "#servicio-<slug>" directamente, esto sustituye la lista
+           dentro del mismo ".index" — el masthead no se mueve, solo
+           este bloque, con el mismo deslizamiento que la transición
+           índice↔servicios pero en un solo panel. El botón "¿Hablamos?"
+           del final es deliberadamente discreto (mismo estilo que el de
+           cada fila) — solo abre el modal de contacto de siempre, no
+           repite aquí ese contenido. Rellenado en tiempo de ejecución,
+           nunca a mano. -->
+      <div class="service-detail" id="service-detail" hidden>
+        <p class="masthead-back">
+          <a href="#" class="back-link" id="service-detail-back">← Volver a servicios</a>
+        </p>
+
+        <div class="index-head">
+          <span class="index-head-number" aria-hidden="true">N°</span>
+          <span class="index-head-title" id="service-detail-title" tabindex="-1"></span>
+        </div>
+        <p class="row-price service-detail-price" id="service-detail-price" hidden></p>
+
+        <div class="service-detail-body" id="service-detail-body"></div>
+
+        <button type="button" class="row-url row-hablamos service-detail-hablamos" id="service-detail-hablamos">¿Hablamos? →</button>
       </div>
 
       <!-- Alternativa accesible para navegadores/crawlers sin JavaScript
