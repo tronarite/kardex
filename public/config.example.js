@@ -320,6 +320,17 @@ const UNITS = [
                                   esté interesado escribe (correo, teléfono
                                   o el canal que prefieras) y ahí se habla
                                   el alcance y el precio según cada caso.
+     slug          Opcional      El nombre del servicio es un permalink
+                                  real a "#servicio-<slug>" (con su propio
+                                  <h2 id>, no solo texto suelto) — así cada
+                                  servicio es una entidad enlazable/
+                                  indexable por separado, no solo una fila
+                                  más de una página única. Si lo omites,
+                                  el slug sale solo del nombre (sin
+                                  tildes/mayúsculas, espacios → guiones);
+                                  indícalo solo si quieres una URL más
+                                  corta o si el nombre cambia pero quieres
+                                  mantener el mismo enlace.
    ============================================================================ */
 const SERVICES = [
   {

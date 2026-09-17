@@ -252,13 +252,15 @@ Cada bloque de `SERVICES` en `config.js` es una tarjeta de la vista. Solo `name`
 const SERVICES = [
   {
     name: "NOMBRE DEL SERVICIO",
-    order: 1,   // opcional, igual que en UNITS
+    order: 1,          // opcional, igual que en UNITS
     description: "En qué consiste, con el detalle que quieras.",
+    priceRange: "Desde 30€",   // opcional; si lo quitas, queda como ejemplo orientativo sin precio
+    slug: "nombre-del-servicio", // opcional; ver más abajo
   },
 ];
 ```
 
-Deliberadamente **no hay campo de precio ni de tarifa por hora**: la idea es que sean ejemplos orientativos de lo que sabes hacer, no un catálogo cerrado con tarifario. Al pulsar cualquier tarjeta se abre un modal de contacto ampliado (el mismo correo/teléfono del masthead, en grande) — quien esté interesado escribe y ahí se habla el alcance y el precio según cada caso.
+El nombre de cada servicio no es solo texto: es un `<h2>` con su propio permalink real a `#servicio-<slug>` (el `<a>` lleva el `href`, el `<h2>` el `id`) — así cada servicio es una entidad enlazable e indexable por separado, no una fila más de una página sin URLs propias. Si no indicas `slug`, sale solo a partir de `name` (sin tildes/mayúsculas, espacios → guiones); indícalo a mano solo si quieres una URL más corta o si vas a cambiar el nombre pero quieres conservar el mismo enlace. El botón "¿Hablamos?" de cada tarjeta es aparte del permalink: abre el modal de contacto ampliado (el mismo correo/teléfono del masthead, en grande) — quien esté interesado escribe y ahí se habla el alcance y el precio si no lo has puesto ya en `priceRange`.
 
 ### Los 4 puntos a favor (`servicesHighlights`)
 El bloque de icono + etiqueta + texto que aparece encima del listado también es editable, con `SITE_CONFIG.servicesHighlights`:

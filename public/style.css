@@ -780,9 +780,14 @@ body {
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
-/* .index-link también se usa en la vista de servicios como <button> (abre
-   el modal de contacto en vez de navegar) — estos resets no afectan a su
-   uso normal como <a>, solo hacen que un <button> se vea idéntico. */
+/* .index-link es el layout en grid (número/cuerpo/CTA) de cada fila. En
+   el índice de proyectos sigue siendo un único <a> interactivo; en
+   servicios ya no envuelve un solo <button> — es un <div> sin
+   comportamiento propio, porque dentro lleva DOS elementos interactivos
+   por separado (el permalink <a> del título y el <button> de contacto,
+   ver createServiceRow) en vez de uno que lo cubra todo. Estos resets de
+   fondo/borde/cursor no molestan al <div>, solo hacen que un <a>/<button>
+   se vean idénticos cuando SÍ es el propio .index-link el interactivo. */
 .index-link {
   display: grid;
   grid-template-columns: 2.25rem 1fr auto;
@@ -808,18 +813,25 @@ body {
   }
 }
 
+/* Cubre tanto que .index-link SEA el elemento con foco (índice de
+   proyectos, un único <a>) como que el foco esté en alguno de sus hijos
+   interactivos (servicios: el <a> del título o el <button> de
+   contacto) — de ahí las dos formas del :has() de abajo. */
 .index-row:hover,
-.index-link:focus-visible {
+.index-link:focus-visible,
+.index-row:has(.index-link :focus-visible) {
   background-color: var(--surface-hover);
 }
 
 .index-row:hover::before,
-.index-row:has(.index-link:focus-visible)::before {
+.index-row:has(.index-link:focus-visible)::before,
+.index-row:has(.index-link :focus-visible)::before {
   opacity: 1;
   transform: scaleY(1);
 }
 
-.index-link:focus-visible {
+.index-link:focus-visible,
+.index-link :focus-visible {
   outline: 2px solid var(--line-strong);
   outline-offset: -2px;
 }
@@ -862,17 +874,36 @@ body {
    línea, la etiqueta de estado (y el precio, si lo hay) quedan pegados a
    la derecha de la última palabra del título en vez de bajar solos a una
    línea aparte — el mismo comportamiento que tendría cualquier texto
-   seguido de un elemento en línea. */
+   seguido de un elemento en línea. En servicios, .row-head es un <h2>
+   (antes un <span> decorativo) — el margen de un h2 rompería el "gap" de
+   .row-body, así que se resetea a 0; el tamaño/peso de letra los pone
+   .row-name (el <a> de dentro), no el propio <h2>. */
 .row-head {
   display: block;
+  margin: 0;
+  font: inherit;
 }
 
+/* En el índice de proyectos sigue siendo un <span> decorativo dentro de
+   un <a> que ya envuelve toda la fila (createUnitRow); en servicios es
+   el permalink real del título — un <a href="#servicio-slug"> propio
+   (createServiceRow) — de ahí el reset de "text-decoration" y el
+   subrayado solo al pasar el ratón/foco, para que no se lea como un
+   enlace azul de toda la vida en ninguno de los dos casos. */
 .row-name {
   font-family: var(--font-display);
   font-size: 1.05rem;
   font-weight: 500;
   color: var(--text);
   letter-spacing: -0.005em;
+  text-decoration: none;
+}
+
+a.row-name:hover,
+a.row-name:focus-visible {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1.5px;
 }
 
 .row-flag {
@@ -901,12 +932,24 @@ body {
   max-width: 46rem;
 }
 
+/* En el índice de proyectos sigue siendo un <span> decorativo (toda la
+   fila ya es un <a>, ver createUnitRow); en servicios es un <button>
+   real que abre el modal de contacto (createServiceRow) — de ahí el
+   reset de fondo/borde/cursor, que un <span> no necesita pero tampoco le
+   afecta. */
 .row-url {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
   font-family: var(--font-mono);
   font-size: 0.74rem;
+  line-height: inherit;
   color: var(--text-dim);
   white-space: nowrap;
   align-self: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   transition: color 0.18s ease, transform 0.18s ease;
 }
 

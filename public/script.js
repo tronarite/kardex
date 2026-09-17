@@ -11,6 +11,18 @@
 const prefersReducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// Usado por createServiceRow para darle a cada servicio un ancla propia
+// (#servicio-slug) sin depender de que "slug" esté en config.js — quita
+// tildes/diacríticos (NFD + strip de marcas combinantes) y deja solo
+// minúsculas/números separados por guiones.
+const slugify = (text) =>
+  text
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
 // "type" describe SOLO la fase del proyecto (color del punto). Para la
 // categoría (REPOSITORIO, MÚSICA, SERVICIO...) usa "label", que es texto
 // libre y no toca el color — así una entrada puede combinar cualquier
@@ -337,18 +349,41 @@ const renderUnits = (units) => {
 // contacto del propio masthead (#contact-block), donde la persona elige
 // ella misma el canal (email, teléfono si lo revela...) en vez de que se lo
 // impongamos aquí.
+//
+// El nombre de cada servicio es un <h2> con un <a href="#servicio-slug">
+// propio (permalink real, con su "id" en el propio <h2>) — antes toda la
+// fila era un único <button> sin ningún encabezado ni ancla, así que
+// ningún servicio era una entidad direccionable/indexable por separado
+// (ver guía de SEO estructural). El CTA "¿Hablamos?" pasa a ser un
+// <button> aparte que abre el modal de contacto — antes ese mismo botón
+// envolvía toda la fila, lo que impedía anidar un <h2>/<a> dentro (el
+// modelo de contenido de <button> no admite encabezados ni enlaces).
+// "slug" es opcional: si no se indica, sale de service.name (slugify);
+// "usedSlugs" evita ids duplicados si dos servicios generan el mismo slug.
 // ==========================================================================
-const createServiceRow = (service, index) => {
+const createServiceRow = (service, index, usedSlugs) => {
   const row = document.createElement("li");
   row.className = "index-row animate-init";
 
-  // <button>, no <a>: no navega a ningún sitio, abre el modal de contacto
-  // (ver openContactModal/initContactModal) — .index-link ya trae los
-  // resets necesarios para que un botón se vea igual que el enlace normal.
-  const link = document.createElement("button");
-  link.type = "button";
-  link.className = "index-link";
-  link.addEventListener("click", () => openContactModal(link));
+  let slug = service.slug || slugify(service.name) || `servicio-${index + 1}`;
+  if (usedSlugs) {
+    let unique = slug;
+    let n = 2;
+    while (usedSlugs.has(unique)) {
+      unique = `${slug}-${n}`;
+      n++;
+    }
+    usedSlugs.add(unique);
+    slug = unique;
+  }
+  const anchorId = `servicio-${slug}`;
+
+  // Reutiliza el layout en grid de .index-link (número/cuerpo/CTA), pero
+  // ya no es un único elemento interactivo — ahora hay dos por separado
+  // (el permalink del título y el botón de contacto), así que es un <div>
+  // sin comportamiento propio.
+  const wrap = document.createElement("div");
+  wrap.className = "index-link";
 
   const number = document.createElement("span");
   number.className = "row-number";
@@ -357,11 +392,13 @@ const createServiceRow = (service, index) => {
   const body = document.createElement("span");
   body.className = "row-body";
 
-  const head = document.createElement("span");
+  const head = document.createElement("h2");
   head.className = "row-head";
+  head.id = anchorId;
 
-  const name = document.createElement("span");
+  const name = document.createElement("a");
   name.className = "row-name";
+  name.href = `#${anchorId}`;
   name.textContent = service.name;
   head.appendChild(name);
 
@@ -381,14 +418,16 @@ const createServiceRow = (service, index) => {
     body.appendChild(desc);
   }
 
-  const cta = document.createElement("span");
+  const cta = document.createElement("button");
+  cta.type = "button";
   cta.className = "row-url";
   cta.textContent = "¿Hablamos? →";
+  cta.addEventListener("click", () => openContactModal(cta));
 
-  link.appendChild(number);
-  link.appendChild(body);
-  link.appendChild(cta);
-  row.appendChild(link);
+  wrap.appendChild(number);
+  wrap.appendChild(body);
+  wrap.appendChild(cta);
+  row.appendChild(wrap);
 
   return row;
 };
@@ -423,8 +462,9 @@ const renderServices = (services) => {
   const sorted = sortServicesByOrder(validServices);
 
   container.innerHTML = "";
+  const usedSlugs = new Set();
   const rows = sorted.map((service, index) => {
-    const row = createServiceRow(service, index);
+    const row = createServiceRow(service, index, usedSlugs);
     container.appendChild(row);
     return row;
   });
