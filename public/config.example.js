@@ -311,6 +311,8 @@ const UNITS = [
      description   Opcional      En qué consiste, con el detalle que quieras
                                   (a diferencia de la description de UNITS,
                                   aquí no hace falta que sea una frase corta).
+                                  Admite markdown mínimo — ver "details"
+                                  más abajo.
      order         Opcional      Igual que en UNITS: fija la posición sin
                                   mover el bloque.
      priceRange    Opcional      Igual que en UNITS: texto libre junto al
@@ -335,15 +337,23 @@ const UNITS = [
                                   y lleva al detalle de ESE servicio (la
                                   misma "otra ventana" que aparece al
                                   cambiar entre índice y servicios, pero
-                                  para un solo servicio) — ahí se ve
-                                  "description" y, justo debajo, "details"
-                                  si lo has escrito aquí (separa párrafos
-                                  con una línea en blanco): la corta
-                                  siempre, la larga solo dentro del
-                                  detalle. Al final del detalle hay un
-                                  botón discreto "¿Hablamos?" que abre el
-                                  modal de contacto — no depende de
-                                  "details", sigue ahí aunque lo omitas.
+                                  para un solo servicio) — con título
+                                  grande, un hueco para el precio (si hay
+                                  "priceRange") y, debajo, "description"
+                                  seguida de "details" si lo has escrito
+                                  aquí: la corta siempre, la larga solo
+                                  dentro del detalle. Al final hay un
+                                  botón "¿Hablamos?" que abre el modal de
+                                  contacto — no depende de "details",
+                                  sigue ahí aunque lo omitas.
+
+                                  Tanto "description" como "details"
+                                  admiten un markdown mínimo (no un
+                                  parser completo): **negrita**,
+                                  *cursiva* (o _cursiva_), `código`,
+                                  [enlace](https://...) y listas con
+                                  "- " al principio de línea. Separa
+                                  párrafos con una línea en blanco.
    ============================================================================ */
 const SERVICES = [
   {

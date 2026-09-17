@@ -1160,24 +1160,91 @@ body {
   display: none;
 }
 
-.service-detail .index-head {
-  margin-top: 0.5rem;
+/* Título grande de verdad (mismo tratamiento serif que .identity-name,
+   un punto por debajo) — antes reutilizaba .index-head-title, pensado
+   para una etiqueta de sección pequeña ("N° SERVICIOS"), no para ser el
+   titular del propio detalle. */
+.service-detail-title {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 0;
 }
 
-/* .row-price está pensado para ir en línea junto a un título (margin-left
-   + vertical-align) — aquí va suelto en su propia línea, así que se
-   resetea esa parte y se deja un poco de aire respecto al título. */
+/* Hueco propio para el precio (antes era .row-price suelto, pensado
+   para ir en línea junto a un título pequeño) — aquí es una insignia
+   con su propio borde/relleno, al mismo nivel visual que el título
+   grande de arriba. */
 .service-detail-price {
-  display: block;
-  margin: -0.75rem 0 0;
-  vertical-align: baseline;
+  display: inline-flex;
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 0.35rem 0.75rem;
 }
 
+/* display:inline-flex de arriba gana por especificidad al [hidden] del
+   user-agent stylesheet — mismo patrón que .whatsapp-cta[hidden] y
+   compañía. Sin priceRange, paintServiceDetailView oculta este badge. */
+.service-detail-price[hidden] {
+  display: none;
+}
+
+/* "description"/"details" pasan por renderMarkdown (ver script.js) en
+   vez de texto plano — estos estilos valen tanto para los <p>/<ul> que
+   genera como para lo que venga dentro (<strong>/<em>/<code>/<a>). */
 .service-detail-body {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
   max-width: 46rem;
+}
+
+.service-detail-body p,
+.service-detail-body ul {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.95rem;
+  color: var(--text-body);
+  line-height: 1.6;
+}
+
+.service-detail-body ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-left: 1.25rem;
+}
+
+.service-detail-body strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.service-detail-body code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--surface-hover);
+  padding: 0.15em 0.4em;
+  border-radius: var(--radius);
+}
+
+.service-detail-body a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.service-detail-body a:hover,
+.service-detail-body a:focus-visible {
+  text-decoration-color: var(--accent);
 }
 
 /* Mismo lenguaje visual que .back-link (borde + relleno tenue del

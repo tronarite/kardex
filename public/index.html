@@ -220,21 +220,18 @@
            "#servicio-<slug>" directamente, esto sustituye la lista
            dentro del mismo ".index" — el masthead no se mueve, solo
            este bloque, con el mismo deslizamiento que la transición
-           índice↔servicios pero en un solo panel. El botón "¿Hablamos?"
-           del final es deliberadamente discreto (mismo estilo que el de
-           cada fila) — solo abre el modal de contacto de siempre, no
-           repite aquí ese contenido. Rellenado en tiempo de ejecución,
-           nunca a mano. -->
+           índice↔servicios pero en un solo panel. El botón de arriba
+           ("← Volver") y el de abajo ("¿Hablamos?") son los únicos
+           elementos fijos; título/precio/cuerpo se rellenan en tiempo de
+           ejecución, nunca a mano — "description"/"details" admiten
+           markdown básico (ver renderMarkdown en script.js). -->
       <div class="service-detail" id="service-detail" hidden>
         <p class="masthead-back">
           <a href="#" class="back-link" id="service-detail-back">← Volver a servicios</a>
         </p>
 
-        <div class="index-head">
-          <span class="index-head-number" aria-hidden="true">N°</span>
-          <span class="index-head-title" id="service-detail-title" tabindex="-1"></span>
-        </div>
-        <p class="row-price service-detail-price" id="service-detail-price" hidden></p>
+        <h2 class="service-detail-title" id="service-detail-title" tabindex="-1"></h2>
+        <p class="service-detail-price" id="service-detail-price" hidden></p>
 
         <div class="service-detail-body" id="service-detail-body"></div>
 

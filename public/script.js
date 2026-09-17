@@ -909,6 +909,58 @@ const paintServiceList = (config) => {
 // los dos, por separado — "details" no sustituye a "description", se
 // añade debajo (párrafos separados por líneas en blanco). El botón
 // "¿Hablamos?" del final es siempre el mismo, esté o no "details".
+const escapeHtml = (text) =>
+  text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+// Markdown mínimo, no un parser completo: negrita, cursiva, código en
+// línea y enlaces, sobre texto ya escapado (nunca HTML crudo, el texto
+// de config.js se trata igual de "confiable" que el resto pero no hay
+// motivo para no escaparlo primero). "**" se resuelve antes que "*" para
+// que no queden asteriscos sueltos confundiendo la cursiva.
+const renderInlineMarkdown = (text) =>
+  escapeHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    .replace(/_(.+?)_/g, "<em>$1</em>")
+    .replace(/`(.+?)`/g, "<code>$1</code>")
+    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+
+// Bloques separados por línea en blanco (igual que antes de admitir
+// markdown); dentro de cada bloque, las líneas se agrupan por rachas
+// consecutivas de "empieza por '- '" o no — así "Incluye:" seguido de
+// una lista, sin línea en blanco entre medias, sale como un <p> y un
+// <ul> aparte en vez de un único párrafo con guiones sueltos.
+const renderMarkdown = (text) => {
+  const blocks = text.split(/\n{2,}/).map((block) => block.trim()).filter(Boolean);
+
+  return blocks
+    .map((block) => {
+      const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
+      const groups = [];
+
+      lines.forEach((line) => {
+        const isListLine = line.startsWith("- ");
+        const lastGroup = groups[groups.length - 1];
+        if (lastGroup && lastGroup.isList === isListLine) {
+          lastGroup.lines.push(line);
+        } else {
+          groups.push({ isList: isListLine, lines: [line] });
+        }
+      });
+
+      return groups
+        .map((group) => {
+          if (group.isList) {
+            const items = group.lines.map((line) => `<li>${renderInlineMarkdown(line.slice(2))}</li>`).join("");
+            return `<ul>${items}</ul>`;
+          }
+          return `<p>${group.lines.map(renderInlineMarkdown).join("<br>")}</p>`;
+        })
+        .join("");
+    })
+    .join("");
+};
+
 const paintServiceDetailView = (config, service, slug) => {
   const indexHead = document.getElementById("index-head");
   const servicesIntro = document.getElementById("services-intro");
@@ -933,24 +985,8 @@ const paintServiceDetailView = (config, service, slug) => {
   }
 
   if (bodyEl) {
-    bodyEl.innerHTML = "";
-
-    if (service.description) {
-      const desc = document.createElement("p");
-      desc.className = "row-desc";
-      desc.textContent = service.description;
-      bodyEl.appendChild(desc);
-    }
-
-    if (service.details) {
-      service.details.split(/\n{2,}/).forEach((paragraph) => {
-        if (!paragraph.trim()) return;
-        const p = document.createElement("p");
-        p.className = "row-desc";
-        p.textContent = paragraph.trim();
-        bodyEl.appendChild(p);
-      });
-    }
+    const text = [service.description, service.details].filter(Boolean).join("\n\n");
+    bodyEl.innerHTML = text ? renderMarkdown(text) : "";
   }
 
   document.title = `${service.name} — ${config.operatorName || "Servicios"}`;
