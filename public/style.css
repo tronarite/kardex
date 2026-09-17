@@ -743,6 +743,15 @@ body {
   color: var(--text-dim);
 }
 
+/* Mismo motivo que .service-detail-title:focus-visible — se enfoca por
+   script al cambiar de vista (ver goTo en initViewSwitcher/
+   slideServicePanel), y sin esto el navegador pone su anillo de foco
+   por defecto en vez de uno a juego con el resto del sitio. */
+.index-head-title:focus-visible {
+  outline: 2px solid var(--line-strong);
+  outline-offset: 4px;
+}
+
 .index-list {
   list-style: none;
 }
@@ -1177,6 +1186,18 @@ body {
   margin: 0;
   padding-bottom: 0.4rem;
   border-bottom: 1.5px solid var(--accent);
+}
+
+/* Se enfoca por script al entrar al detalle (ver slideServicePanel en
+   script.js, para que el lector de pantalla anuncie el título nuevo) —
+   sin esto, el navegador le pone su propio anillo de foco por defecto
+   (un recuadro negro grueso, nada que ver con el resto del sitio) cada
+   vez que el foco "se ve" como de teclado. Mismo tratamiento que el
+   resto de :focus-visible del sitio, con más "offset" para no pegarse
+   al subrayado de arriba. */
+.service-detail-title:focus-visible {
+  outline: 2px solid var(--line-strong);
+  outline-offset: 6px;
 }
 
 /* Hueco propio para el precio (antes era .row-price suelto, pensado

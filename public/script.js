@@ -828,6 +828,13 @@ const SERVICE_HASH_PREFIX = "#servicio-";
 let serviceDetailAnimating = false;
 let currentServiceSlug = null;
 
+// Si se pide ir a un servicio MIENTRAS el panel ya está animando (p.ej.
+// se pulsa "← Volver" y, antes de que termine esa animación, se pulsa
+// otra fila), el clic no debe perderse en silencio — se guarda aquí y
+// slideServicePanel lo retoma en cuanto la animación en curso termina
+// (ver su "focusAfter" de abajo).
+let pendingServiceSlug = null;
+
 const slugFromHash = () =>
   location.hash.startsWith(SERVICE_HASH_PREFIX) ? location.hash.slice(SERVICE_HASH_PREFIX.length) : null;
 
@@ -872,6 +879,12 @@ const slideServicePanel = (direction, paint, focusId) => {
     setTimeout(() => {
       serviceDetailAnimating = false;
       focusAfter();
+
+      if (pendingServiceSlug) {
+        const nextSlug = pendingServiceSlug;
+        pendingServiceSlug = null;
+        goToServiceDetail(nextSlug);
+      }
     }, VIEW_TRANSITION_MS);
   }, VIEW_TRANSITION_MS);
 };
@@ -1007,9 +1020,18 @@ const initServiceDetail = (config) => {
   // solo cuando de verdad vamos a manejarlo nosotros). Cambia el hash y
   // deja que "hashchange" (más abajo) dispare la animación — así el
   // botón atrás del navegador reutiliza exactamente el mismo camino.
+  // Si ya hay una animación en curso (p.ej. se pulsó esta fila justo
+  // después de "← Volver", antes de que esa transición terminara), el
+  // clic no se descarta: se guarda en "pendingServiceSlug" y
+  // slideServicePanel lo retoma en cuanto la animación actual acaba —
+  // antes se perdía en silencio (el clic no hacía nada visible).
   goToServiceDetail = (slug) => {
     if (!serviceBySlug.has(slug)) return false;
-    if (!serviceDetailAnimating && slug !== currentServiceSlug) {
+    if (serviceDetailAnimating) {
+      pendingServiceSlug = slug;
+      return true;
+    }
+    if (slug !== currentServiceSlug) {
       location.hash = `${SERVICE_HASH_PREFIX}${slug}`;
     }
     return true;
