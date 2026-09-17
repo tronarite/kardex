@@ -7,7 +7,11 @@
   <!-- Título, meta tags y la imagen de previsualización se generan solos
        desde config.js con Docker (ver scripts/sync-meta.js) — no los
        edites aquí a mano, se sobrescriben. Los valores de abajo son solo
-       la plantilla genérica que ves antes de la primera sincronización. -->
+       la plantilla genérica que ves antes de la primera sincronización.
+       Si SITE_CONFIG.sections.services está activo, /servicios
+       (servicios.html) también se genera en esa misma sincronización a
+       partir de este archivo: cuerpo idéntico, solo cambian la cabecera y
+       la alternativa sin JavaScript. -->
   <title>Tu Nombre — Índice personal</title>
   <meta name="description" content="Índice personal de proyectos y enlaces de Tu Nombre / Alias. DESARROLLO SOFTWARE · INGENIERÍA & SISTEMAS.">
   <meta name="robots" content="index, follow">
@@ -101,15 +105,61 @@
         <p class="identity-role" id="operator-subtitle">DESARROLLO SOFTWARE // INGENIERÍA &amp; SISTEMAS</p>
       </div>
 
+      <!-- Solo visible en la vista de servicios cuando las dos secciones
+           están activas (ver initViewSwitcher en script.js) — nunca es una
+           página distinta, es la misma index.html cambiando de contenido
+           con una transición. -->
+      <div class="masthead-service-extra" id="masthead-service-extra" hidden>
+        <p class="masthead-back">
+          <a href="#" class="back-link" id="back-to-index-link">← Volver al índice</a>
+        </p>
+      </div>
+
       <div class="contact-block" id="contact-block">
         <span class="contact-kicker">CONTACTO</span>
-        <a href="mailto:contacto@ejemplo.com" class="contact-email" id="contact-email-link">
-          <span id="contact-email-text">contacto@ejemplo.com</span>
+
+        <!-- CTA principal, solo si "sections.services" está activo y hay
+             teléfono configurado (ver initWhatsApp en script.js) — el
+             número va directo en el enlace, así que no tiene sentido
+             "ocultarlo" hasta el clic: quien vea el botón ya puede leer el
+             número en el propio href. En modo solo-portfolio (o sin
+             teléfono) esto se queda oculto y el bloque no cambia respecto
+             a como era antes de la vista de servicios. -->
+        <a href="#" id="whatsapp-link" class="whatsapp-cta" hidden target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 448 512" aria-hidden="true" focusable="false">
+            <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+          </svg>
+          WhatsApp
         </a>
-        <button id="copy-email-btn" class="copy-btn" aria-label="Copiar correo al portapapeles">
-          <span id="copy-btn-text">Copiar dirección</span>
+
+        <!-- Al pulsar copia el correo al portapapeles (con feedback en
+             "copy-status" para lectores de pantalla y un estado ".copied"
+             visual). Es un <button>, no un enlace "mailto:" — solo texto
+             para copiar, no abre el cliente de correo (ver
+             initContactManager). -->
+        <button type="button" class="contact-email" id="contact-email-link" aria-label="Copiar correo">
+          <span id="contact-email-text">contacto@ejemplo.com</span>
         </button>
+
+        <div class="contact-actions" id="contact-actions">
+          <!-- Solo se muestra si "sections.services" está activo y hay
+               teléfono configurado. El número se muestra en claro, sin
+               "revelar" previo — el clic solo lo copia al portapapeles
+               (ver initPhoneCopy). Es un <button>, no un enlace "tel:". -->
+          <button type="button" id="phone-link" class="contact-phone" hidden aria-label="Copiar teléfono">
+            <span id="phone-text"></span>
+          </button>
+        </div>
         <span class="visually-hidden" id="copy-status" role="status" aria-live="polite"></span>
+
+        <!-- Solo se muestra si "sections.services" está activo y hay
+             ubicación configurada (SITE_CONFIG.location). -->
+        <p class="service-location" id="service-location" hidden>
+          <svg class="location-pin" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 6.19 12.13 6.46 12.42a.75.75 0 0 0 1.08 0C12.81 21.13 19 14.25 19 9c0-3.86-3.14-7-7-7Zm0 9.75A2.75 2.75 0 1 1 12 6.25a2.75 2.75 0 0 1 0 5.5Z"/>
+          </svg>
+          <span id="location-text"></span>
+        </p>
       </div>
 
       <p class="masthead-footer">
@@ -117,8 +167,26 @@
       </p>
     </aside>
 
-    <!-- Índice de proyectos y enlaces. -->
+    <!-- Índice de proyectos y enlaces — también hace de vista de servicios
+         cuando "sections.services" está activo: cambia de contenido en el
+         sitio (sin navegar a otra página) al pulsar la fila SERVICIOS o el
+         enlace "Volver al índice" del masthead (ver initViewSwitcher en
+         script.js). -->
     <main class="index" id="index" aria-label="Proyectos y enlaces">
+      <!-- Solo se muestra en la vista de servicios, por encima del
+           encabezado "N° SERVICIOS" — a modo de titular de la sección,
+           no de aviso aparte. -->
+      <p class="services-intro" id="services-intro" hidden>
+        Un vistazo a en qué puedo ayudarte con tu equipo, sin catálogo cerrado ni tarifas fijas, cada caso se habla de forma personalizada.
+        <strong>¿Te interesa alguno?</strong> Contáctame por email, WhatsApp o por teléfono.
+      </p>
+
+      <!-- Solo en la vista de servicios, igual que la entradilla de arriba.
+           Se rellena en tiempo de ejecución desde
+           SITE_CONFIG.servicesHighlights (ver renderServiceHighlights en
+           script.js) — no hay tarjetas fijas aquí. -->
+      <div class="services-highlights" id="services-highlights" hidden></div>
+
       <div class="index-head">
         <span class="index-head-number" aria-hidden="true">N°</span>
         <span class="index-head-title" id="content-title" tabindex="-1">PROYECTOS Y ENLACES</span>
@@ -133,11 +201,16 @@
            initListFadeGuard) — no solo visualmente ocultas. -->
       <div class="index-scroll" id="index-scroll">
         <ol class="index-list" id="content-list">
-          <!-- Se inserta dinámicamente desde config.js / script.js (UNITS). -->
+          <!-- Se inserta dinámicamente desde config.js / script.js: UNITS
+               en la vista de índice, SERVICES en la de servicios. -->
         </ol>
+
+        <p class="row-desc" id="services-empty" hidden>Todavía no hay servicios listados aquí.</p>
       </div>
 
-      <!-- Alternativa accesible para navegadores/crawlers sin JavaScript. -->
+      <!-- Alternativa accesible para navegadores/crawlers sin JavaScript
+           (la transición a la vista de servicios necesita JS; sin él se
+           queda en el índice de proyectos). -->
       <noscript>
         <ol class="index-list">
           <li class="index-row">
@@ -167,15 +240,45 @@
             </a>
           </li>
         </ol>
-        <p class="row-desc">¿Tienes alguna duda? Escribe directamente a <a href="mailto:contacto@ejemplo.com">contacto@ejemplo.com</a>.</p>
+        <p class="row-desc">¿Buscas los servicios? Escribe directamente a <a href="mailto:contacto@ejemplo.com">contacto@ejemplo.com</a>.</p>
       </noscript>
     </main>
 
   </div>
 
-  <footer class="credit">
+  <footer class="credit" id="watermark-footer">
     <a href="https://github.com/tronarite/kardex" target="_blank" rel="noopener noreferrer">Powered by Kardex</a>
   </footer>
+
+  <!-- Modal de contacto: se abre al pulsar cualquier servicio (ver
+       initContactModal en script.js) — una versión más grande y centrada
+       del bloque de contacto del masthead, con sus propios controles
+       (mismo comportamiento, wireado por separado con initContactManager/
+       initPhoneReveal para no duplicar lógica). -->
+  <div class="modal-backdrop" id="contact-modal-backdrop" hidden>
+    <div class="contact-modal" id="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+      <button type="button" class="modal-close" id="contact-modal-close" aria-label="Cerrar">✕</button>
+
+      <span class="contact-kicker" id="contact-modal-title">CONTACTO</span>
+
+      <a href="#" id="modal-whatsapp-link" class="whatsapp-cta whatsapp-cta--modal" hidden target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 448 512" aria-hidden="true" focusable="false">
+          <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+        </svg>
+        WhatsApp
+      </a>
+
+      <button type="button" class="contact-email contact-email--modal" id="modal-contact-email-link" aria-label="Copiar correo">
+        <span id="modal-contact-email-text">contacto@ejemplo.com</span>
+      </button>
+      <div class="contact-actions" id="modal-contact-actions">
+        <button type="button" id="modal-phone-link" class="contact-phone contact-phone--modal" hidden aria-label="Copiar teléfono">
+          <span id="modal-phone-text"></span>
+        </button>
+      </div>
+      <span class="visually-hidden" id="modal-copy-status" role="status" aria-live="polite"></span>
+    </div>
+  </div>
 
   <script src="config.js"></script>
   <script src="script.js"></script>

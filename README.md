@@ -19,6 +19,7 @@
 - [Requisitos](#requisitos)
 - [Inicio rápido con Docker](#inicio-rápido-con-docker)
 - [Configuración](#configuración)
+- [Vista de servicios](#vista-de-servicios)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Licencia](#licencia)
 
@@ -35,6 +36,8 @@
 - **SEO / PWA listo:** Open Graph, Twitter Card, `manifest.json`, `robots.txt`, `sitemap.xml`, página 404 propia e iconos para instalar como app.
 - **Docker listo:** imagen `nginx:1.27-alpine` con Gzip, cache headers, `HEALTHCHECK`, cabeceras de seguridad y CSP estricta; edición en caliente vía volumen montado, sin reconstruir la imagen para cambios de contenido.
 - **SEO y previsualizaciones al compartir, sin tocarlas a mano:** el contenedor sincroniza `<title>`, `og:title`/`og:description`, `canonical`, el Sitemap **y la propia imagen de la tarjeta** directamente desde tu `config.js` — edita tu nombre, tema o dominio una vez y se propaga solo (ver [Meta tags y dominio](#meta-tags-y-dominio)).
+- **Índice y/o servicios, a elegir:** `SITE_CONFIG.sections` activa o desactiva el índice de proyectos y la vista de servicios por separado — con las dos activas funciona como un único sitio con transición animada entre ambas; con solo una, esa es directamente la portada. Ver [Vista de servicios](#vista-de-servicios).
+- **Marca de agua opcional:** el "Powered by Kardex" del pie se puede quitar con `SITE_CONFIG.showWatermark: false`.
 
 ---
 
@@ -183,7 +186,7 @@ Para un proyecto que en realidad es algo que ofreces (no un enlace a tu propio t
 Esto también cambia la vista previa al compartir el enlace (WhatsApp, Twitter/X, Discord...) — ver [Meta tags y dominio](#meta-tags-y-dominio), que incluye `og:title`/`twitter:title` y la propia imagen de la tarjeta.
 
 ### Meta tags y dominio
-`<title>`, la meta description, `og:*`/`twitter:*` (incluida la URL absoluta de la imagen), `canonical`, el `?v=` del favicon (`faviconVersion`), el bloque **JSON-LD** (`<script type="application/ld+json">` inline en el `<head>` — Google ignora el `src` en ese tipo de script), `public/robots.txt`, `public/sitemap.xml` y **la imagen de la tarjeta** (`public/og-image.png`) **se generan solos** a partir de `operatorName`, `operatorRole`, `pageTitle`, `theme`, `siteUrl` y `faviconVersion` de tu `config.js` — no los edites a mano, se sobrescriben. El contenedor Docker lo sincroniza al arrancar y también en caliente: si editas `config.js` mientras el contenedor sigue arriba, se vuelve a aplicar solo, sin reiniciar nada (`scripts/docker-entrypoint-meta.sh` vigila el archivo con `inotifywait` — en Windows/Docker Desktop esa vigilancia en caliente no siempre detecta cambios hechos desde fuera del propio contenedor; si no ves el cambio, `docker compose restart` lo fuerza).
+`<title>`, la meta description, `og:*`/`twitter:*` (incluida la URL absoluta de la imagen), `canonical`, el `?v=` del favicon (`faviconVersion`), el bloque **JSON-LD** (`<script type="application/ld+json">` inline en el `<head>` — Google ignora el `src` en ese tipo de script), `public/robots.txt`, `public/sitemap.xml`, **la imagen de la tarjeta** (`public/og-image.png`) y, según `SITE_CONFIG.sections` (ver [Vista de servicios](#vista-de-servicios)), `public/servicios.html` + `public/og-servicios-image.png` **se generan solos** a partir de tu `config.js` — no los edites a mano, se sobrescriben. El contenedor Docker lo sincroniza al arrancar y también en caliente: si editas `config.js` mientras el contenedor sigue arriba, se vuelve a aplicar solo, sin reiniciar nada (`scripts/docker-entrypoint-meta.sh` vigila el archivo con `inotifywait` — en Windows/Docker Desktop esa vigilancia en caliente no siempre detecta cambios hechos desde fuera del propio contenedor; si no ves el cambio, `docker compose restart` lo fuerza).
 
 `og-image.png` es una tarjeta 1200×630 generada de cero (no una plantilla con el texto encima): mismo icono/kicker/nombre/rol que el sitio, con el fondo y el acento del `theme` activo. Para dibujarla hace falta rasterizar un SVG a PNG — dentro de Docker se usa `rsvg-convert` (instalado vía `apk` en el `Dockerfile`, con `ttf-dejavu` para que haya con qué dibujar el texto: Alpine no trae fuentes por defecto); en local sin Docker cae en `sips` si estás en macOS. Si no encuentra ninguna de las dos, avisa y no toca la imagen que ya hubiera — el resto de la sincronización sigue igual.
 
@@ -191,11 +194,13 @@ Esto también cambia la vista previa al compartir el enlace (WhatsApp, Twitter/X
 
 Si sirves el sitio sin Docker, ejecuta `node scripts/sync-meta.js` a mano cada vez que cambies esos campos.
 
-`public/index.html`, `public/robots.txt`, `public/sitemap.xml` y `public/og-image.png` sí están en git (a diferencia de `config.js`) — al publicar con tus datos reales, tu copia local queda "sucia" frente a la plantilla genérica del repo. Trátalos igual que `config.js`:
+`public/index.html`, `public/servicios.html` (si existe), `public/robots.txt`, `public/sitemap.xml`, `public/og-image.png` y `public/og-servicios-image.png` (si existe) sí están en git (a diferencia de `config.js`) — al publicar con tus datos reales, tu copia local queda "sucia" frente a la plantilla genérica del repo. Trátalos igual que `config.js`:
 
 ```bash
 git update-index --skip-worktree public/index.html \
   public/robots.txt public/sitemap.xml public/og-image.png
+# si tienes sections.portfolio y sections.services activos a la vez:
+git update-index --skip-worktree public/servicios.html public/og-servicios-image.png
 ```
 
 (revierte con `--no-skip-worktree` sobre el archivo si alguna vez necesitas tocar de verdad la plantilla, no solo tus datos).
@@ -209,12 +214,109 @@ Si el navegador se empeña en seguir mostrando el icono viejo de su caché, sube
 
 ---
 
+## Vista de servicios
+
+Un listado aparte, pensado para ofertar servicios propios (no proyectos/enlaces). Qué partes del sitio están activas lo decide `SITE_CONFIG.sections` en `config.js`:
+
+```javascript
+const SITE_CONFIG = {
+  // ...
+  sections: {
+    portfolio: true,   // índice de proyectos/enlaces (UNITS) en "/"
+    services: false,   // vista de servicios (SERVICES, ver abajo)
+  },
+};
+```
+
+- **Solo `portfolio`** (o sin `sections`): comportamiento de siempre, sin nada de servicios.
+- **`portfolio` y `services`:** el índice vive en `/` y la vista de servicios en `/servicios` — una URL real y compartible, no un `#hash`. Para acceder desde el índice, añade (o edita) un bloque en `UNITS` cuyo `url` sea exactamente `"/servicios"` — ese valor especial lo reconoce `script.js` y, en vez de abrir un enlace, dispara una transición animada dentro de la misma página (el masthead sale por un lado y entra por el otro; la lista de proyectos se disuelve y aparece la de servicios):
+
+  ```javascript
+  {
+    name: "SERVICIOS",
+    url: "/servicios",   // valor especial: abre la vista de servicios, no navega
+    description: "Ejemplos orientativos de en qué puedo ayudarte.",
+    type: "proximamente",
+    label: "SERVICIO",
+    ctaText: "Ver servicios",   // opcional: texto de la derecha en vez de "/servicios →"
+  }
+  ```
+
+  También se puede enlazar directamente compartiendo `tu-dominio.example/servicios` — si alguien llega así (en vez de pulsar el enlace desde el índice), el botón para salir de la vista dice "Índice" en vez de "Volver al índice", porque de verdad no viene de ningún sitio.
+- **Solo `services`:** no hay índice de proyectos — la vista de servicios pasa a ser directamente la portada del sitio (`/`), sin transición ni enlace de vuelta (no hay a qué volver).
+
+### Listar los servicios (`SERVICES`)
+Cada bloque de `SERVICES` en `config.js` es una tarjeta de la vista. Solo `name` es obligatorio:
+
+```javascript
+const SERVICES = [
+  {
+    name: "NOMBRE DEL SERVICIO",
+    order: 1,   // opcional, igual que en UNITS
+    description: "En qué consiste, con el detalle que quieras.",
+  },
+];
+```
+
+Deliberadamente **no hay campo de precio ni de tarifa por hora**: la idea es que sean ejemplos orientativos de lo que sabes hacer, no un catálogo cerrado con tarifario. Al pulsar cualquier tarjeta se abre un modal de contacto ampliado (el mismo correo/teléfono del masthead, en grande) — quien esté interesado escribe y ahí se habla el alcance y el precio según cada caso.
+
+### Los 4 puntos a favor (`servicesHighlights`)
+El bloque de icono + etiqueta + texto que aparece encima del listado también es editable, con `SITE_CONFIG.servicesHighlights`:
+
+```javascript
+servicesHighlights: [
+  { icon: "rayo", label: "Más rápido", desc: "Optimizo tu equipo para que vaya fluido, sin ralentizaciones ni cuelgues." },
+  { icon: "check", label: "Menos errores", desc: "..." },
+  { icon: "escudo", label: "Seguro", desc: "..." },
+  { icon: "chat", label: "Trato cercano", desc: "..." },
+],
+```
+
+`icon` elige entre un set fijo ya dibujado: `"rayo"`, `"check"`, `"escudo"`, `"chat"`, `"reloj"`, `"estrella"`, `"grafico"`, `"herramienta"`, `"corazon"`, `"bombilla"` (no admite un SVG propio). Puedes añadir, quitar o reordenar entradas libremente; si quitas el campo entero, no se muestra ningún punto a favor.
+
+### Subtítulo al compartir el enlace (`servicesOgDescription`)
+El texto que se ve en la tarjeta de previsualización al compartir `/servicios` (WhatsApp, Twitter/X, Discord...) también es configurable:
+
+```javascript
+servicesOgDescription: "Más rápido, menos errores, seguro y con trato cercano: ejemplos orientativos de en qué puedo ayudarte con tu equipo.",
+```
+
+Opcional — si lo quitas, se usa un texto genérico por defecto.
+
+### Teléfono, WhatsApp y ubicación (opcionales, solo en esta vista)
+Dos campos opcionales de `SITE_CONFIG` que **solo se muestran en la vista de servicios**, no en el índice principal:
+
+```javascript
+const SITE_CONFIG = {
+  // ...
+  contactPhone: "+34 600 000 000",   // opcional
+  location: "Madrid, España",         // opcional
+};
+```
+
+- `contactPhone` alimenta DOS botones: el teléfono en claro (el clic solo lo copia al portapapeles, no abre el marcador) y "WhatsApp" (enlace directo a `wa.me` con ese mismo número). Escríbelo con el prefijo de país (`+34 ...`): de ahí sale el `wa.me/34...` del botón.
+- `location` es orientativa (ciudad/zona, o "Remoto"), no una dirección exacta.
+
+Si quitas cualquiera de los dos campos (o los dejas vacíos), esa parte simplemente no se muestra — no hace falta desactivar nada más.
+
+En pantallas estrechas, los botones de acción (copiar correo, teléfono, WhatsApp) se muestran en fila con salto de línea automático en vez de uno debajo de otro — a partir de 860px (donde el masthead pasa a ser una columna lateral angosta) vuelven a apilarse en columna (ver `.contact-actions` en `style.css`).
+
+### Aparecer en buscadores y al compartir
+
+- **`portfolio` + `services`:** `/servicios` es una URL de verdad, no un `#hash` — tiene su propio `<title>`, meta description, `canonical`, entrada en `sitemap.xml` y tarjeta social (`public/og-servicios-image.png`, con los puntos a favor y sus iconos), distinta de la del índice. `scripts/sync-meta.js` **genera `public/servicios.html` entero a partir de `index.html`** (cuerpo idéntico, solo cambian la cabecera y el `<noscript>`), así que su estructura nunca se desincroniza — no lo edites a mano. nginx sirve ese archivo en la ruta `/servicios` (regla en `nginx.conf`).
+- **Solo `services`:** al ser `index.html` la propia vista de servicios, es ese archivo el que se sincroniza directamente con el `<title>`/meta/JSON-LD/`<noscript>` de servicios y con `og-image.png` dibujado con los puntos a favor — no se genera ningún `servicios.html` aparte.
+
+En ambos casos, el `<noscript>` lleva la lista real de tus `SERVICES` (nombre + descripción), así que un crawler que no ejecuta JavaScript —o Google en su primer pase— ya ve contenido de verdad, no una página en blanco.
+
+---
+
 ## Estructura del proyecto
 
 ```
 Kardex/
 ├── public/                  # Todo lo que se sirve tal cual en el navegador
 │   ├── index.html            # Estructura semántica; sus meta tags OG/Twitter se sincronizan solas (ver Meta tags y dominio)
+│   ├── servicios.html         # Ruta /servicios — solo si sections.portfolio y sections.services están los dos activos (ver Vista de servicios); no lo edites a mano
 │   ├── 404.html                # Página de error, mismo diseño y tema que el resto del sitio
 │   ├── style.css              # Design system: tokens light-dark(), layout, componentes
 │   ├── config.example.js       # Plantilla genérica — SÍ se sube al repo
@@ -226,6 +328,7 @@ Kardex/
 │   ├── favicon.ico                    # Fallback clásico del favicon
 │   ├── preview.jpg                     # Captura de la interfaz, usada en el README
 │   ├── og-image.png                     # Tarjeta og:image / twitter:image — se genera sola (ver Meta tags y dominio)
+│   ├── og-servicios-image.png            # Misma idea, para /servicios — solo si las dos secciones están activas (ver Vista de servicios)
 │   ├── icons/                             # apple-touch-icon.png, icon-192.png, icon-512.png
 │   ├── manifest.json                       # Manifest PWA (instalable)
 │   ├── robots.txt                           # Directivas para crawlers, se sincroniza solo

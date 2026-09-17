@@ -14,6 +14,21 @@
    ============================================================================ */
 
 const SITE_CONFIG = {
+  // Qué partes del sitio están activas. Si quitas "sections" por completo,
+  // se usa { portfolio: true, services: false } — el índice de proyectos
+  // solo, sin vista de servicios.
+  //   portfolio: true   -> índice de proyectos/enlaces (UNITS) en "/"
+  //   services: true    -> vista de servicios (SERVICES más abajo)
+  // Con las dos en true: índice en "/" y "/servicios" como página real y
+  // compartible, con la fila "SERVICIOS" de UNITS como acceso y una
+  // animación de cruce entre ambas vistas.
+  // Con solo "services" en true: la vista de servicios pasa a ser la
+  // portada del sitio ("/"), sin lista de proyectos.
+  sections: {
+    portfolio: true,
+    services: false,
+  },
+
   // Tu nombre, alias o marca personal.
   operatorName: "Tu Nombre / Alias",
 
@@ -24,6 +39,25 @@ const SITE_CONFIG = {
   // Tu correo de contacto. Se usa para el enlace "mailto:" y para el botón
   // de copiar al portapapeles.
   contactEmail: "contacto@ejemplo.com",
+
+  // Tu teléfono de contacto, solo se usa si "sections.services" es true.
+  // Opcional: si lo quitas, la vista de servicios simplemente no muestra
+  // el bloque de teléfono ni el botón de WhatsApp (ver abajo). No aparece
+  // en texto plano hasta que alguien pulsa "mostrar teléfono" — un filtro
+  // básico contra bots que solo leen el HTML, no una verificación real
+  // (para eso haría falta un backend, que este sitio no tiene). Escríbelo
+  // con el prefijo de país (formato "+NN NNN NNN NNN"): de aquí también
+  // sale el botón de WhatsApp, que necesita esos mismos dígitos con el
+  // prefijo para armar el enlace a wa.me — y ese botón SÍ lleva el número
+  // directo en el enlace (sin filtro de clic), porque no tiene sentido
+  // "revelar" un wa.me que ya funciona en cuanto se ve.
+  contactPhone: "+34 600 000 000",
+
+  // Tu ubicación, solo se usa si "sections.services" es true — pensada
+  // para dar una idea de dónde trabajas, no una dirección exacta (ej.
+  // "Madrid, España" o "Remoto (España)"). Opcional: si la quitas o la
+  // dejas vacía, esa vista simplemente no muestra el bloque de ubicación.
+  location: "Madrid, España",
 
   // Título de la pestaña del navegador. Opcional: si lo quitas o lo dejas
   // vacío, se usa automáticamente "{operatorName} — Índice".
@@ -74,6 +108,28 @@ const SITE_CONFIG = {
     type: "disponible",
     label: "DISPONIBLE",   // texto libre, opcional (si lo quitas, usa uno por defecto)
   },
+
+  // Muestra u oculta el "Powered by Kardex" del pie de página. Opcional:
+  // si lo quitas, se muestra (true por defecto).
+  showWatermark: true,
+
+  // "Puntos a favor" de la vista de servicios (icono + etiqueta + texto),
+  // solo se usan si "sections.services" es true. Elige "icon" de este set
+  // fijo: "rayo" | "check" | "escudo" | "chat" | "reloj" | "estrella" |
+  // "grafico" | "herramienta" | "corazon" | "bombilla". Opcional: si lo
+  // quitas, no se muestra ningún punto a favor.
+  servicesHighlights: [
+    { icon: "rayo", label: "Más rápido", desc: "Optimizo tu equipo para que vaya fluido, sin ralentizaciones ni cuelgues." },
+    { icon: "check", label: "Menos errores", desc: "Reviso conflictos y programas innecesarios antes de que den problemas de verdad." },
+    { icon: "escudo", label: "Seguro", desc: "Tu equipo y tus datos, tratados con el mismo cuidado que si fueran los míos." },
+    { icon: "chat", label: "Trato cercano", desc: "Soluciones reales, explicadas en claro y sin venderte de más." },
+  ],
+
+  // Subtítulo que se ve en la tarjeta de previsualización al compartir el
+  // enlace de /servicios (WhatsApp, Twitter, Discord...) — el
+  // og:description/twitter:description de esa página. Solo se usa si
+  // "sections.services" es true. Opcional: si lo quitas, se usa uno genérico.
+  servicesOgDescription: "Más rápido, menos errores, seguro y con trato cercano: ejemplos orientativos de en qué puedo ayudarte con tu equipo.",
 };
 
 
@@ -106,8 +162,12 @@ const SITE_CONFIG = {
                                   genera solo a partir de "url".
      ctaText       Opcional      Sustituye del todo el texto de la derecha
                                   por uno propio (también con " →" al
-                                  final) en vez de mostrar una URL. Si lo
-                                  indicas, gana siempre a "displayUrl".
+                                  final) en vez de mostrar una URL — pensado
+                                  para enlaces que no tiene sentido mostrar
+                                  como dirección web (rutas internas, un
+                                  correo, etc.), ej. "Ver servicios" en vez
+                                  de "/servicios →". Si lo indicas, gana
+                                  siempre a "displayUrl".
      priceRange    Opcional      Texto libre junto al indicador, ej. "20€ –
                                   50€" o "Desde 30€". Si lo omites, no se
                                   muestra nada.
@@ -195,5 +255,66 @@ const UNITS = [
     description: "Historial musical y estadísticas en tiempo real.",
     type: "activo",
     label: "RRSS",
+  },
+  {
+    // "/servicios" es un valor especial que reconoce script.js: en vez de
+    // enlazar a otra página, abre la vista de servicios (ver SERVICES más
+    // abajo) con una transición, dentro de esta misma web — solo funciona
+    // si "sections.services" está en true; si no, se trata como un enlace
+    // normal (y "/servicios" dará 404, porque esa vista no existe). Si
+    // prefieres enlazar a una web externa en su lugar, cambia "url" por esa
+    // dirección normal (como en los demás bloques de arriba) y quita
+    // "ctaText" (se generará el texto a partir de esa URL).
+    // "ctaText" es lo que hace que aquí se lea "Ver servicios →" en vez de
+    // "/servicios →" — si lo quitas, usa "Ver servicios" por defecto.
+    name: "SERVICIOS",
+    order: 5,
+    url: "/servicios",
+    description: "Ejemplos orientativos de en qué puedo ayudarte.",
+    type: "proximamente",
+    label: "SERVICIO",
+    ctaText: "Ver servicios",
+  },
+];
+
+
+/* ============================================================================
+   SERVICIOS — listado de la vista de servicios, solo se usa si
+   "sections.services" es true (dentro de esta misma web, no una página
+   aparte — se abre desde la fila "SERVICIOS" de UNITS, con
+   "url: '/servicios'", o es la propia portada si "sections.portfolio" es
+   false)
+   ============================================================================
+   No sustituye a la fila "SERVICIOS" de arriba en UNITS — esa sigue siendo el
+   enlace que aparece en el índice principal; esto es lo que se ve dentro
+   de la vista de servicios que abre.
+
+   Cada bloque es una tarjeta de servicio. Solo "name" es obligatorio.
+
+     name          Obligatorio   Nombre del servicio.
+     description   Opcional      En qué consiste, con el detalle que quieras
+                                  (a diferencia de la description de UNITS,
+                                  aquí no hace falta que sea una frase corta).
+     order         Opcional      Igual que en UNITS: fija la posición sin
+                                  mover el bloque.
+     priceRange    Opcional      Igual que en UNITS: texto libre junto al
+                                  nombre, ej. "Desde 30€" o "20€ – 50€".
+                                  Si lo omites, la tarjeta queda como un
+                                  ejemplo orientativo sin precio — quien
+                                  esté interesado escribe (correo, teléfono
+                                  o el canal que prefieras) y ahí se habla
+                                  el alcance y el precio según cada caso.
+   ============================================================================ */
+const SERVICES = [
+  {
+    name: "NOMBRE DEL SERVICIO",
+    order: 1,
+    description: "Descripción de en qué consiste este servicio, qué incluye y qué no.",
+    priceRange: "Desde 30€",
+  },
+  {
+    name: "OTRO SERVICIO",
+    order: 2,
+    description: "Otra descripción, tan larga como haga falta.",
   },
 ];
