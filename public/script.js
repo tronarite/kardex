@@ -425,8 +425,16 @@ const createServiceRow = (service, index, usedSlugs, slugMap) => {
     body.appendChild(desc);
   }
 
+  // Puramente informativo (toda la caja ya es clicable, ver el "click"
+  // de "wrap" más arriba) — solo para que se note, a la derecha, que la
+  // fila lleva a algo más, igual que el resto de filas del sitio.
+  const cta = document.createElement("span");
+  cta.className = "row-url";
+  cta.textContent = "Saber más →";
+
   wrap.appendChild(number);
   wrap.appendChild(body);
+  wrap.appendChild(cta);
   row.appendChild(wrap);
 
   return row;

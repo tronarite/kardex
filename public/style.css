@@ -895,9 +895,10 @@ body {
 /* En el índice de proyectos sigue siendo un <span> decorativo dentro de
    un <a> que ya envuelve toda la fila (createUnitRow); en servicios es
    el permalink real del título — un <a href="#servicio-slug"> propio
-   (createServiceRow) — de ahí el reset de "text-decoration" y el
-   subrayado solo al pasar el ratón/foco, para que no se lea como un
-   enlace azul de toda la vida en ninguno de los dos casos. */
+   (createServiceRow), sin subrayado ni al pasar el ratón: toda la caja
+   ya avisa de que es clicable (fondo + franja de acento al hover, ver
+   .index-row:hover), no hace falta que el título se lea como un enlace
+   azul de toda la vida además. */
 .row-name {
   font-family: var(--font-display);
   font-size: 1.05rem;
@@ -905,13 +906,6 @@ body {
   color: var(--text);
   letter-spacing: -0.005em;
   text-decoration: none;
-}
-
-a.row-name:hover,
-a.row-name:focus-visible {
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-decoration-thickness: 1.5px;
 }
 
 .row-flag {
@@ -966,20 +960,6 @@ a.row-name:focus-visible {
     grid-column: 2 / -1;
     white-space: normal;
   }
-}
-
-/* "¿Hablamos?" del panel de detalle (ver .service-detail más abajo)
-   reutiliza la tipografía de .row-url tal cual, pero no vive dentro de
-   un .index-link/.index-row — es un hijo suelto de .service-detail, así
-   que "grid-column"/"align-self" de arriba no le afectan (piensan en un
-   hijo de grid) y necesita su propio color de hover/foco en vez del que
-   pone ".index-row:hover" para las filas normales. Deliberadamente
-   discreto (mismo peso visual que un enlace de "seguir leyendo", no un
-   botón de acción destacado). */
-.row-hablamos:hover,
-.row-hablamos:focus-visible {
-  color: var(--accent);
-  transform: translateX(2px);
 }
 
 .index-row:hover .row-url {
@@ -1200,9 +1180,39 @@ a.row-name:focus-visible {
   max-width: 46rem;
 }
 
+/* Mismo lenguaje visual que .back-link (borde + relleno tenue del
+   acento, sólido al pasar el ratón/foco) — los dos son botones de
+   acción del propio panel de detalle, así que deben pesar igual; un
+   poco más grande para que se note como el cierre del panel, no un
+   enlace de "seguir leyendo". */
 .service-detail-hablamos {
+  display: inline-flex;
+  align-items: center;
   align-self: flex-start;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1.5px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 0.6rem 1.1rem;
   margin-top: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.service-detail-hablamos:hover {
+  background: var(--accent);
+  color: var(--bg);
+  transform: translateX(2px);
+}
+
+.service-detail-hablamos:focus-visible {
+  outline: 2px solid var(--line-strong);
+  outline-offset: 2px;
 }
 
 /* Antes era un enlace de texto discreto — ahora es el único camino de
