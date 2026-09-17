@@ -1163,8 +1163,11 @@ body {
 /* Título grande de verdad (mismo tratamiento serif que .identity-name,
    un punto por debajo) — antes reutilizaba .index-head-title, pensado
    para una etiqueta de sección pequeña ("N° SERVICIOS"), no para ser el
-   titular del propio detalle. */
+   titular del propio detalle. Subrayado minimalista (línea fina, no un
+   divisor grueso) bajo el propio texto — "inline-block" para que el
+   ancho del borde sea el del texto, no el de toda la columna. */
 .service-detail-title {
+  display: inline-block;
   font-family: var(--font-display);
   font-size: 1.9rem;
   font-weight: 500;
@@ -1172,6 +1175,8 @@ body {
   letter-spacing: -0.01em;
   color: var(--text);
   margin: 0;
+  padding-bottom: 0.4rem;
+  border-bottom: 1.5px solid var(--accent);
 }
 
 /* Hueco propio para el precio (antes era .row-price suelto, pensado
