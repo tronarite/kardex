@@ -24,6 +24,13 @@ const SITE_CONFIG = {
   // animación de cruce entre ambas vistas.
   // Con solo "services" en true: la vista de servicios pasa a ser la
   // portada del sitio ("/"), sin lista de proyectos.
+  //
+  // Al margen de "sections", siempre existe "/qr": una tarjeta con tu
+  // nombre/rol y un QR grande al sitio, pensada para enseñar en pantalla
+  // (networking, una tarjeta física con ese enlace...). Con las dos
+  // secciones activas, "/qr" es la del índice y "/servicios/qr" la de
+  // servicios; con solo una activa, "/qr" es la de esa única sección (ver
+  // qrPortfolioName/qrServicesName más abajo e initQrPage en script.js).
   sections: {
     portfolio: true,
     services: false,
@@ -35,6 +42,15 @@ const SITE_CONFIG = {
   // Una línea corta que te describe. Si escribes "//" en medio, se separa
   // visualmente en dos partes (puedes quitar el "//" si prefieres una frase).
   operatorRole: "DESARROLLO SOFTWARE // INGENIERÍA & SISTEMAS",
+
+  // Nombre a mostrar en las tarjetas "/qr" y "/servicios/qr" (ver más
+  // abajo) — pensadas para enseñar la pantalla y que alguien escanee el QR
+  // al sitio. Útiles si usas un alias en el índice pero tu nombre real de
+  // cara a servicios (o viceversa): "qrPortfolioName" es el nombre de la
+  // tarjeta de "/qr" (índice), "qrServicesName" el de "/servicios/qr".
+  // Ambos opcionales — si los quitas, esas tarjetas usan "operatorName".
+  qrPortfolioName: "Tu Nombre / Alias",
+  qrServicesName: "Tu Nombre / Alias",
 
   // Tu correo de contacto. Se usa para el enlace "mailto:" y para el botón
   // de copiar al portapapeles.

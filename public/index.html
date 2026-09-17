@@ -2,6 +2,13 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <!-- Todas las rutas relativas del sitio (style.css, script.js,
+       favicon.svg...) asumen que se resuelven desde la raíz — cierto en
+       "/" y en "/servicios" (un solo segmento), pero no en rutas con más
+       de un segmento como "/servicios/qr": sin esto, "style.css" ahí
+       resolvería a "/servicios/style.css" (404). Debe ir antes que
+       cualquier <link>/<script> con ruta relativa. -->
+  <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <!-- Título, meta tags y la imagen de previsualización se generan solos
@@ -278,6 +285,25 @@
         </button>
       </div>
       <span class="visually-hidden" id="modal-copy-status" role="status" aria-live="polite"></span>
+    </div>
+  </div>
+
+  <!-- Tarjeta de "/qr" y "/servicios/qr": pensada para enseñar la
+       pantalla (networking, tarjeta física con este enlace...) — nombre,
+       rol y un QR grande al propio sitio. Rellenada y mostrada por
+       initQrPage (ver script.js), que decide qué identidad usar según la
+       ruta y qué secciones estén activas; oculta el resto de ".page" en
+       vez de sustituir el documento, así no hace falta un HTML aparte. -->
+  <div class="qr-page" id="qr-page" hidden>
+    <div class="qr-card">
+      <p class="identity-kicker">
+        <span id="qr-kicker-text"></span>
+      </p>
+      <h1 class="identity-name" id="qr-name"></h1>
+      <p class="identity-role" id="qr-role"></p>
+      <div class="qr-code" id="qr-code" aria-hidden="true"></div>
+      <p class="qr-hint">Escanea para abrir el sitio</p>
+      <a href="/" class="qr-back-link" id="qr-back-link">← Ir al sitio</a>
     </div>
   </div>
 

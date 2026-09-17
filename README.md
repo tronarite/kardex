@@ -301,6 +301,17 @@ Si quitas cualquiera de los dos campos (o los dejas vacíos), esa parte simpleme
 
 En pantallas estrechas, los botones de acción (copiar correo, teléfono, WhatsApp) se muestran en fila con salto de línea automático en vez de uno debajo de otro — a partir de 860px (donde el masthead pasa a ser una columna lateral angosta) vuelven a apilarse en columna (ver `.contact-actions` en `style.css`).
 
+### Tarjeta con QR (`/qr`)
+
+Al margen de qué secciones tengas activas, el sitio sirve siempre una tarjeta en `/qr`: tu nombre, tu rol y un QR grande que apunta al propio sitio — pensada para enseñar la pantalla (en persona, en una tarjeta física con ese enlace impreso...), no para compartir como enlace normal.
+
+- **Con `portfolio` + `services` activos:** `/qr` es la tarjeta del índice y `/servicios/qr` la de servicios, cada una con su propio nombre (ver `qrPortfolioName`/`qrServicesName` más abajo) y su QR apuntando a `/` o a `/servicios` respectivamente.
+- **Con una sola sección activa:** solo existe `/qr`, con la identidad de esa sección — `/servicios/qr` no tiene sentido si no hay índice del que distinguirse.
+
+`qrPortfolioName`/`qrServicesName` son opcionales: si los quitas, ambas tarjetas usan `operatorName`. Útil si usas un alias en el índice pero tu nombre real de cara a servicios (o viceversa).
+
+El QR se genera en el navegador con `qrcode.js` (de kazuhikoarase, MIT, vendido en `public/` — no se pide a ningún servicio externo) y se pinta en negro sobre blanco siempre, sin importar el tema activo: invertirlo en modo oscuro es más "bonito" pero algunos lectores de QR no reconocen igual de bien un código claro-sobre-oscuro, y aquí lo que importa es que escanee.
+
 ### Aparecer en buscadores y al compartir
 
 - **`portfolio` + `services`:** `/servicios` es una URL de verdad, no un `#hash` — tiene su propio `<title>`, meta description, `canonical`, entrada en `sitemap.xml` y tarjeta social (`public/og-servicios-image.png`, con los puntos a favor y sus iconos), distinta de la del índice. `scripts/sync-meta.js` **genera `public/servicios.html` entero a partir de `index.html`** (cuerpo idéntico, solo cambian la cabecera y el `<noscript>`), así que su estructura nunca se desincroniza — no lo edites a mano. nginx sirve ese archivo en la ruta `/servicios` (regla en `nginx.conf`).
@@ -322,6 +333,7 @@ Kardex/
 │   ├── config.example.js       # Plantilla genérica — SÍ se sube al repo
 │   ├── config.js                # Tu configuración real — en .gitignore, nunca se sube
 │   ├── script.js                 # Renderizado, gestión de tema y copiado — lógica, no toques datos aquí
+│   ├── qrcode.js                  # Generador de QR vendido (kazuhikoarase, MIT) — solo lo carga /qr
 │   ├── theme-init.js              # Evita el parpadeo de tema al recargar (externo por la CSP)
 │   ├── 404-theme.js                # Aplica el theme-pack en la página 404
 │   ├── favicon.svg                   # Marca vectorial (tarjeta de índice)

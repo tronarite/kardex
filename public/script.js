@@ -762,6 +762,24 @@ const initViewSwitcher = (config) => {
 // ==========================================================================
 // IDENTIDAD Y DISPONIBILIDAD
 // ==========================================================================
+// Compartido por renderIdentity y initQrPage: pinta "role" en "el" partido
+// por "//" con un <span class="sep"> entre trozos, en vez de un textContent
+// plano — así ambos sitios muestran el rol exactamente igual.
+const fillRoleParts = (el, role) => {
+  el.innerHTML = "";
+  role.split("//").forEach((part, index, arr) => {
+    el.appendChild(document.createTextNode(part.trim()));
+    if (index < arr.length - 1) {
+      const sep = document.createElement("span");
+      sep.className = "sep";
+      sep.textContent = "//";
+      el.appendChild(document.createTextNode(" "));
+      el.appendChild(sep);
+      el.appendChild(document.createTextNode(" "));
+    }
+  });
+};
+
 const renderIdentity = (config) => {
   document.title = config.pageTitle || `${config.operatorName} — Índice`;
 
@@ -772,18 +790,7 @@ const renderIdentity = (config) => {
 
   const roleEl = document.getElementById("operator-subtitle");
   if (roleEl && config.operatorRole) {
-    roleEl.innerHTML = "";
-    config.operatorRole.split("//").forEach((part, index, arr) => {
-      roleEl.appendChild(document.createTextNode(part.trim()));
-      if (index < arr.length - 1) {
-        const sep = document.createElement("span");
-        sep.className = "sep";
-        sep.textContent = "//";
-        roleEl.appendChild(document.createTextNode(" "));
-        roleEl.appendChild(sep);
-        roleEl.appendChild(document.createTextNode(" "));
-      }
-    });
+    fillRoleParts(roleEl, config.operatorRole);
   }
 
   const flagEl = document.getElementById("status-flag");
@@ -798,6 +805,97 @@ const renderIdentity = (config) => {
   if (timestampEl) {
     timestampEl.textContent = getSystemTimestamp();
   }
+};
+
+// ==========================================================================
+// TARJETA "/qr" Y "/servicios/qr"
+// Pensada para enseñar la pantalla (a alguien en persona, en una tarjeta
+// física...) — nombre, rol y un QR grande al propio sitio. "/qr" es
+// siempre la sección "de arriba" (índice si las dos secciones están
+// activas, o la única activa si solo hay una); "/servicios/qr" solo tiene
+// sentido cuando las dos coexisten, igual que "/servicios" mismo — por
+// eso exige SECTIONS.services además de comprobar la ruta.
+//
+// El generador de QR (qrcode.js, de kazuhikoarase, MIT) NO se carga en el
+// resto del sitio — solo aquí, y solo si la ruta coincide — para no
+// añadir peso a las páginas normales por una función que casi nadie usa.
+// ==========================================================================
+const QR_VIEW_URL = "/qr";
+const SERVICES_QR_VIEW_URL = "/servicios/qr";
+
+const buildQrSvg = (qr, text) => {
+  const count = qr.getModuleCount();
+  const cell = 4;
+  const margin = cell * 2;
+  const size = count * cell + margin * 2;
+
+  let modules = "";
+  for (let row = 0; row < count; row++) {
+    for (let col = 0; col < count; col++) {
+      if (qr.isDark(row, col)) {
+        modules += `<rect x="${col * cell + margin}" y="${row * cell + margin}" width="${cell}" height="${cell}"/>`;
+      }
+    }
+  }
+
+  // Siempre negro sobre blanco, sin importar el tema (aunque esté en
+  // modo oscuro) — invertir los colores según --bg/--text daría un QR de
+  // claro-sobre-oscuro que muchos lectores no reconocen igual de bien;
+  // un QR tiene que funcionar aunque el resto de la tarjeta no combine.
+  return `<svg viewBox="0 0 ${size} ${size}" role="img" aria-label="Código QR con el enlace ${text}">` +
+    `<rect width="${size}" height="${size}" fill="#fff"/>` +
+    `<g fill="#000">${modules}</g></svg>`;
+};
+
+const initQrPage = (config) => {
+  const path = location.pathname.replace(/\/+$/, "") || "/";
+  const isServicesQr = SECTIONS.services && path === SERVICES_QR_VIEW_URL;
+  const isTopQr = path === QR_VIEW_URL;
+
+  if (!isServicesQr && !isTopQr) return false;
+
+  const kind = isServicesQr || (SECTIONS.services && !SECTIONS.portfolio) ? "services" : "portfolio";
+  const name = (kind === "services" ? config.qrServicesName : config.qrPortfolioName) || config.operatorName;
+  const kicker = kind === "services" ? "SERVICIOS" : "ÍNDICE PERSONAL";
+  const targetPath = kind === "services" && SECTIONS.portfolio ? "/servicios" : "/";
+  const qrUrl = new URL(targetPath, config.siteUrl).toString();
+
+  document.title = `QR — ${name}`;
+
+  const page = document.querySelector(".page");
+  const watermark = document.getElementById("watermark-footer");
+  const qrPage = document.getElementById("qr-page");
+  if (page) page.hidden = true;
+  if (watermark) watermark.hidden = true;
+  if (!qrPage) return true;
+  qrPage.hidden = false;
+
+  const kickerEl = document.getElementById("qr-kicker-text");
+  if (kickerEl) kickerEl.textContent = kicker;
+
+  const nameEl = document.getElementById("qr-name");
+  if (nameEl) nameEl.textContent = name;
+
+  const roleEl = document.getElementById("qr-role");
+  if (roleEl && config.operatorRole) fillRoleParts(roleEl, config.operatorRole);
+
+  const backLink = document.getElementById("qr-back-link");
+  if (backLink) backLink.href = targetPath;
+
+  const qrCodeEl = document.getElementById("qr-code");
+  if (qrCodeEl) {
+    const script = document.createElement("script");
+    script.src = "qrcode.js";
+    script.onload = () => {
+      const qr = qrcode(0, "M");
+      qr.addData(qrUrl);
+      qr.make();
+      qrCodeEl.innerHTML = buildQrSvg(qr, qrUrl);
+    };
+    document.body.appendChild(script);
+  }
+
+  return true;
 };
 
 // ==========================================================================
@@ -1031,6 +1129,11 @@ const initListFadeGuard = () => {
 document.addEventListener("DOMContentLoaded", () => {
   initThemeManager();
   applyThemePack(SITE_CONFIG.theme);
+
+  // "/qr" o "/servicios/qr": tarjeta aparte, no el índice/servicios de
+  // siempre — corta aquí, no tiene sentido pintar el resto.
+  if (initQrPage(SITE_CONFIG)) return;
+
   renderIdentity(SITE_CONFIG);
   initContactManager(SITE_CONFIG);
 
