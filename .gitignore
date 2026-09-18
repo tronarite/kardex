@@ -14,3 +14,7 @@ public/config.js
 # uses como material de partida) — no forman parte del proyecto.
 /servicios.html
 
+# Estado del servidor dev nativo (scripts/dev-server.sh): config nginx
+# generada, PIDs y logs — se regenera en cada arranque, no es código.
+/.dev-runtime/
+

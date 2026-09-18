@@ -18,6 +18,7 @@
 - [Características](#características)
 - [Requisitos](#requisitos)
 - [Inicio rápido con Docker](#inicio-rápido-con-docker)
+- [Inicio rápido en local, sin Docker](#inicio-rápido-en-local-sin-docker)
 - [Configuración](#configuración)
 - [Vista de servicios](#vista-de-servicios)
 - [Estructura del proyecto](#estructura-del-proyecto)
@@ -43,7 +44,9 @@
 
 ## Requisitos
 
-Solo necesitas [Docker](https://www.docker.com/) con Docker Compose (viene incluido en Docker Desktop) — no hace falta instalar Node ni ningún gestor de paquetes en tu máquina, ni build step de ningún tipo; el propio contenedor trae Node solo para sincronizar las etiquetas de SEO (ver [Meta tags y dominio](#meta-tags-y-dominio)). Node en tu máquina solo hace falta si quieres servir el sitio *sin* Docker.
+Para producción, [Docker](https://www.docker.com/) con Docker Compose (viene incluido en Docker Desktop) — no hace falta instalar Node ni ningún gestor de paquetes en tu máquina, ni build step de ningún tipo; el propio contenedor trae Node solo para sincronizar las etiquetas de SEO (ver [Meta tags y dominio](#meta-tags-y-dominio)).
+
+Para desarrollo local sin Docker, [Node](https://nodejs.org/) (cualquier versión reciente, ya que solo se usa `sync-meta.js` sin dependencias externas) y [nginx](https://nginx.org/) — en macOS, `brew install nginx`. Ver [Inicio rápido en local, sin Docker](#inicio-rápido-en-local-sin-docker).
 
 ---
 
@@ -62,6 +65,29 @@ Para detenerlo:
 ```bash
 docker compose down
 ```
+
+---
+
+## Inicio rápido en local, sin Docker
+
+Pensado para desarrollo día a día en tu Mac sin tener Docker Desktop abierto — usa nginx nativo (Homebrew) sirviendo `public/` con la **misma `nginx.conf`** que usa la imagen Docker (cabeceras de seguridad, CSP, caché, rutas de `/servicios` y `/qr`, 404 propia — una sola fuente de verdad, no una copia que se pueda desincronizar), más un watcher en Node que sustituye al `inotifywait` del contenedor para volver a generar las etiquetas SEO cada vez que guardas `config.js`.
+
+```bash
+brew install nginx                              # una sola vez
+cp public/config.example.js public/config.js    # si aún no lo tienes
+scripts/dev-server.sh
+```
+
+Accede en: **`http://localhost:8090`** (mismo puerto que con Docker).
+
+Para detenerlo:
+```bash
+scripts/dev-server-stop.sh
+```
+
+**Para aplicar un cambio:** igual que con Docker — edita `public/config.js` o cualquier archivo de `public/` y recarga la pestaña (F5). `dev-server.sh` deja el watcher de `config.js` corriendo en segundo plano (log en `.dev-runtime/watch-meta.log`), así que las etiquetas SEO se resincronizan solas sin reiniciar nada. Solo hace falta volver a ejecutar `scripts/dev-server.sh` si cambias `nginx.conf` (se regenera el server block al arrancar).
+
+Este modo es solo para desarrollo local — para desplegar en un servidor real, usa [Docker](#inicio-rápido-con-docker); `Dockerfile`, `docker-compose.yml` y `nginx.conf` no cambian entre uno y otro.
 
 ---
 
@@ -186,13 +212,13 @@ Para un proyecto que en realidad es algo que ofreces (no un enlace a tu propio t
 Esto también cambia la vista previa al compartir el enlace (WhatsApp, Twitter/X, Discord...) — ver [Meta tags y dominio](#meta-tags-y-dominio), que incluye `og:title`/`twitter:title` y la propia imagen de la tarjeta.
 
 ### Meta tags y dominio
-`<title>`, la meta description, `og:*`/`twitter:*` (incluida la URL absoluta de la imagen), `canonical`, el `?v=` del favicon (`faviconVersion`), el bloque **JSON-LD** (`<script type="application/ld+json">` inline en el `<head>` — Google ignora el `src` en ese tipo de script), `public/robots.txt`, `public/sitemap.xml`, **la imagen de la tarjeta** (`public/og-image.png`) y, según `SITE_CONFIG.sections` (ver [Vista de servicios](#vista-de-servicios)), `public/servicios.html` + `public/og-servicios-image.png` **se generan solos** a partir de tu `config.js` — no los edites a mano, se sobrescriben. El contenedor Docker lo sincroniza al arrancar y también en caliente: si editas `config.js` mientras el contenedor sigue arriba, se vuelve a aplicar solo, sin reiniciar nada (`scripts/docker-entrypoint-meta.sh` vigila el archivo con `inotifywait` — en Windows/Docker Desktop esa vigilancia en caliente no siempre detecta cambios hechos desde fuera del propio contenedor; si no ves el cambio, `docker compose restart` lo fuerza).
+`<title>`, la meta description, `og:*`/`twitter:*` (incluida la URL absoluta de la imagen), `canonical`, el `?v=` del favicon (`faviconVersion`), el bloque **JSON-LD** (`<script type="application/ld+json">` inline en el `<head>` — Google ignora el `src` en ese tipo de script), `public/robots.txt`, `public/sitemap.xml`, **la imagen de la tarjeta** (`public/og-image.png`) y, según `SITE_CONFIG.sections` (ver [Vista de servicios](#vista-de-servicios)), `public/servicios.html` + `public/og-servicios-image.png` **se generan solos** a partir de tu `config.js` — no los edites a mano, se sobrescriben. Tanto el contenedor Docker como `scripts/dev-server.sh` (sin Docker) lo sincronizan al arrancar y también en caliente: si editas `config.js` mientras siguen arriba, se vuelve a aplicar solo, sin reiniciar nada (`scripts/docker-entrypoint-meta.sh`/`scripts/dev-watch-meta.js` vigilan el archivo — en Windows/Docker Desktop esa vigilancia en caliente no siempre detecta cambios hechos desde fuera del propio contenedor; si no ves el cambio, `docker compose restart` lo fuerza).
 
 `og-image.png` es una tarjeta 1200×630 generada de cero (no una plantilla con el texto encima): mismo icono/kicker/nombre/rol que el sitio, con el fondo y el acento del `theme` activo. Para dibujarla hace falta rasterizar un SVG a PNG — dentro de Docker se usa `rsvg-convert` (instalado vía `apk` en el `Dockerfile`, con `ttf-dejavu` para que haya con qué dibujar el texto: Alpine no trae fuentes por defecto); en local sin Docker cae en `sips` si estás en macOS. Si no encuentra ninguna de las dos, avisa y no toca la imagen que ya hubiera — el resto de la sincronización sigue igual.
 
 ¿Por qué todo esto no se resuelve solo con JavaScript en el navegador, como el resto de `config.js`? Porque bots como el de Discord, Twitter/X o WhatsApp leen estas etiquetas (e imagen) directamente del HTML servido, sin ejecutar JavaScript — si solo se rellenaran en el navegador, la previsualización al compartir el enlace saldría en blanco o genérica. `scripts/sync-meta.js` (Node) las deja ya escritas antes de que nginx los sirva.
 
-Si sirves el sitio sin Docker, ejecuta `node scripts/sync-meta.js` a mano cada vez que cambies esos campos.
+Si sirves el sitio con `scripts/dev-server.sh` (ver [Inicio rápido en local, sin Docker](#inicio-rápido-en-local-sin-docker)) esto es automático. Sirviendo `public/` de cualquier otra forma (sin ese script ni Docker), ejecuta `node scripts/sync-meta.js` a mano cada vez que cambies esos campos.
 
 `public/index.html`, `public/servicios.html` (si existe), `public/robots.txt`, `public/sitemap.xml`, `public/og-image.png` y `public/og-servicios-image.png` (si existe) sí están en git (a diferencia de `config.js`) — al publicar con tus datos reales, tu copia local queda "sucia" frente a la plantilla genérica del repo. Trátalos igual que `config.js`:
 
@@ -354,9 +380,12 @@ Kardex/
 │   └── sitemap.xml                           # Sitemap básico, se sincroniza solo
 ├── scripts/
 │   ├── sync-meta.js         # Lee config.js y rellena las etiquetas de SEO/redes (ver Meta tags y dominio)
-│   └── docker-entrypoint-meta.sh  # Lo ejecuta el contenedor solo, al arrancar y en caliente
+│   ├── docker-entrypoint-meta.sh  # Lo ejecuta el contenedor Docker solo, al arrancar y en caliente
+│   ├── dev-server.sh         # Arranca nginx nativo + watcher, sin Docker (ver Inicio rápido en local, sin Docker)
+│   ├── dev-server-stop.sh     # Para lo que arrancó dev-server.sh
+│   └── dev-watch-meta.js       # Equivalente a docker-entrypoint-meta.sh pero con fs.watch (sin inotify)
 ├── Dockerfile                # Imagen de producción nginx:1.27-alpine + Node (para sync-meta.js)
-├── nginx.conf                 # Gzip, cache headers, cabeceras de seguridad y CSP
+├── nginx.conf                 # Gzip, cache headers, cabeceras de seguridad y CSP — fuente única, la usan Docker y dev-server.sh
 ├── docker-compose.yml           # Monta public/ dentro del contenedor (puerto 8090:80)
 └── .dockerignore
 ```
