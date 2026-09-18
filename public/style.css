@@ -733,21 +733,24 @@ body {
    zona de desvanecido de abajo de .index-scroll. */
 .scroll-hint {
   position: sticky;
-  bottom: 0.75rem;
+  bottom: 0.5rem;
   align-self: center;
   z-index: 5;
   display: grid;
   place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  margin-top: -3rem;
+  width: 2rem;
+  height: 2rem;
+  margin-top: -2rem;
   padding: 0;
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  color: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: 50%;
+  background: none;
+  color: var(--text-muted);
+  border: 0;
   cursor: pointer;
-  animation: scroll-hint-ping 1.8s ease-out infinite;
+  animation: scroll-hint-breathe 2.4s ease-in-out infinite;
+}
+
+.scroll-hint:hover {
+  color: var(--accent);
 }
 
 .scroll-hint svg {
@@ -763,10 +766,10 @@ body {
   outline-offset: 3px;
 }
 
-/* Círculo con un aro que se expande y se desvanece, en bucle. */
-@keyframes scroll-hint-ping {
-  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
-  70%, 100% { box-shadow: 0 0 0 0.9rem transparent; }
+/* Respira despacio (solo opacidad, sin movimiento) para no distraer. */
+@keyframes scroll-hint-breathe {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.9; }
 }
 
 .index-head-number {
