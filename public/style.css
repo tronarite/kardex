@@ -728,6 +728,37 @@ body {
   }
 }
 
+/* Flecha "hay más abajo" (la crea initListFadeGuard en script.js). Sticky
+   al borde inferior del viewport en móvil; en escritorio se solapa con la
+   zona de desvanecido de abajo de .index-scroll. */
+.scroll-hint {
+  position: sticky;
+  bottom: 0.5rem;
+  align-self: center;
+  z-index: 5;
+  margin-top: -2rem;
+  padding: 0.25rem 0.75rem;
+  background: none;
+  border: 0;
+  color: var(--accent);
+  cursor: pointer;
+  animation: scroll-hint-bob 1.6s ease-in-out infinite;
+}
+
+.scroll-hint[hidden] {
+  display: none;
+}
+
+.scroll-hint:focus-visible {
+  outline: 1px dashed var(--accent);
+  outline-offset: 2px;
+}
+
+@keyframes scroll-hint-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
 .index-head-number {
   font-family: var(--font-mono);
   font-size: 0.7rem;

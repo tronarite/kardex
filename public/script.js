@@ -1394,10 +1394,35 @@ const initListFadeGuard = () => {
 
   const isDesktopLayout = () => window.matchMedia("(min-width: 860px)").matches;
 
+  // Flecha "hay más abajo": botón que solo se ve mientras queda lista por
+  // ver. Va como último hijo de ".index" (ver .scroll-hint en style.css).
+  const hint = document.createElement("button");
+  hint.type = "button";
+  hint.className = "scroll-hint";
+  hint.hidden = true;
+  hint.setAttribute("aria-label", "Hay más contenido: desplazar hacia abajo");
+  hint.innerHTML =
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  scrollArea.after(hint);
+
+  hint.addEventListener("click", () => {
+    const target = isDesktopLayout() ? scrollArea : window;
+    target.scrollBy({ top: (isDesktopLayout() ? scrollArea.clientHeight : window.innerHeight) * 0.8, behavior: "smooth" });
+  });
+
+  const updateHint = () => {
+    const el = document.documentElement;
+    const remaining = isDesktopLayout()
+      ? scrollArea.scrollHeight - scrollArea.scrollTop - scrollArea.clientHeight
+      : el.scrollHeight - window.scrollY - window.innerHeight;
+    hint.hidden = scrollArea.hidden || remaining < 8;
+  };
+
   let ticking = false;
 
   const update = () => {
     ticking = false;
+    updateHint();
 
     const active = isDesktopLayout();
     const listRect = scrollArea.getBoundingClientRect();
@@ -1427,6 +1452,8 @@ const initListFadeGuard = () => {
 
   scrollArea.addEventListener("scroll", requestUpdate);
   window.addEventListener("resize", requestUpdate);
+  window.addEventListener("scroll", requestUpdate, { passive: true }); // móvil: scrolla la página entera
+  new MutationObserver(requestUpdate).observe(scrollArea, { attributes: true, attributeFilter: ["hidden"] });
 
   // renderUnits/renderServices sustituyen el contenido de #content-list en
   // cada cambio de vista — hay que recalcular qué queda tapado cada vez.
