@@ -709,7 +709,7 @@ body {
     padding-top: 2rem;
     /* Recorrido extra al final: la última fila sube por encima de la zona
        de desvanecido de abajo en vez de quedarse pegada al borde. */
-    padding-bottom: 3rem;
+    padding-bottom: 4.5rem;
     /* La franja de acento (.index-row::before) se sale de la fila hacia
        la izquierda (bleed); sin este hueco quedaría recortada por el
        propio scroll (overflow-y:auto obliga a recortar también en X).
