@@ -1409,12 +1409,14 @@ const initListFadeGuard = () => {
     target.scrollBy({ top: (isDesktopLayout() ? scrollArea.clientHeight : window.innerHeight) * 0.8, behavior: "smooth" });
   });
 
+  // Se oculta en cuanto la última fila queda entera por encima de la zona
+  // de desvanecido — no cuando se agota el scroll, que con el padding-bottom
+  // de .index-scroll llega bastante después de ver ya todo.
   const updateHint = () => {
-    const el = document.documentElement;
-    const remaining = isDesktopLayout()
-      ? scrollArea.scrollHeight - scrollArea.scrollTop - scrollArea.clientHeight
-      : el.scrollHeight - window.scrollY - window.innerHeight;
-    hint.hidden = scrollArea.hidden || remaining < 8;
+    const rows = scrollArea.querySelectorAll(".index-row");
+    const last = rows[rows.length - 1];
+    const bottom = isDesktopLayout() ? scrollArea.getBoundingClientRect().bottom - FADE_ZONE_PX : window.innerHeight;
+    hint.hidden = scrollArea.hidden || !last || last.getBoundingClientRect().bottom <= bottom;
   };
 
   let ticking = false;
