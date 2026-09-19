@@ -1402,7 +1402,7 @@ const initListFadeGuard = () => {
   hint.hidden = true;
   hint.setAttribute("aria-label", "Hay más contenido: desplazar hacia abajo");
   hint.innerHTML =
-    '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+    '<span>Ver más</span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
   scrollArea.after(hint);
 
   hint.addEventListener("click", () => {

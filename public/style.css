@@ -736,15 +736,18 @@ body {
   bottom: 0.5rem;
   align-self: center;
   z-index: 5;
-  display: grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   margin-top: -2rem;
-  padding: 0;
+  padding: 0.4rem 0.75rem;
   background: none;
   color: var(--text-muted);
   border: 0;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
   animation: scroll-hint-breathe 2.4s ease-in-out infinite;
 }
