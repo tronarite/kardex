@@ -1380,10 +1380,9 @@ const initContactModal = (config) => {
 // sea mínimamente detrás de la zona de desvanecido de ARRIBA, deja de
 // poder pulsarse DE VERDAD (pointer-events, no solo queda tapada
 // visualmente) y sale del orden de tabulación con teclado. La zona de
-// abajo NO bloquea: al no haber padding-bottom equivalente al
-// padding-top de .index-scroll, la última fila siempre acaba tocando ese
-// borde al hacer scroll hasta el final — bloquearla ahí la habría dejado
-// para siempre sin poder pulsarse. En móvil (menos de 860px) toda la
+// abajo NO bloquea: ahí no hace falta, porque el padding-bottom de
+// .index-scroll deja la última fila por encima del desvanecido al llegar
+// al final del scroll. En móvil (menos de 860px) toda la
 // página se desplaza normal y esto no aplica.
 // ==========================================================================
 const FADE_ZONE_PX = 28; // debe coincidir con "black 1.75rem" del mask-image de .index-scroll en style.css
