@@ -733,31 +733,26 @@ body {
    zona de desvanecido de abajo de .index-scroll. */
 .scroll-hint {
   position: sticky;
-  bottom: 0.5rem;
+  bottom: 0.75rem;
   align-self: center;
   z-index: 5;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  margin-top: -2rem;
-  padding: 0.4rem 0.75rem;
-  /* Fondo del color de la página: no se nota como caja, pero tapa las
-     filas que se desvanecen justo detrás y el texto se lee limpio. */
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
-  border-radius: 999px;
-  color: var(--text-dim);
+  gap: 0.4rem;
+  margin-top: -2.75rem;
+  padding: 0.5rem 1rem 0.5rem 1.15rem;
+  background: var(--accent);
+  color: var(--bg);
   border: 0;
+  border-radius: 999px;
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
-  animation: scroll-hint-breathe 2.4s ease-in-out infinite;
-}
-
-.scroll-hint:hover {
-  color: var(--accent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 45%, transparent);
+  animation: scroll-hint-bob 1.4s ease-in-out infinite;
 }
 
 .scroll-hint svg {
@@ -773,10 +768,9 @@ body {
   outline-offset: 3px;
 }
 
-/* Respira despacio (solo opacidad, sin movimiento) para no distraer. */
-@keyframes scroll-hint-breathe {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
+@keyframes scroll-hint-bob {
+  0%, 100% { transform: translateY(0); box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 45%, transparent); }
+  50% { transform: translateY(-5px); box-shadow: 0 10px 22px color-mix(in srgb, var(--accent) 30%, transparent); }
 }
 
 .index-head-number {
