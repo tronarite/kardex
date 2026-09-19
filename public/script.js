@@ -484,10 +484,10 @@ const renderServices = (services) => {
 };
 
 /**
- * El teléfono se muestra en claro (sin "revelar" previo) y el clic lo
- * copia al portapapeles en vez de abrir el marcador — es un <button>, no
- * un enlace "tel:". Misma mecánica que initContactManager para el
- * correo, con su propio texto de estado.
+ * El teléfono se muestra en claro (sin "revelar" previo) y, en escritorio,
+ * el clic lo copia al portapapeles — es un <button>; en pantallas táctiles
+ * pasa a ser un enlace "tel:" (ver más abajo). Misma mecánica que
+ * initContactManager para el correo, con su propio texto de estado.
  *
  * "ids" permite reutilizar la misma lógica en dos sitios (el bloque de
  * contacto del masthead y su versión ampliada del modal, ver
@@ -502,6 +502,21 @@ const initPhoneCopy = (config, ids = {}) => {
   if (phoneText && phone) phoneText.textContent = phone;
 
   if (!phoneLink || !phoneText || !phone) return;
+
+  // En pantallas táctiles el número es un enlace "tel:" (se puede llamar
+  // con un toque, como el de WhatsApp); en escritorio no hay marcador al
+  // que llamar, así que el clic sigue copiándolo.
+  if (window.matchMedia("(pointer: coarse)").matches) {
+    const call = document.createElement("a");
+    call.id = phoneLink.id;
+    call.className = phoneLink.className;
+    call.hidden = phoneLink.hidden;
+    call.href = `tel:${phone.replace(/[^\d+]/g, "")}`;
+    call.setAttribute("aria-label", "Llamar por teléfono");
+    call.append(...phoneLink.childNodes);
+    phoneLink.replaceWith(call);
+    return;
+  }
 
   phoneLink.addEventListener("click", async () => {
     const ok = await copyToClipboard(phone);
