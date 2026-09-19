@@ -752,7 +752,6 @@ body {
   text-transform: uppercase;
   cursor: pointer;
   box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 45%, transparent);
-  animation: scroll-hint-bob 2.4s ease-in-out infinite;
 }
 
 .scroll-hint svg {
@@ -766,11 +765,6 @@ body {
 .scroll-hint:focus-visible {
   outline: 2px dashed var(--accent);
   outline-offset: 3px;
-}
-
-@keyframes scroll-hint-bob {
-  0%, 100% { transform: translateY(0); box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 45%, transparent); }
-  50% { transform: translateY(-2px); box-shadow: 0 10px 22px color-mix(in srgb, var(--accent) 30%, transparent); }
 }
 
 .index-head-number {
