@@ -294,7 +294,7 @@ Toda la tarjeta se puede pulsar: lleva al detalle de ESE servicio, la misma "otr
 `description` y `details` admiten un markdown mínimo, no un parser completo: `**negrita**`, `*cursiva*` (o `_cursiva_`), `` `código` ``, `[enlace](https://...)` y listas con `- ` al principio de línea, separando párrafos con una línea en blanco.
 
 ### Los 4 puntos a favor (`servicesHighlights`)
-El bloque de icono + etiqueta + texto que aparece encima del listado también es editable, con `SITE_CONFIG.servicesHighlights`:
+El bloque de icono + etiqueta + texto que aparece encima del listado (hasta 4 en una fila en escritorio) también es editable, con `SITE_CONFIG.servicesHighlights`:
 
 ```javascript
 servicesHighlights: [
@@ -306,6 +306,21 @@ servicesHighlights: [
 ```
 
 `icon` elige entre un set fijo ya dibujado: `"rayo"`, `"check"`, `"escudo"`, `"chat"`, `"reloj"`, `"estrella"`, `"grafico"`, `"herramienta"`, `"corazon"`, `"bombilla"` (no admite un SVG propio). Puedes añadir, quitar o reordenar entradas libremente; si quitas el campo entero, no se muestra ningún punto a favor.
+
+### "Cómo funciona" (`servicesSteps`)
+Una franja de pasos numerados (el número se pone solo) que se ve en la columna del masthead, debajo del contacto — en móvil, al final de la lista de servicios. Solo aparece en la vista de servicios y se oculta al abrir el detalle de uno:
+
+```javascript
+servicesSteps: [
+  { title: "Me escribes", desc: "Cuéntame qué necesitas por WhatsApp o correo." },
+  { title: "Acordamos el precio", desc: "Te doy una tarifa orientativa antes de empezar." },
+  { title: "Lo hago", desc: "Me pongo con ello y te explico lo que hago." },
+],
+servicesStepsTitle: "Cómo funciona",   // opcional, es el valor por defecto
+showServicesSteps: true,                // false = apagar la franja sin borrar los pasos
+```
+
+Si quitas `servicesSteps` (o lo dejas vacío), no se muestra nada.
 
 ### Subtítulo al compartir el enlace (`servicesOgDescription`)
 El texto que se ve en la tarjeta de previsualización al compartir `/servicios` (WhatsApp, Twitter/X, Discord...) también es configurable:

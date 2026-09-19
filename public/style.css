@@ -359,7 +359,19 @@ body {
     padding-bottom: 0;
     border-bottom: none;
     min-height: 0;
-    overflow: hidden;
+    /* Si en una pantalla baja no cabe todo (contacto + pasos), el masthead
+       se desplaza por dentro en vez de recortarse. */
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    /* Desvanecido arriba/abajo, solo por el lado con contenido oculto
+       (las variables las pone initMastheadFade en script.js). */
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black var(--fade-t, 0px), black calc(100% - var(--fade-b, 0px)), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, black var(--fade-t, 0px), black calc(100% - var(--fade-b, 0px)), transparent 100%);
+  }
+
+  .masthead::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -1143,6 +1155,69 @@ body {
   display: none;
 }
 
+/* "Cómo funciona": pasos numerados en una fila (apilados en móvil). El
+   número sale de un contador CSS, no del texto — así no hay que numerar a
+   mano en config.js. Solo variables de tema, sin colores fijos. */
+.services-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+/* Título de la franja (data-title lo pone renderServiceSteps): misma
+   etiqueta pequeña que "CONTACTO". flex-basis 100% = ocupa su propia fila
+   cuando los pasos van en horizontal (móvil). */
+.services-steps::before {
+  content: attr(data-title);
+  flex-basis: 100%;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.services-steps[hidden] {
+  display: none;
+}
+
+.services-step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1 1 180px;
+  min-width: 0;
+  counter-increment: step;
+}
+
+.services-step::before {
+  content: counter(step, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.services-step-title {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.services-step-desc {
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+
 .service-highlight {
   display: flex;
   align-items: flex-start;
@@ -1180,6 +1255,38 @@ body {
   font-size: 0.8rem;
   color: var(--text-body);
   line-height: 1.45;
+}
+
+/* Pasos en la columna estrecha del masthead (escritorio, ver
+   initServiceExtrasPlacement): en vertical y compactos, con el número al
+   lado del título. */
+.masthead .services-steps {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.6rem;
+  margin: 0;
+}
+
+.masthead .services-steps::before {
+  flex-basis: auto;
+}
+
+.masthead .services-step {
+  flex: none;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.6rem;
+  row-gap: 0.1rem;
+}
+
+.masthead .services-step-desc {
+  grid-column: 2;
+  font-size: 0.8rem;
+}
+
+/* En móvil va detrás de la lista (ver initServiceExtrasPlacement). */
+.index-scroll ~ .services-steps {
+  margin-top: 1.5rem;
 }
 
 .masthead-service-extra {
@@ -1635,6 +1742,58 @@ body.modal-open {
 /* --------------------------------------------------------------------------
    Accessibility & Reduced Motion
    -------------------------------------------------------------------------- */
+/* Escritorio: aprovecha todo el alto y el ancho, y compacta los espaciados
+   para que quepan contacto + pasos en el masthead y más servicios a la vez
+   en la lista. Va al final a propósito: gana por orden
+   a los valores base de arriba, que siguen valiendo para móvil. */
+@media (min-width: 860px) {
+  .page {
+    max-width: 1120px;
+    padding-top: max(2.25rem, env(safe-area-inset-top));
+    gap: 3.25rem;
+  }
+
+  .masthead {
+    gap: 1.4rem;
+  }
+
+  .contact-block {
+    gap: 0.9rem;
+  }
+
+  .identity-name {
+    font-size: 2rem;
+  }
+
+  .masthead .services-steps {
+    gap: 0.7rem;
+  }
+
+  /* Puntos a favor sobre la lista: hasta 4 en una fila, más compactos. */
+  .services-highlights {
+    gap: 0.8rem 1.5rem;
+    margin-bottom: 1.1rem;
+  }
+
+  .service-highlight {
+    flex-basis: 140px;
+  }
+
+  .service-highlight-desc {
+    font-size: 0.76rem;
+    line-height: 1.35;
+  }
+
+  .services-intro {
+    margin-bottom: 1rem;
+  }
+
+  .index-link {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

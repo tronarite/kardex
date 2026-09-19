@@ -484,10 +484,10 @@ const renderServices = (services) => {
 };
 
 /**
- * El teléfono se muestra en claro (sin "revelar" previo) y el clic lo
- * copia al portapapeles en vez de abrir el marcador — es un <button>, no
- * un enlace "tel:". Misma mecánica que initContactManager para el
- * correo, con su propio texto de estado.
+ * El teléfono se muestra en claro (sin "revelar" previo) y, en escritorio,
+ * el clic lo copia al portapapeles — es un <button>; en pantallas táctiles
+ * pasa a ser un enlace "tel:" (ver más abajo). Misma mecánica que
+ * initContactManager para el correo, con su propio texto de estado.
  *
  * "ids" permite reutilizar la misma lógica en dos sitios (el bloque de
  * contacto del masthead y su versión ampliada del modal, ver
@@ -502,6 +502,21 @@ const initPhoneCopy = (config, ids = {}) => {
   if (phoneText && phone) phoneText.textContent = phone;
 
   if (!phoneLink || !phoneText || !phone) return;
+
+  // En pantallas táctiles el número es un enlace "tel:" (se puede llamar
+  // con un toque, como el de WhatsApp); en escritorio no hay marcador al
+  // que llamar, así que el clic sigue copiándolo.
+  if (window.matchMedia("(pointer: coarse)").matches) {
+    const call = document.createElement("a");
+    call.id = phoneLink.id;
+    call.className = phoneLink.className;
+    call.hidden = phoneLink.hidden;
+    call.href = `tel:${phone.replace(/[^\d+]/g, "")}`;
+    call.setAttribute("aria-label", "Llamar por teléfono");
+    call.append(...phoneLink.childNodes);
+    phoneLink.replaceWith(call);
+    return;
+  }
 
   phoneLink.addEventListener("click", async () => {
     const ok = await copyToClipboard(phone);
@@ -601,6 +616,62 @@ const renderServiceHighlights = (highlights) => {
   });
 };
 
+// Franja "Cómo funciona" desde SITE_CONFIG.servicesSteps = [{ title, desc }].
+// Sin pasos válidos queda vacía y oculta; setServicesStepsHidden respeta eso
+// al mostrarla de nuevo (volver del detalle de un servicio).
+const renderServiceSteps = (steps, servicesStepsTitle) => {
+  const container = document.getElementById("services-steps");
+  if (!container) return;
+
+  container.innerHTML = "";
+  // Título visible vía CSS (attr) — SITE_CONFIG.servicesStepsTitle lo cambia.
+  const heading = servicesStepsTitle || "Cómo funciona";
+  container.dataset.title = heading;
+  container.setAttribute("aria-label", heading);
+
+  (steps || []).forEach((item) => {
+    if (!item || !item.title) return;
+
+    const li = document.createElement("li");
+    li.className = "services-step";
+
+    const title = document.createElement("span");
+    title.className = "services-step-title";
+    title.textContent = item.title;
+    li.appendChild(title);
+
+    if (item.desc) {
+      const desc = document.createElement("span");
+      desc.className = "services-step-desc";
+      desc.textContent = item.desc;
+      li.appendChild(desc);
+    }
+
+    container.appendChild(li);
+  });
+};
+
+const setServicesStepsHidden = (hidden) => {
+  const container = document.getElementById("services-steps");
+  if (container) container.hidden = hidden || !container.childElementCount;
+};
+
+// Dónde vive la franja de pasos: en escritorio, en la columna del masthead
+// (debajo del contacto), para no empujar la lista de servicios; en móvil,
+// donde el masthead va ENTERO antes que la lista, detrás de ella. Es el
+// mismo nodo (no una copia), así que ocultarlo/mostrarlo sigue igual.
+const initServiceExtrasPlacement = () => {
+  const steps = document.getElementById("services-steps");
+  const contact = document.getElementById("contact-block");
+  const list = document.getElementById("index-scroll");
+  if (!steps || !contact || !list) return;
+
+  const media = window.matchMedia("(min-width: 860px)");
+  const place = () => (media.matches ? contact : list).after(steps);
+  media.addEventListener("change", place);
+  place();
+};
+
 // Pinta el contenido de servicios (texto del masthead + lista) en el DOM
 // compartido con el índice. La usan tanto initViewSwitcher (cuando las dos
 // secciones están activas) como la inicialización directa cuando servicios
@@ -633,6 +704,9 @@ const applyServicesContent = (config) => {
     servicesHighlights.hidden = false;
     renderServiceHighlights(config.servicesHighlights);
   }
+  // showServicesSteps: false apaga la franja aunque servicesSteps tenga pasos.
+  renderServiceSteps(config.showServicesSteps === false ? [] : config.servicesSteps, config.servicesStepsTitle);
+  setServicesStepsHidden(false);
 
   document.title = config.operatorName ? `Servicios — ${config.operatorName}` : "Servicios";
 
@@ -709,6 +783,7 @@ const initViewSwitcher = (config) => {
       main.setAttribute("aria-label", "Proyectos y enlaces");
       if (servicesIntro) servicesIntro.hidden = true;
       if (servicesHighlights) servicesHighlights.hidden = true;
+      setServicesStepsHidden(true);
       document.title = config.pageTitle || `${config.operatorName} — Índice`;
       renderUnits(UNITS);
 
@@ -910,6 +985,7 @@ const paintServiceList = (config) => {
   if (indexHead) indexHead.hidden = false;
   if (servicesIntro) servicesIntro.hidden = false;
   if (servicesHighlights) servicesHighlights.hidden = false;
+  setServicesStepsHidden(false);
   if (indexScroll) indexScroll.hidden = false;
   if (detail) detail.hidden = true;
 
@@ -987,6 +1063,7 @@ const paintServiceDetailView = (config, service, slug) => {
   if (indexHead) indexHead.hidden = true;
   if (servicesIntro) servicesIntro.hidden = true;
   if (servicesHighlights) servicesHighlights.hidden = true;
+  setServicesStepsHidden(true);
   if (indexScroll) indexScroll.hidden = true;
   if (detail) detail.hidden = false;
 
@@ -1467,6 +1544,40 @@ const initListFadeGuard = () => {
 };
 
 // ==========================================================================
+// DESVANECIDO DEL MASTHEAD (columna izquierda)
+// En escritorio el masthead se desplaza por dentro cuando no cabe (pantallas
+// bajas). Como la lista de la derecha, se desvanece por arriba y por abajo —
+// pero solo por el lado en el que de verdad hay más contenido oculto, para
+// no apagar el indicador de disponibilidad ni el "Actualizado" cuando todo
+// cabe (ver .masthead en style.css, variables --fade-t / --fade-b).
+// ==========================================================================
+const initMastheadFade = () => {
+  const masthead = document.querySelector(".masthead");
+  if (!masthead) return;
+
+  // Sin requestAnimationFrame: solo lee scrollTop/scrollHeight y escribe dos
+  // variables CSS, es barato de sobra para llamarlo en cada evento.
+  const update = () => {
+    const hiddenAbove = masthead.scrollTop > 4;
+    const hiddenBelow = masthead.scrollHeight - masthead.scrollTop - masthead.clientHeight > 4;
+    masthead.style.setProperty("--fade-t", hiddenAbove ? "1.75rem" : "0px");
+    masthead.style.setProperty("--fade-b", hiddenBelow ? "1.75rem" : "0px");
+  };
+
+  masthead.addEventListener("scroll", update);
+  window.addEventListener("resize", update);
+  // Cambia qué bloques se ven (pasos, contacto...) al cambiar de vista.
+  new MutationObserver(update).observe(masthead, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    attributeFilter: ["hidden"],
+  });
+
+  update();
+};
+
+// ==========================================================================
 // INICIALIZACIÓN
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", () => {
@@ -1486,6 +1597,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (SECTIONS.services) {
+    initServiceExtrasPlacement();
     initPhoneCopy(SITE_CONFIG);
     initContactManager(SITE_CONFIG, {
       emailLink: "modal-contact-email-link",
@@ -1521,4 +1633,5 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   initListFadeGuard();
+  initMastheadFade();
 });
