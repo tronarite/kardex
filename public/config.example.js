@@ -141,19 +141,6 @@ const SITE_CONFIG = {
     { icon: "chat", label: "Trato cercano", desc: "Soluciones reales, explicadas en claro y sin venderte de más." },
   ],
 
-  // "Cómo funciona": pasos numerados que se ven encima de la lista de
-  // servicios (el número se pone solo). Solo se usa si "sections.services"
-  // es true. Opcional: si lo quitas, no se muestra la franja. Para apagarla
-  // sin borrar los pasos, pon "showServicesSteps: false".
-  showServicesSteps: true,
-  // "servicesStepsTitle" cambia el título de la franja (por defecto
-  // "Cómo funciona").
-  servicesSteps: [
-    { title: "Me escribes", desc: "Cuéntame qué necesitas por WhatsApp o correo." },
-    { title: "Acordamos el precio", desc: "Te doy una tarifa orientativa antes de empezar." },
-    { title: "Lo hago", desc: "Me pongo con ello y te explico lo que hago." },
-  ],
-
   // Subtítulo que se ve en la tarjeta de previsualización al compartir el
   // enlace de /servicios (WhatsApp, Twitter, Discord...) — el
   // og:description/twitter:description de esa página. Solo se usa si
